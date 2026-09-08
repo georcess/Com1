@@ -9,12 +9,19 @@ import { MenuItem } from '../types';
 
 interface MenuProps {
   onAddToCart: (itemName: string, size: string, price: number) => void;
+  initialCategory?: string;
 }
 
-export const Menu: React.FC<MenuProps> = ({ onAddToCart }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all' }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [addedItemName, setAddedItemName] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (initialCategory) {
+      setSelectedCategory(initialCategory);
+    }
+  }, [initialCategory]);
 
   const categories = [
     { id: 'all', label: 'All Items', icon: UtensilsCrossed },

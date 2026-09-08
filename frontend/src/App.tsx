@@ -13,6 +13,7 @@ import { CartItem, User } from './types';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
+  const [selectedMenuCategory, setSelectedMenuCategory] = useState<string>('all');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState<string>('');
@@ -175,13 +176,26 @@ export function App() {
       <main className="flex-1">
         {activeTab === 'home' && (
           <div className="animate-in fade-in duration-300">
-            <Hero onStartOrdering={() => setActiveTab('menu')} />
+            <Hero
+              onStartOrdering={() => {
+                setSelectedMenuCategory('all');
+                setActiveTab('menu');
+              }}
+              onAddToCart={handleAddToCart}
+              onExploreCategory={(cat) => {
+                setSelectedMenuCategory(cat);
+                setActiveTab('menu');
+              }}
+            />
           </div>
         )}
 
         {activeTab === 'menu' && (
           <div className="animate-in fade-in duration-300">
-            <Menu onAddToCart={handleAddToCart} />
+            <Menu
+              onAddToCart={handleAddToCart}
+              initialCategory={selectedMenuCategory}
+            />
           </div>
         )}
 

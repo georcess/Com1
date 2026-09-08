@@ -666,3 +666,83 @@ function clearAllOrders() {
     })
     .catch(err => console.error('Clear error:', err));
 }
+
+
+/* ============================================================
+   FEATURED PRODUCTS CAROUSEL SLIDER (HOME PAGE)
+   ============================================================ */
+
+let currentSlideIndex = 0;
+const totalSlides = 6;
+let sliderTimer = null;
+let isSliderPaused = false;
+
+function initFeaturedSlider() {
+    startSliderAutoPlay();
+}
+
+function startSliderAutoPlay() {
+    if (sliderTimer) clearInterval(sliderTimer);
+    sliderTimer = setInterval(() => {
+        if (!isSliderPaused) {
+            nextSlide();
+        }
+    }, 4500);
+}
+
+function updateSliderView() {
+    const track = document.getElementById('carousel-track');
+    const pills = document.querySelectorAll('.slider-category-tabs .cat-pill');
+    const dots = document.querySelectorAll('.carousel-dots .dot');
+
+    if (track) {
+        track.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+    }
+
+    // Update Category Pills
+    pills.forEach((pill, idx) => {
+        if (idx === currentSlideIndex) {
+            pill.classList.add('active');
+        } else {
+            pill.classList.remove('active');
+        }
+    });
+
+    // Update Dots
+    dots.forEach((dot, idx) => {
+        if (idx === currentSlideIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+function jumpToSlide(index) {
+    currentSlideIndex = (index + totalSlides) % totalSlides;
+    updateSliderView();
+}
+
+function prevSlide() {
+    currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+    updateSliderView();
+}
+
+function nextSlide() {
+    currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+    updateSliderView();
+}
+
+function pauseSlider() {
+    isSliderPaused = true;
+}
+
+function resumeSlider() {
+    isSliderPaused = false;
+}
+
+// Start slider when document loads
+document.addEventListener('DOMContentLoaded', () => {
+    initFeaturedSlider();
+});
+

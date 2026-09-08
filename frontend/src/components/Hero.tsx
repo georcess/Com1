@@ -2,21 +2,28 @@ import React from 'react';
 import { ArrowRight, Sparkles, Heart, Leaf, ShieldCheck } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from './ui/card';
+import { FeaturedCarousel } from './FeaturedCarousel';
 
 interface HeroProps {
   onStartOrdering: () => void;
+  onAddToCart: (itemName: string, size: string, price: number) => void;
+  onExploreCategory: (category: string) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onStartOrdering }) => {
+export const Hero: React.FC<HeroProps> = ({
+  onStartOrdering,
+  onAddToCart,
+  onExploreCategory,
+}) => {
   return (
-    <div className="flex flex-col gap-12 pb-12">
+    <div className="flex flex-col gap-8 pb-12">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden rounded-3xl bg-brand-brown py-20 text-center text-white shadow-xl">
+      <section className="relative overflow-hidden rounded-3xl bg-brand-brown py-16 sm:py-20 text-center text-white shadow-xl mx-4 mt-4">
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay"
+          className="absolute inset-0 bg-cover bg-center opacity-35 mix-blend-overlay"
           style={{ backgroundImage: "url('/public/images/Boy.jpeg')" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-brown via-brand-brown/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-brown via-brand-brown/85 to-brand-brown/60" />
 
         <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-6 px-4">
           <div className="relative">
@@ -39,7 +46,7 @@ export const Hero: React.FC<HeroProps> = ({ onStartOrdering }) => {
             </p>
           </div>
 
-          <p className="max-w-xl text-sm italic text-amber-200/80 sm:text-base">
+          <p className="max-w-xl text-sm italic text-amber-200/80 sm:text-base leading-relaxed">
             “Welcome to Mr.Boy SpecialTea. Enjoy the taste of our drinks at an affordable price! From Milk Tea, Fruit Tea, to freshly brewed Coffee!”
           </p>
 
@@ -47,16 +54,22 @@ export const Hero: React.FC<HeroProps> = ({ onStartOrdering }) => {
             variant="brand"
             size="lg"
             onClick={onStartOrdering}
-            className="group gap-2 rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-xl"
+            className="group gap-2 rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-xl active:scale-95 transition-transform"
           >
-            Start Ordering
+            Start Ordering Now
             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
           </Button>
         </div>
       </section>
 
-      {/* Our Approach Cards */}
-      <section className="container mx-auto px-4">
+      {/* Product Showcase Sliding Carousel (1 from each category) */}
+      <FeaturedCarousel
+        onAddToCart={onAddToCart}
+        onExploreCategory={onExploreCategory}
+      />
+
+      {/* Our Approach Section */}
+      <section className="container mx-auto px-4 pt-4">
         <div className="text-center space-y-2 mb-8">
           <h2 className="font-display text-3xl font-bold tracking-tight text-brand-brown">
             Our Approach
