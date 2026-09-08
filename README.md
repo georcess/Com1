@@ -1,23 +1,24 @@
 # ☕ Mr. Boy SpecialTea — Online Ordering System
 
-> A web-based ordering system with User Authentication and Admin Management for **Mr. Boy SpecialTea**, located at Dela Costa V, Burgos Montalban, Rodriguez, Rizal, Philippines.
+> A full-stack web ordering system built with **React, Tailwind CSS & shadcn/ui**, featuring User Authentication, Product Search, Shopping Cart, Receipt Generation, and Protected Admin Order Management for **Mr. Boy SpecialTea** (Dela Costa V, Burgos Montalban, Rodriguez, Rizal, Philippines).
 
 ---
 
 ## 📋 Table of Contents
 
 - [About](#about)
+- [Modern Frontend with shadcn/ui](#-modern-frontend-with-shadcnui)
 - [Features](#features)
 - [Authentication & Roles](#-authentication--roles)
 - [Menu Categories](#menu-categories)
 - [Tech Stack](#tech-stack)
-- [Architecture (MVC)](#architecture-mvc)
+- [Architecture](#-architecture)
 - [Project Structure](#project-structure)
-- [Quick Start (Python + SQLite — No XAMPP Needed)](#-quick-start-python--sqlite--no-xampp-needed)
+- [Quick Start (Python + SQLite + shadcn Frontend)](#-quick-start-python--sqlite--shadcn-frontend)
+- [Frontend Development Mode](#-frontend-development-mode)
 - [Alternative Setup (PHP + XAMPP / MySQL)](#-alternative-setup-php--xampp--mysql)
-- [Database Configuration & Schema](#-database-configuration--schema)
 - [API Endpoints](#-api-endpoints)
-- [Team](#-team)
+- [Development Team](#-development-team)
 - [Contact](#-contact)
 - [License](#-license)
 
@@ -25,10 +26,22 @@
 
 ## 📖 About
 
-**Mr. Boy SpecialTea** is a local tea and coffee shop that offers affordable beverages and snacks. This project is a full-featured online ordering system that allows:
+**Mr. Boy SpecialTea** is a beloved local tea and coffee shop offering premium handcrafted drinks at affordable everyday prices. This project delivers a high-performance, responsive web application where:
 
-- Customers to **register accounts**, **log in**, browse the menu, add items to cart, and generate receipts with automatic customer name filling.
-- Store administrators to **log in securely**, view incoming customer orders in real time, mark orders as done, clear records, and inspect sales revenue summaries.
+- Customers can **register accounts**, **log in**, **search flavors live**, add items with customized sizes & add-ons to their cart, and generate formatted printable receipts.
+- Store administrators can **log in securely**, view incoming customer orders in real time, mark orders as done, clear records, and monitor revenue analytics.
+
+---
+
+## 🎨 Modern Frontend with shadcn/ui
+
+The frontend has been rebuilt from the ground up using **shadcn/ui** and **Tailwind CSS**:
+
+- 💎 **shadcn UI Components:** Cards, Dialogs, Buttons, Tabs, Inputs, Badges, and Tables built on accessible Radix UI primitives.
+- 🔍 **Live Search:** Instant filtering across all 45+ flavors and categories.
+- ⚡ **Toast Notifications:** Instant feedback when items are added to the cart.
+- 👥 **Team Showcase:** Dedicated section honoring the 10 student creators from BREWCODE Group 4 with their actual photos.
+- 📱 **Fully Responsive:** Seamless layout across mobile phones, tablets, laptops, and wide screens.
 
 ---
 
@@ -36,16 +49,16 @@
 
 | Feature | Description |
 |---|---|
-| 🔐 **User Authentication** | Tabbed Login & Register popup modal with password hashing |
+| 🎨 **shadcn/ui Design** | Premium component design with warm coffee & tea brand palette |
+| 🔍 **Live Menu Search** | Real-time search across Milktea, Coffee, Fruit Tea, Frappe, Hot Cups, and Snacks |
+| 🔐 **User Authentication** | Tabbed Login & Register modal with password hashing & session management |
 | 👤 **User Profiles & Roles** | Automatic distinction between Customers and Administrators |
-| 🏠 **Home Page** | Hero banner with shop logo and branding |
-| 📜 **Menu** | Full menu with 6 categories and product images |
-| 🛒 **Cart & Ordering** | Add items, add-ons (Pearl ₱9), auto-fill customer name, view totals |
-| 🧾 **Receipt Generation** | On-screen receipt with customer name and itemized list |
-| 🔒 **Protected Admin Dashboard** | Restricted to admin users with order management & table actions |
-| 📈 **Sales Summary** | Daily, monthly, and yearly sales reports |
-| 📬 **Contact Form** | Customers can send messages saved to the database |
-| 🎨 **Responsive Design** | Mobile-friendly layout with smooth fade transitions |
+| 🏠 **Interactive Hero** | Modern banner with drink badges, logo, and "Our Approach" grid |
+| 🛒 **Cart & Stepper** | Add items, pearl add-ons (₱9), auto-fill customer name, view totals |
+| 🧾 **Receipt Generation** | On-screen official receipt popup with itemized list & print support |
+| 🔒 **Admin Dashboard** | Order table with live KPIs, completion action, and clear-all records |
+| 👥 **Team Showcase** | Dedicated profile cards with photos for BREWCODE Group 4 |
+| 📬 **Contact Form** | Customer inquiry form with input validation and feedback |
 
 ---
 
@@ -85,50 +98,14 @@ The system automatically seeds a default administrator account on first run:
 
 ## 🛠 Tech Stack
 
-| Layer | Options |
+| Layer | Technology |
 |---|---|
-| **Frontend** | HTML5, CSS3, JavaScript (Vanilla) |
-| **Backend Option 1 (Recommended / Quick)** | Python 3 + Flask + SQLite (Zero config, no XAMPP needed) |
-| **Backend Option 2** | PHP 7+ + MySQL / Apache (XAMPP / InfinityFree) |
-| **Architecture** | MVC (Model–View–Controller) |
-| **Security** | Password Hashing (Werkzeug in Python / `password_hash` in PHP) |
-| **Fonts** | Google Fonts (Lilita One, Playfair Display) |
-
----
-
-## 🏗 Architecture (MVC)
-
-This project follows the **Model–View–Controller** pattern:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Browser (Client)                    │
-│     app.js handles Auth state, Navigation, & Cart       │
-└──────────────┬──────────────────────────┬───────────────┘
-               │ Page Load               │ API Calls
-               ▼                         ▼
-         ┌───────────┐           ┌──────────────┐
-         │ index.php │           │  api/*.php   │
-         │  or Flask │           │ (Endpoints)  │
-         └─────┬─────┘           └──────┬───────┘
-               │ includes                │ delegates
-               ▼                         ▼
-        ┌─────────────┐         ┌────────────────┐
-        │  views/*.php │         │ controllers/   │
-        │  (Templates) │         │ *Controller.php│
-        └─────────────┘         └───────┬────────┘
-                                        │ calls
-                                        ▼
-                                ┌────────────────┐
-                                │   models/      │
-                                │ User/Order/Cont│
-                                └───────┬────────┘
-                                        │ queries
-                                        ▼
-                                ┌────────────────┐
-                                │ SQLite / MySQL │
-                                └────────────────┘
-```
+| **Frontend Framework** | **React 19 + TypeScript + Vite** |
+| **UI Components** | **shadcn/ui** (Radix UI Primitives) |
+| **Styling** | **Tailwind CSS + Lucide React Icons** |
+| **Backend Option 1 (Recommended)** | **Python 3 + Flask + SQLite** (Zero config, no XAMPP required) |
+| **Backend Option 2** | **PHP 7+ + MySQL / Apache** (XAMPP / InfinityFree) |
+| **Architecture** | MVC / Component-Driven Architecture |
 
 ---
 
@@ -137,68 +114,63 @@ This project follows the **Model–View–Controller** pattern:
 ```
 comission/
 ├── .htaccess                         # Apache DirectoryIndex config
-├── .gitignore                        # Git ignore rules
+├── .gitignore                        # Git ignore rules (node_modules, db, etc.)
 ├── README.md                         # Project documentation
-├── server.py                         # 🚀 Python + Flask + SQLite backend (Zero XAMPP)
-├── index.html                        # Main frontend HTML
-├── index.php                         # PHP front controller
+├── server.py                         # 🚀 Python + Flask + SQLite backend
+│
+├── frontend/                         # ⚛️ React + TypeScript + shadcn/ui App
+│   ├── index.html                    # Single Page App root
+│   ├── package.json                  # React, Radix UI, Tailwind, Lucide dependencies
+│   ├── vite.config.ts                # Vite config with path aliases & API proxy
+│   ├── tailwind.config.js            # Tailwind config with shadcn design tokens
+│   └── src/
+│       ├── types.ts                  # TypeScript definitions
+│       ├── lib/utils.ts              # shadcn clsx/tailwind-merge utility
+│       ├── data/menu.ts              # Complete 45+ drink & snack data
+│       ├── components/
+│       │   ├── ui/                   # shadcn primitives (Button, Card, Dialog, Tabs, etc.)
+│       │   ├── Navbar.tsx            # Sticky header with cart badge & auth profile
+│       │   ├── Hero.tsx              # Modern hero banner & Approach grid
+│       │   ├── Menu.tsx              # Live search, category pills, product cards
+│       │   ├── Cart.tsx              # Cart review, add-ons, name autofill
+│       │   ├── ReceiptModal.tsx      # Printable receipt dialog
+│       │   ├── Team.tsx              # BREWCODE Group 4 showcase
+│       │   ├── About.tsx             # Mission & store location
+│       │   ├── Contact.tsx           # Contact message form
+│       │   ├── AdminDashboard.tsx    # Role-protected order manager & KPIs
+│       │   └── AuthModal.tsx         # Login / Register tabbed dialog
+│       ├── App.tsx                   # Main state & view coordinator
+│       └── main.tsx                  # React DOM mount
 │
 ├── config/
 │   └── database.php                  # PHP DB config (local/production toggle)
-│
-├── models/
-│   ├── User.php                      # User authentication & registration model
-│   ├── Order.php                     # Order CRUD + sales summary model
-│   └── Contact.php                   # Contact message model
-│
-├── controllers/
-│   ├── AuthController.php            # Login, Register, Logout, Current User logic
-│   ├── OrderController.php           # Order API logic
-│   └── ContactController.php         # Contact form logic
-│
-├── views/
-│   ├── layouts/
-│   │   ├── header.php                # HTML head, meta, CSS link
-│   │   └── footer.php                # Footer, JS script tag
-│   ├── auth/
-│   │   └── modal.php                 # Login / Register tabbed popup modal
-│   ├── home.php                      # Hero, approach cards, CTA
-│   ├── menu.php                      # All menu categories & items
-│   ├── cart.php                      # Shopping cart & receipt
-│   ├── about.php                     # About us section
-│   ├── contact.php                   # Contact form
-│   └── admin/
-│       ├── dashboard.php             # Admin order table (role protected)
-│       └── sales_summary.php         # Sales report (daily/monthly/yearly)
+├── models/                           # PHP MVC models (User, Order, Contact)
+├── controllers/                      # PHP MVC controllers (AuthController, OrderController)
+├── views/                            # PHP MVC view partials
+├── api/                              # REST API endpoints (PHP)
+│   ├── register.php
+│   ├── login.php
+│   ├── logout.php
+│   ├── current_user.php
+│   ├── submit_order.php
+│   ├── fetch_orders.php
+│   ├── delete_order.php
+│   ├── clear_orders.php
+│   └── save_contact.php
 │
 ├── public/
-│   ├── css/
-│   │   └── style.css                 # All styles (organized by component + Auth)
-│   ├── js/
-│   │   └── app.js                    # All client-side logic & Auth management
-│   └── images/                       # Product & branding images (52 files)
-│
-├── api/
-│   ├── register.php                  # POST — Register new user
-│   ├── login.php                     # POST — Log in user
-│   ├── logout.php                    # POST — Log out user
-│   ├── current_user.php              # GET  — Get current session user
-│   ├── submit_order.php              # POST — Create new order
-│   ├── fetch_orders.php              # GET  — List all orders
-│   ├── delete_order.php              # POST — Delete single order
-│   ├── clear_orders.php              # POST — Delete all orders
-│   └── save_contact.php              # POST — Save contact message
-│
-└── team/                             # Team member photos (10 members)
+│   ├── images/                       # Product & branding pictures (52 files)
+│   └── team/                         # Team member photos (10 members)
+└── team/                             # Original team photos
 ```
 
 ---
 
-## ⚡ Quick Start (Python + SQLite — No XAMPP Needed)
+## ⚡ Quick Start (Python + SQLite + shadcn Frontend)
 
-The fastest and easiest way to run the entire website with full database functionality without installing XAMPP.
+The fastest way to run the application with the modern shadcn frontend and database:
 
-### 1. Install Flask
+### 1. Install Python Flask
 
 ```bash
 pip install flask
@@ -214,63 +186,32 @@ python server.py
 
 Go to: **[http://localhost:5000](http://localhost:5000)**
 
-- The SQLite database (`database/mr_boy.db`) and tables (`users`, `orders`, `contact_messages`) are **automatically created**.
-- Default administrator account (`admin` / `admin123`) is seeded automatically.
+- The SQLite database (`database/mr_boy.db`) and admin credentials are set up **automatically**.
+- The compiled **React + shadcn/ui** interface is served directly.
+
+---
+
+## 💻 Frontend Development Mode
+
+If you want to run Vite with Hot Module Replacement (HMR):
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open: **[http://localhost:5173](http://localhost:5173)** (Proxy points to Flask on port 5000).
 
 ---
 
 ## 🐘 Alternative Setup (PHP + XAMPP / MySQL)
 
-If you prefer or are required to use PHP & MySQL:
+If running in a PHP/XAMPP environment:
 
-### 1. Copy Files to `htdocs`
-
-Copy the `comission` folder to:
-```
-C:\xampp\htdocs\comission\
-```
-
-### 2. Database Setup in phpMyAdmin
-
-Open `http://localhost/phpmyadmin` and execute:
-
-```sql
-CREATE DATABASE IF NOT EXISTS mr_boy_db;
-USE mr_boy_db;
-
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) UNIQUE NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    fullname VARCHAR(150) NOT NULL,
-    role VARCHAR(20) DEFAULT 'customer',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_name VARCHAR(255) NOT NULL,
-    order_details TEXT NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE contact_messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    contact VARCHAR(50) NOT NULL,
-    message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### 3. Open in Browser
-
-```
-http://localhost/comission/
-```
+1. Copy the `comission` folder to `C:\xampp\htdocs\comission\`
+2. Create database `mr_boy_db` in phpMyAdmin (`http://localhost/phpmyadmin`)
+3. Open `http://localhost/comission/`
 
 ---
 
@@ -291,22 +232,22 @@ http://localhost/comission/
 
 ---
 
-## 👥 Team
+## 👥 Development Team
 
 **BREWCODE — Group 4**
 
-| Member |
-|---|
-| Apolonio |
-| Apuyan |
-| Cañete |
-| Jerez, Ayiza |
-| Obosa |
-| Refalpa, Jona Mae |
-| Ricafranca |
-| Rogel |
-| Toledo |
-| Vargas |
+| Member | Role |
+|---|---|
+| **Apolonio** | Project Developer |
+| **Apuyan** | Full Stack & UI |
+| **Cañete** | Frontend Specialist |
+| **Jerez, Ayiza** | System Architect |
+| **Obosa** | Database Engineer |
+| **Refalpa, Jona Mae** | UI/UX Designer |
+| **Ricafranca** | Quality Assurance |
+| **Rogel** | Backend Developer |
+| **Toledo** | System Documentation |
+| **Vargas** | Lead Developer |
 
 ---
 

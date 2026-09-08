@@ -84,15 +84,25 @@ def init_db():
 
 # ── Static File Serving ───────────────────────────────────────
 
+DIST_DIR = os.path.join(BASE_DIR, 'frontend', 'dist')
+
 @app.route('/')
 def index():
-    """Serve the main page (index.html)."""
+    """Serve modern React + shadcn frontend if built, or fallback to root index.html."""
+    if os.path.exists(os.path.join(DIST_DIR, 'index.html')):
+        return send_file(os.path.join(DIST_DIR, 'index.html'))
     return send_file(os.path.join(BASE_DIR, 'index.html'))
+
+
+@app.route('/assets/<path:filename>')
+def serve_dist_assets(filename):
+    """Serve compiled Vite React assets."""
+    return send_from_directory(os.path.join(DIST_DIR, 'assets'), filename)
 
 
 @app.route('/public/<path:filename>')
 def serve_public(filename):
-    """Serve static assets (CSS, JS, images)."""
+    """Serve static media assets (images, team photos, etc.)."""
     return send_from_directory(os.path.join(BASE_DIR, 'public'), filename)
 
 
