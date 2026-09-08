@@ -1,5 +1,19 @@
-import React, { useState, useMemo } from 'react';
-import { Coffee, Flame, Sparkles, CupSoda, Cookie, UtensilsCrossed, Plus, Search, Check } from 'lucide-react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { 
+  Coffee, 
+  Flame, 
+  Sparkles, 
+  CupSoda, 
+  Cookie, 
+  UtensilsCrossed, 
+  Plus, 
+  Search, 
+  Check, 
+  ChevronLeft, 
+  ChevronRight, 
+  ChevronsLeft, 
+  ChevronsRight 
+} from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -16,12 +30,22 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [addedItemName, setAddedItemName] = useState<string | null>(null);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(8);
+  const menuTopRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (initialCategory) {
       setSelectedCategory(initialCategory);
     }
   }, [initialCategory]);
+
+  // Reset to page 1 whenever category, search query, or items per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchQuery, itemsPerPage]);
 
   const categories = [
     { id: 'all', label: 'All Items', icon: UtensilsCrossed },
@@ -43,6 +67,21 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
     });
   }, [selectedCategory, searchQuery]);
 
+  // Pagination calculations
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / itemsPerPage));
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredItems.length);
+  const paginatedItems = useMemo(() => {
+    return filteredItems.slice(startIndex, endIndex);
+  }, [filteredItems, startIndex, endIndex]);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    setCurrentPage(page);
+    menuTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const handleAddWithFeedback = (name: string, size: string, price: number) => {
     onAddToCart(name, size, price);
     setAddedItemName(`${name} (${size})`);
@@ -51,8 +90,25 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
     }, 1800);
   };
 
+  // Generate pagination number list with ellipsis for large page counts
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (validCurrentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages);
+      } else if (validCurrentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', validCurrentPage - 1, validCurrentPage, validCurrentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
+    <div ref={menuTopRef} className="container mx-auto px-4 py-8 space-y-8 scroll-mt-20">
       {/* Toast Notification for Added Item */}
       {addedItemName && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-2xl bg-brand-brown text-white px-5 py-3 shadow-2xl animate-in slide-in-from-bottom-5 border border-brand-amber/30">
@@ -117,11 +173,41 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
         })}
       </div>
 
-      {/* Results Count */}
-      <div className="flex items-center justify-between text-xs text-muted-foreground px-1 border-b pb-2">
-        <span>Showing <strong>{filteredItems.length}</strong> items</span>
-        {searchQuery && (
-          <span>Search results for &ldquo;<strong>{searchQuery}</strong>&rdquo;</span>
+      {/* Results Count & Items Per Page Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground px-1 border-b pb-3">
+        <div>
+          {filteredItems.length > 0 ? (
+            <span>
+              Showing <strong className="text-brand-brown">{startIndex + 1}–{endIndex}</strong> of <strong className="text-brand-brown">{filteredItems.length}</strong> items (Page {validCurrentPage} of {totalPages})
+            </span>
+          ) : (
+            <span>No items found</span>
+          )}
+          {searchQuery && (
+            <span className="ml-2 font-medium text-brand-orange">
+              for &ldquo;{searchQuery}&rdquo;
+            </span>
+          )}
+        </div>
+
+        {/* Per-page Selector */}
+        {filteredItems.length > 0 && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-medium">Per page:</span>
+            {[8, 12, 16].map(num => (
+              <Button
+                key={num}
+                variant={itemsPerPage === num ? 'brand' : 'ghost'}
+                size="sm"
+                onClick={() => setItemsPerPage(num)}
+                className={`h-7 px-2.5 text-xs font-semibold rounded-md ${
+                  itemsPerPage === num ? 'shadow-xs' : 'text-muted-foreground hover:text-brand-brown'
+                }`}
+              >
+                {num}
+              </Button>
+            ))}
+          </div>
         )}
       </div>
 
@@ -138,65 +224,156 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {filteredItems.map((item: MenuItem) => (
-            <Card 
-              key={item.id}
-              className="group flex flex-col overflow-hidden border border-brand-brown/10 bg-white transition-all hover:-translate-y-1.5 hover:shadow-xl rounded-2xl"
-            >
-              {/* Item Image with Category Badge */}
-              <div className="relative h-48 w-full overflow-hidden bg-brand-cream/80">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                <Badge 
-                  variant="brand"
-                  className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm"
-                >
-                  {item.category}
-                </Badge>
-                <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow">
-                  Starts at ₱{item.prices[0].price}
+        <>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {paginatedItems.map((item: MenuItem) => (
+              <Card 
+                key={item.id}
+                className="group flex flex-col overflow-hidden border border-brand-brown/10 bg-white transition-all hover:-translate-y-1.5 hover:shadow-xl rounded-2xl"
+              >
+                {/* Item Image with Category Badge */}
+                <div className="relative h-48 w-full overflow-hidden bg-brand-cream/80">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <Badge 
+                    variant="brand"
+                    className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm"
+                  >
+                    {item.category}
+                  </Badge>
+                  <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow">
+                    Starts at ₱{item.prices[0].price}
+                  </div>
                 </div>
+
+                {/* Item Info */}
+                <CardHeader className="p-4 pb-1">
+                  <CardTitle className="line-clamp-1 text-base font-bold text-brand-brown">
+                    {item.name}
+                  </CardTitle>
+                </CardHeader>
+
+                <CardContent className="flex-1 p-4 pt-1">
+                  <p className="text-xs text-muted-foreground">
+                    Made fresh with premium ingredients &amp; balanced sweetness.
+                  </p>
+                </CardContent>
+
+                {/* Size Buttons */}
+                <CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+                  {item.prices.map(p => (
+                    <Button
+                      key={p.size}
+                      variant="default"
+                      size="sm"
+                      onClick={() => handleAddWithFeedback(item.name, p.size, p.price)}
+                      className="flex-1 bg-brand-coffee text-white hover:bg-brand-brown gap-1 font-semibold text-xs py-2 shadow-sm active:scale-95 transition-transform"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>{p.size} &bull; ₱{p.price}</span>
+                    </Button>
+                  ))}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+
+          {/* Pagination Navigation Bar */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 border-t border-brand-brown/10">
+              <div className="text-xs text-muted-foreground order-2 sm:order-1">
+                Page <strong className="text-brand-brown">{validCurrentPage}</strong> of <strong className="text-brand-brown">{totalPages}</strong>
               </div>
 
-              {/* Item Info */}
-              <CardHeader className="p-4 pb-1">
-                <CardTitle className="line-clamp-1 text-base font-bold text-brand-brown">
-                  {item.name}
-                </CardTitle>
-              </CardHeader>
+              <div className="flex items-center gap-1.5 order-1 sm:order-2">
+                {/* First Page */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(1)}
+                  disabled={validCurrentPage === 1}
+                  className="h-8 w-8 rounded-lg"
+                  title="First Page"
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
 
-              <CardContent className="flex-1 p-4 pt-1">
-                <p className="text-xs text-muted-foreground">
-                  Made fresh with premium ingredients &amp; balanced sweetness.
-                </p>
-              </CardContent>
+                {/* Previous Page */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(validCurrentPage - 1)}
+                  disabled={validCurrentPage === 1}
+                  className="h-8 gap-1 px-2.5 rounded-lg text-xs"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="hidden sm:inline">Prev</span>
+                </Button>
 
-              {/* Size Buttons */}
-              <CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
-                {item.prices.map(p => (
-                  <Button
-                    key={p.size}
-                    variant="default"
-                    size="sm"
-                    onClick={() => handleAddWithFeedback(item.name, p.size, p.price)}
-                    className="flex-1 bg-brand-coffee text-white hover:bg-brand-brown gap-1 font-semibold text-xs py-2 shadow-sm active:scale-95 transition-transform"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>{p.size} &bull; ₱{p.price}</span>
-                  </Button>
-                ))}
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                {/* Number Buttons */}
+                <div className="flex items-center gap-1">
+                  {getPageNumbers().map((pageNum, idx) => {
+                    if (pageNum === '...') {
+                      return (
+                        <span key={`ellipsis-${idx}`} className="px-1 text-xs text-muted-foreground select-none">
+                          &hellip;
+                        </span>
+                      );
+                    }
+
+                    const isCurrent = pageNum === validCurrentPage;
+                    return (
+                      <Button
+                        key={`page-${pageNum}`}
+                        variant={isCurrent ? 'brand' : 'outline'}
+                        size="sm"
+                        onClick={() => handlePageChange(pageNum as number)}
+                        className={`h-8 w-8 p-0 rounded-lg text-xs font-bold transition-all ${
+                          isCurrent 
+                            ? 'shadow-md scale-105 bg-brand-brown text-white' 
+                            : 'bg-white hover:bg-brand-cream text-brand-brown'
+                        }`}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+
+                {/* Next Page */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(validCurrentPage + 1)}
+                  disabled={validCurrentPage === totalPages}
+                  className="h-8 gap-1 px-2.5 rounded-lg text-xs"
+                >
+                  <span className="hidden sm:inline">Next</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+
+                {/* Last Page */}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={validCurrentPage === totalPages}
+                  className="h-8 w-8 rounded-lg"
+                  title="Last Page"
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
