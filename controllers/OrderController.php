@@ -53,11 +53,16 @@ class OrderController {
     }
 
     /**
-     * Fetch all orders (GET → JSON).
+     * Fetch all orders or filter by user (GET → JSON).
      */
     public static function fetchAll() {
         header('Content-Type: application/json');
-        echo json_encode(Order::getAll());
+        $userId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
+        if ($userId && $userId > 0) {
+            echo json_encode(Order::getByUserId($userId));
+        } else {
+            echo json_encode(Order::getAll());
+        }
     }
 
     /**

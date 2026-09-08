@@ -46,6 +46,37 @@ export const PageSkeleton: React.FC<PageSkeletonProps> = ({ tab = 'home' }) => {
     );
   }
 
+  if (tab === 'history' || tab === 'orders') {
+    return (
+      <div className="container mx-auto max-w-4xl px-4 py-8 space-y-8 animate-in fade-in duration-200">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-56" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Skeleton className="h-20 w-full rounded-2xl" />
+          <Skeleton className="h-20 w-full rounded-2xl" />
+          <Skeleton className="h-20 w-full rounded-2xl" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-5 rounded-2xl bg-white/70 border border-brand-brown/10 space-y-3">
+              <div className="flex justify-between">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-5 w-24 rounded-full" />
+              </div>
+              <Skeleton className="h-12 w-full rounded-xl" />
+              <div className="flex justify-between pt-2 border-t">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-8 w-28 rounded-xl" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (tab === 'cart') {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8 animate-in fade-in duration-200">

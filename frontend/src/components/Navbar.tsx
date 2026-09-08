@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Coffee, User as UserIcon, LogOut, Shield } from 'lucide-react';
+import { ShoppingBag, Coffee, User as UserIcon, LogOut, Shield, Clock } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { User } from '../types';
@@ -78,6 +78,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </Button>
 
+          {currentUser && (
+            <Button
+              variant={activeTab === 'history' ? 'amber' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('history')}
+              className={activeTab === 'history' ? '' : 'text-white hover:bg-white/10 hover:text-white'}
+            >
+              <Clock className="h-4 w-4 mr-1" />
+              My Orders
+            </Button>
+          )}
+
           <Button
             variant={activeTab === 'contact' ? 'amber' : 'ghost'}
             size="sm"
@@ -92,21 +104,25 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-2">
           {currentUser ? (
             <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1.5 backdrop-blur">
-              <div className="flex items-center gap-1.5 text-sm font-medium text-amber-50">
+              <div 
+                className="flex items-center gap-1.5 text-sm font-medium text-amber-50 cursor-pointer hover:text-brand-amber transition-colors"
+                onClick={() => setActiveTab('history')}
+                title="View your Order History"
+              >
                 <UserIcon className="h-4 w-4 text-brand-amber" />
                 <span className="max-w-[120px] truncate sm:max-w-[160px]">{currentUser.fullname}</span>
-                {currentUser.role === 'admin' && (
-                  <Badge 
-                    variant="brand" 
-                    className="text-[10px] px-1.5 py-0 uppercase cursor-pointer hover:bg-brand-orange transition-colors flex items-center gap-0.5"
-                    onClick={() => setActiveTab('admin')}
-                    title="Open Admin Dashboard"
-                  >
-                    <Shield className="h-2.5 w-2.5" />
-                    Admin
-                  </Badge>
-                )}
               </div>
+              {currentUser.role === 'admin' && (
+                <Badge 
+                  variant="brand" 
+                  className="text-[10px] px-1.5 py-0 uppercase cursor-pointer hover:bg-brand-orange transition-colors flex items-center gap-0.5"
+                  onClick={() => setActiveTab('admin')}
+                  title="Open Admin Dashboard"
+                >
+                  <Shield className="h-2.5 w-2.5" />
+                  Admin
+                </Badge>
+              )}
               <Button
                 variant="destructive"
                 size="sm"

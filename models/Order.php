@@ -78,6 +78,33 @@ class Order {
     }
 
     /**
+     * Fetch orders by user ID.
+     *
+     * @param int $userId
+     * @return array List of order records for this user.
+     */
+    public static function getByUserId($userId) {
+        $conn = getConnection();
+        $stmt = $conn->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC");
+        $orders = [];
+
+        if ($stmt) {
+            $stmt->bind_param('i', $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $orders[] = $row;
+                }
+            }
+            $stmt->close();
+        }
+
+        $conn->close();
+        return $orders;
+    }
+
+    /**
      * Delete an order by ID.
      *
      * @param int $id

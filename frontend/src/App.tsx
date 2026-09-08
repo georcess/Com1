@@ -8,6 +8,7 @@ import { About } from './components/About';
 import { Contact } from './components/Contact';
 import { Team } from './components/Team';
 import { AdminDashboard } from './components/AdminDashboard';
+import { OrderHistory } from './components/OrderHistory';
 import { AuthModal } from './components/AuthModal';
 import { ReceiptModal } from './components/ReceiptModal';
 import { PageSkeleton } from './components/PageSkeleton';
@@ -254,6 +255,16 @@ export function App() {
                   onOpenAuth={handleOpenAuth}
                   onGenerateReceipt={handleGenerateReceipt}
                   isSubmitting={isSubmitting}
+                />
+              </div>
+            )}
+
+            {activeTab === 'history' && (
+              <div className="animate-in fade-in duration-300">
+                <OrderHistory
+                  currentUser={currentUser}
+                  onOpenAuth={handleOpenAuth}
+                  onOpenMenu={() => handleTabChange('menu')}
                 />
               </div>
             )}

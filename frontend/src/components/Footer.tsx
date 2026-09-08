@@ -167,7 +167,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               </button>
               <span className="text-white/20">&bull;</span>
               <button onClick={() => onNavigate('cart')} className="text-amber-200 hover:text-white hover:underline transition-colors">
-                Order Cart
+                Cart
+              </button>
+              <span className="text-white/20">&bull;</span>
+              <button onClick={() => onNavigate('history')} className="text-amber-200 hover:text-white hover:underline transition-colors">
+                My Orders
               </button>
               <span className="text-white/20">&bull;</span>
               <button onClick={() => onNavigate('contact')} className="text-amber-200 hover:text-white hover:underline transition-colors">
