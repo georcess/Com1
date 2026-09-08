@@ -78,18 +78,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </Button>
 
-          {currentUser && (
-            <Button
-              variant={activeTab === 'history' ? 'amber' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('history')}
-              className={activeTab === 'history' ? '' : 'text-white hover:bg-white/10 hover:text-white'}
-            >
-              <Clock className="h-4 w-4 mr-1" />
-              My Orders
-            </Button>
-          )}
-
           <Button
             variant={activeTab === 'contact' ? 'amber' : 'ghost'}
             size="sm"
@@ -106,8 +94,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1.5 backdrop-blur">
               <div 
                 className="flex items-center gap-1.5 text-sm font-medium text-amber-50 cursor-pointer hover:text-brand-amber transition-colors"
-                onClick={() => setActiveTab('history')}
-                title="View your Order History"
+                onClick={() => setActiveTab('cart')}
+                title="View your Order & Purchases"
               >
                 <UserIcon className="h-4 w-4 text-brand-amber" />
                 <span className="max-w-[120px] truncate sm:max-w-[160px]">{currentUser.fullname}</span>

@@ -1,9 +1,10 @@
-import React from 'react';
-import { ShoppingBag, Trash2, Plus, Receipt, Sparkles, User as UserIcon, Lock, LogIn, CheckCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingBag, Trash2, Plus, Receipt, Sparkles, User as UserIcon, Lock, LogIn, CheckCircle, Clock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { OrderHistory } from './OrderHistory';
 import { CartItem, User } from '../types';
 
 interface CartProps {
@@ -19,6 +20,7 @@ interface CartProps {
   onOpenAuth: (tab: 'login' | 'register') => void;
   onGenerateReceipt: () => void;
   isSubmitting: boolean;
+  initialTab?: 'cart' | 'history';
 }
 
 export const Cart: React.FC<CartProps> = ({
@@ -34,11 +36,57 @@ export const Cart: React.FC<CartProps> = ({
   onOpenAuth,
   onGenerateReceipt,
   isSubmitting,
+  initialTab = 'cart',
 }) => {
+  const [activeSubTab, setActiveSubTab] = useState<'cart' | 'history'>(initialTab);
+
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <Card className="border border-brand-brown/10 shadow-xl rounded-2xl bg-white overflow-hidden">
-        {/* Card Header */}
+    <div className="container mx-auto max-w-4xl px-4 py-8 space-y-6 animate-in fade-in duration-300">
+      {/* Segmented Top Bar: Active Cart vs My Orders */}
+      <div className="flex items-center justify-center">
+        <div className="inline-flex rounded-2xl bg-brand-brown/10 p-1.5 backdrop-blur-xs border border-brand-brown/15 shadow-inner">
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('cart')}
+            className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-xs sm:text-sm font-bold transition-all ${
+              activeSubTab === 'cart'
+                ? 'bg-brand-coffee text-white shadow-md scale-102'
+                : 'text-brand-brown/70 hover:text-brand-brown hover:bg-white/50'
+            }`}
+          >
+            <ShoppingBag className="h-4 w-4" />
+            <span>Active Cart</span>
+            {cart.length > 0 && (
+              <span className="ml-1 rounded-full bg-brand-orange px-2 py-0.2 text-[10px] font-black text-white shadow-xs">
+                {cart.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('history')}
+            className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-xs sm:text-sm font-bold transition-all ${
+              activeSubTab === 'history'
+                ? 'bg-brand-coffee text-white shadow-md scale-102'
+                : 'text-brand-brown/70 hover:text-brand-brown hover:bg-white/50'
+            }`}
+          >
+            <Clock className="h-4 w-4" />
+            <span>My Orders &amp; Receipts</span>
+          </button>
+        </div>
+      </div>
+
+      {activeSubTab === 'history' ? (
+        <OrderHistory
+          currentUser={currentUser}
+          onOpenAuth={onOpenAuth}
+          onOpenMenu={onOpenMenu}
+        />
+      ) : (
+        <Card className="border border-brand-brown/10 shadow-xl rounded-3xl bg-white overflow-hidden max-w-3xl mx-auto">
+          {/* Card Header */}
         <CardHeader className="bg-brand-coffee text-white p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -264,6 +312,7 @@ export const Cart: React.FC<CartProps> = ({
           </CardFooter>
         )}
       </Card>
+      )}
     </div>
   );
 };
