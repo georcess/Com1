@@ -12,25 +12,37 @@ import {
   ChevronLeft, 
   ChevronRight, 
   ChevronsLeft, 
-  ChevronsRight 
+  ChevronsRight,
+  Eye,
+  Info
 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
+import { ProductModal } from './ProductModal';
 import { MENU_ITEMS } from '../data/menu';
 import { MenuItem } from '../types';
 
 interface MenuProps {
   onAddToCart: (itemName: string, size: string, price: number) => void;
+  onAddAddonToLast?: (name: string, price: number) => void;
   initialCategory?: string;
 }
 
-export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all' }) => {
+export const Menu: React.FC<MenuProps> = ({ 
+  onAddToCart, 
+  onAddAddonToLast, 
+  initialCategory = 'all' 
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [addedItemName, setAddedItemName] = useState<string | null>(null);
   
+  // Product Modal Preview State
+  const [previewItem, setPreviewItem] = useState<MenuItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(8);
@@ -82,6 +94,11 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
     menuTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const handleOpenPreview = (item: MenuItem) => {
+    setPreviewItem(item);
+    setIsModalOpen(true);
+  };
+
   const handleAddWithFeedback = (name: string, size: string, price: number) => {
     onAddToCart(name, size, price);
     setAddedItemName(`${name} (${size})`);
@@ -127,7 +144,7 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
           Our Delicious Menu
         </h2>
         <p className="text-sm text-muted-foreground">
-          Handcrafted drinks and crispy snacks starting at only <strong>₱29</strong>.
+          Handcrafted drinks and crispy snacks starting at only <strong>₱29</strong>. Click any item for its recipe &amp; details!
         </p>
 
         {/* Search Bar */}
@@ -231,8 +248,12 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
                 key={item.id}
                 className="group flex flex-col overflow-hidden border border-brand-brown/10 bg-white transition-all hover:-translate-y-1.5 hover:shadow-xl rounded-2xl"
               >
-                {/* Item Image with Category Badge */}
-                <div className="relative h-48 w-full overflow-hidden bg-brand-cream/80">
+                {/* Item Image with Category Badge & Click-to-Preview */}
+                <div 
+                  className="relative h-48 w-full overflow-hidden bg-brand-cream/80 cursor-pointer"
+                  onClick={() => handleOpenPreview(item)}
+                  title="Click to view details & what it's made of"
+                >
                   <img
                     src={item.image}
                     alt={item.name}
@@ -241,28 +262,54 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
                       (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  
+                  {/* Hover Overlay with Preview Badge */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 text-brand-brown px-3.5 py-1.5 text-xs font-bold shadow-lg transform group-hover:scale-105 transition-transform">
+                      <Eye className="h-3.5 w-3.5 text-brand-orange" />
+                      View Details &amp; Recipe
+                    </span>
+                  </div>
+
                   <Badge 
                     variant="brand"
-                    className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm"
+                    className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm z-10"
                   >
                     {item.category}
                   </Badge>
-                  <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow">
+                  <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow z-10">
                     Starts at ₱{item.prices[0].price}
                   </div>
                 </div>
 
                 {/* Item Info */}
                 <CardHeader className="p-4 pb-1">
-                  <CardTitle className="line-clamp-1 text-base font-bold text-brand-brown">
-                    {item.name}
-                  </CardTitle>
+                  <div className="flex items-start justify-between gap-1">
+                    <CardTitle 
+                      className="line-clamp-1 text-base font-bold text-brand-brown cursor-pointer hover:text-brand-orange transition-colors"
+                      onClick={() => handleOpenPreview(item)}
+                      title="Click to view recipe details"
+                    >
+                      {item.name}
+                    </CardTitle>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenPreview(item)}
+                      className="text-muted-foreground hover:text-brand-orange transition-colors p-0.5 rounded-sm"
+                      title="View details & recipe"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
+                  </div>
                 </CardHeader>
 
                 <CardContent className="flex-1 p-4 pt-1">
-                  <p className="text-xs text-muted-foreground">
-                    Made fresh with premium ingredients &amp; balanced sweetness.
+                  <p 
+                    className="text-xs text-muted-foreground line-clamp-2 cursor-pointer hover:text-brand-brown transition-colors"
+                    onClick={() => handleOpenPreview(item)}
+                  >
+                    Click to view handcrafted ingredients, flavor profile &amp; recipe details.
                   </p>
                 </CardContent>
 
@@ -375,6 +422,18 @@ export const Menu: React.FC<MenuProps> = ({ onAddToCart, initialCategory = 'all'
           )}
         </>
       )}
+
+      {/* Product Details & Recipe Preview Modal */}
+      <ProductModal
+        item={previewItem}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setPreviewItem(null);
+        }}
+        onAddToCart={handleAddWithFeedback}
+        onAddAddonToLast={onAddAddonToLast}
+      />
     </div>
   );
 };

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Sparkles, Coffee, CupSoda, Flame, Cookie, ArrowRight, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Sparkles, Coffee, CupSoda, Flame, Cookie, ArrowRight, Check, Eye } from 'lucide-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { ProductModal } from './ProductModal';
+import { MenuItem } from '../types';
 
 export interface FeaturedProduct {
   category: string;
@@ -17,6 +19,7 @@ export interface FeaturedProduct {
 
 interface FeaturedCarouselProps {
   onAddToCart: (itemName: string, size: string, price: number) => void;
+  onAddAddonToLast?: (name: string, price: number) => void;
   onExploreCategory: (category: string) => void;
 }
 
@@ -102,15 +105,32 @@ const FEATURED_ITEMS: FeaturedProduct[] = [
 
 export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
   onAddToCart,
+  onAddAddonToLast,
   onExploreCategory,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
   const [addedSuccess, setAddedSuccess] = useState(false);
+  
+  // Product Modal State
+  const [previewItem, setPreviewItem] = useState<MenuItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentItem = FEATURED_ITEMS[currentIndex];
+
+  const handleOpenPreview = () => {
+    const asMenuItem: MenuItem = {
+      id: `featured-${currentItem.category}`,
+      name: currentItem.name,
+      category: currentItem.category as any,
+      image: currentItem.image,
+      prices: currentItem.prices,
+    };
+    setPreviewItem(asMenuItem);
+    setIsModalOpen(true);
+  };
 
   // Reset selected size when slide changes
   useEffect(() => {
@@ -212,14 +232,18 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
         {/* Slide Display Card */}
         <div className="overflow-hidden rounded-3xl shadow-2xl border border-brand-brown/10 bg-white">
           <div className="grid grid-cols-1 md:grid-cols-12 min-h-[380px]">
-            {/* Left Column: Product Image with Floating Badges */}
-            <div className="relative md:col-span-6 bg-brand-cream/80 overflow-hidden flex items-center justify-center p-6 sm:p-8">
+            {/* Left Column: Product Image with Floating Badges & Preview Trigger */}
+            <div 
+              className="relative md:col-span-6 bg-brand-cream/80 overflow-hidden flex items-center justify-center p-6 sm:p-8 cursor-pointer group"
+              onClick={handleOpenPreview}
+              title="Click to view full recipe & what it's made of"
+            >
               <div 
                 className="absolute inset-0 bg-cover bg-center blur-2xl opacity-30 scale-110"
                 style={{ backgroundImage: `url('${currentItem.image}')` }}
               />
               
-              <div className="relative z-10 w-full max-w-xs transition-transform duration-500 hover:scale-105">
+              <div className="relative z-10 w-full max-w-xs transition-transform duration-500 group-hover:scale-105">
                 <img
                   src={currentItem.image}
                   alt={currentItem.name}
@@ -229,16 +253,24 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                   }}
                 />
 
+                {/* Hover Quick Preview Overlay */}
+                <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 text-brand-brown px-3.5 py-1.5 text-xs font-bold shadow-xl">
+                    <Eye className="h-3.5 w-3.5 text-brand-orange" />
+                    View Recipe &amp; Ingredients
+                  </span>
+                </div>
+
                 {/* Floating Tag Badge */}
                 <Badge
                   variant="brand"
-                  className="absolute top-3 left-3 bg-brand-orange text-white font-bold text-xs px-3 py-1 shadow-lg"
+                  className="absolute top-3 left-3 bg-brand-orange text-white font-bold text-xs px-3 py-1 shadow-lg z-10"
                 >
                   {currentItem.tag}
                 </Badge>
 
                 {/* Price Pill */}
-                <div className="absolute bottom-3 right-3 rounded-full bg-brand-brown/90 text-amber-200 px-3 py-1 text-xs font-bold backdrop-blur shadow-md">
+                <div className="absolute bottom-3 right-3 rounded-full bg-brand-brown/90 text-amber-200 px-3 py-1 text-xs font-bold backdrop-blur shadow-md z-10">
                   Starts ₱{currentItem.prices[0].price}
                 </div>
               </div>
@@ -247,18 +279,35 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
             {/* Right Column: Details, Size Picker & Add Action */}
             <div className="md:col-span-6 p-6 sm:p-8 flex flex-col justify-between space-y-6 bg-white">
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-brand-orange uppercase tracking-wider">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-brand-coffee">
-                    {React.createElement(currentItem.icon, { className: 'h-3.5 w-3.5' })}
-                  </span>
-                  <span>{currentItem.categoryLabel}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-bold text-brand-orange uppercase tracking-wider">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-brand-coffee">
+                      {React.createElement(currentItem.icon, { className: 'h-3.5 w-3.5' })}
+                    </span>
+                    <span>{currentItem.categoryLabel}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleOpenPreview}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-brand-orange hover:text-brand-brown transition-colors"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span>View Recipe</span>
+                  </button>
                 </div>
 
-                <h3 className="font-display text-2xl sm:text-3xl font-bold text-brand-brown">
+                <h3 
+                  className="font-display text-2xl sm:text-3xl font-bold text-brand-brown cursor-pointer hover:text-brand-orange transition-colors"
+                  onClick={handleOpenPreview}
+                  title="Click to view details"
+                >
                   {currentItem.name}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                <p 
+                  className="text-xs sm:text-sm text-muted-foreground leading-relaxed cursor-pointer"
+                  onClick={handleOpenPreview}
+                >
                   {currentItem.description}
                 </p>
               </div>
@@ -339,6 +388,18 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Product Details & Ingredients Preview Modal */}
+      <ProductModal
+        item={previewItem}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setPreviewItem(null);
+        }}
+        onAddToCart={onAddToCart}
+        onAddAddonToLast={onAddAddonToLast}
+      />
     </section>
   );
 };

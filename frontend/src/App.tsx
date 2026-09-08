@@ -207,6 +207,7 @@ export function App() {
           <div className="animate-in fade-in duration-300">
             <Menu
               onAddToCart={handleAddToCart}
+              onAddAddonToLast={handleAddAddonToLast}
               initialCategory={selectedMenuCategory}
             />
           </div>
