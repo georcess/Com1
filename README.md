@@ -10,11 +10,13 @@
 - [Features](#features)
 - [Menu Categories](#menu-categories)
 - [Tech Stack](#tech-stack)
+- [Architecture (MVC)](#architecture-mvc)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Setup & Installation](#setup--installation)
 - [Database Setup](#database-setup)
 - [Running the Website](#running-the-website)
+- [API Endpoints](#api-endpoints)
 - [Team](#team)
 - [Contact](#contact)
 - [License](#license)
@@ -70,9 +72,54 @@ An **Admin Dashboard** is included for the shop owner to view, manage, and clear
 |---|---|
 | **Frontend** | HTML5, CSS3, JavaScript (Vanilla) |
 | **Backend** | PHP 7+ |
-| **Database** | MySQL (via MySQLi) |
+| **Database** | MySQL (via MySQLi with Prepared Statements) |
 | **Fonts** | Google Fonts (Lilita One, Playfair Display) |
+| **Architecture** | MVC (Model–View–Controller) |
 | **Hosting** | InfinityFree (production) / XAMPP (local development) |
+
+---
+
+## 🏗 Architecture (MVC)
+
+This project follows the **Model–View–Controller** pattern:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                     Browser (Client)                    │
+│          app.js handles SPA navigation & cart           │
+└──────────────┬──────────────────────────┬───────────────┘
+               │ Page Load               │ API Calls
+               ▼                         ▼
+         ┌───────────┐           ┌──────────────┐
+         │ index.php │           │  api/*.php   │
+         │  (Router) │           │ (Endpoints)  │
+         └─────┬─────┘           └──────┬───────┘
+               │ includes                │ delegates
+               ▼                         ▼
+        ┌─────────────┐         ┌────────────────┐
+        │  views/*.php │         │ controllers/   │
+        │  (Templates) │         │  *Controller   │
+        └─────────────┘         └───────┬────────┘
+                                        │ calls
+                                        ▼
+                                ┌────────────────┐
+                                │   models/      │
+                                │  Order.php     │
+                                │  Contact.php   │
+                                └───────┬────────┘
+                                        │ queries
+                                        ▼
+                                ┌────────────────┐
+                                │    MySQL DB    │
+                                │  (mr_boy_db)   │
+                                └────────────────┘
+```
+
+- **Models** (`models/`) — Data access layer. Each model encapsulates all SQL queries for its entity using prepared statements.
+- **Views** (`views/`) — Presentation layer. Broken into reusable partials (header, footer, home, menu, cart, etc.).
+- **Controllers** (`controllers/`) — Business logic. Validates input, calls models, and returns responses.
+- **API** (`api/`) — Thin endpoint files that route HTTP requests to the appropriate controller method.
+- **Public** (`public/`) — Static assets (CSS, JS, images) served directly to the browser.
 
 ---
 
@@ -80,110 +127,119 @@ An **Admin Dashboard** is included for the shop owner to view, manage, and clear
 
 ```
 comission/
-├── README.md                    # This file
-├── BREWCODE_GROUP4/             # Production-ready version (PHP)
-│   ├── .htaccess                # Apache config (DirectoryIndex, rewrites)
-│   ├── BREWCODE_GROUP4.php      # Main application (PHP version)
-│   ├── BREWCODE_GROUP4.css      # Stylesheet
-│   ├── BREWCODE_GROUP4.js       # Client-side JavaScript
-│   ├── submit_order.php         # API: Submit new order to DB
-│   ├── fetch_orders.php         # API: Fetch all orders from DB
-│   ├── get_orders.php           # API: Get orders (alt endpoint)
-│   ├── save_contact.php         # API: Save contact form messages
-│   ├── sales_summary.php        # Sales report page (daily/monthly/yearly)
-│   ├── index2.html              # Alternate landing page
-│   └── pictures/                # Product images for this version
-├── HTML/
-│   └── html.html                # Standalone HTML version (with Admin panel)
-├── CSS/
-│   └── ccs.css                  # Stylesheet (standalone version)
-├── JAVASCRIPT/
-│   └── java.js                  # JavaScript (standalone version)
-├── PHPDATABASE/
-│   ├── submit_order.php         # Order submission (localhost version)
-│   ├── fetch_orders.php         # Fetch orders (localhost version)
-│   └── get_orders.php           # Get orders (localhost version)
-├── CPPROG/                      # Full-stack version (PHP + separated assets)
-│   ├── index.php                # Main PHP page
-│   ├── ccs.css                  # Stylesheet
-│   ├── java.js                  # JavaScript
-│   ├── fetch_orders.php         # Fetch orders
-│   ├── get_orders.php           # Get orders
-│   ├── submit_order.php         # Submit order
-│   ├── save_contact.php         # Save contact messages
-│   ├── sales_summary.php        # Sales report
-│   └── pictures/                # Product images
-├── pictures/                    # Shared product & branding images (52 files)
-└── TEAM PROFILE/                # Team member photos (10 members)
+├── .htaccess                         # Apache DirectoryIndex config
+├── .gitignore                        # Git ignore rules
+├── README.md                         # This file
+├── index.php                         # 🎯 Main entry point (front controller)
+│
+├── config/
+│   └── database.php                  # DB connection (local/production toggle)
+│
+├── models/
+│   ├── Order.php                     # Order CRUD + sales summary
+│   └── Contact.php                   # Contact message creation
+│
+├── controllers/
+│   ├── OrderController.php           # Order API logic
+│   └── ContactController.php         # Contact form logic
+│
+├── views/
+│   ├── layouts/
+│   │   ├── header.php                # HTML head, meta, CSS link
+│   │   └── footer.php                # Footer, JS script tag
+│   ├── home.php                      # Hero, approach cards, CTA
+│   ├── menu.php                      # All menu categories & items
+│   ├── cart.php                      # Shopping cart & receipt
+│   ├── about.php                     # About us section
+│   ├── contact.php                   # Contact form
+│   └── admin/
+│       ├── dashboard.php             # Admin order table
+│       └── sales_summary.php         # Sales report (daily/monthly/yearly)
+│
+├── public/
+│   ├── css/
+│   │   └── style.css                 # All styles (organized by component)
+│   ├── js/
+│   │   └── app.js                    # All client-side logic
+│   └── images/                       # Product & branding images (52 files)
+│
+├── api/
+│   ├── submit_order.php              # POST  — Create new order
+│   ├── fetch_orders.php              # GET   — List all orders
+│   ├── delete_order.php              # POST  — Delete single order
+│   ├── clear_orders.php              # POST  — Delete all orders
+│   └── save_contact.php              # POST  — Save contact message
+│
+└── team/                             # Team member photos (10 members)
 ```
 
 ---
 
 ## 📋 Prerequisites
 
-### For Local Development (Full PHP + MySQL)
-
 1. **[XAMPP](https://www.apachefriends.org/)** (includes Apache, PHP, MySQL, phpMyAdmin)
    - Or any PHP 7+ environment with MySQL support
-
 2. **Web Browser** (Chrome, Firefox, Edge, etc.)
-
-### For Static Preview (HTML only, no database)
-
-1. **Python 3** (for simple HTTP server) — or just open `html.html` directly in a browser.
 
 ---
 
 ## 🚀 Setup & Installation
 
-### Option 1: Quick Static Preview (No PHP/Database)
+### 1. Clone the Repository
 
 ```bash
-# Clone or download the project
-cd comission
-
-# Serve with Python
-python -m http.server 8000 --directory HTML
-
-# Open in browser
-# http://localhost:8000/html.html
+git clone https://github.com/Kiro2-3/Comission1.git
+cd Comission1
 ```
 
-> ⚠️ **Note:** Cart/ordering works (client-side), but submitting orders to the database will fail without a PHP server.
+### 2. Copy to XAMPP Web Root
 
-### Option 2: Full Setup with XAMPP
+```
+C:\xampp\htdocs\comission\
+```
 
-1. **Install XAMPP** from [apachefriends.org](https://www.apachefriends.org/)
+Copy all project files into this directory.
 
-2. **Copy the project** to XAMPP's web root:
-   ```
-   C:\xampp\htdocs\comission\
-   ```
-   Copy the entire contents of the `BREWCODE_GROUP4/` folder (or `CPPROG/` folder) into this directory.
+### 3. Configure Database Connection
 
-3. **Start XAMPP** — Launch Apache and MySQL from the XAMPP Control Panel.
+Edit `config/database.php` and set the environment:
 
-4. **Set up the database** (see [Database Setup](#database-setup) below).
+```php
+// For local development:
+define('ENVIRONMENT', 'local');
 
-5. **Open in browser:**
-   ```
-   http://localhost/comission/
-   ```
+// For InfinityFree production:
+define('ENVIRONMENT', 'production');
+```
+
+### 4. Start XAMPP
+
+Launch **Apache** and **MySQL** from the XAMPP Control Panel.
+
+### 5. Set Up the Database
+
+See [Database Setup](#database-setup) below.
+
+### 6. Open in Browser
+
+```
+http://localhost/comission/
+```
 
 ---
 
 ## 🗄 Database Setup
 
-### 1. Create the Database
-
 Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run:
+
+### Create Database
 
 ```sql
 CREATE DATABASE IF NOT EXISTS mr_boy_db;
 USE mr_boy_db;
 ```
 
-### 2. Create the `orders` Table
+### Create `orders` Table
 
 ```sql
 CREATE TABLE orders (
@@ -195,7 +251,7 @@ CREATE TABLE orders (
 );
 ```
 
-### 3. Create the `contact_messages` Table
+### Create `contact_messages` Table
 
 ```sql
 CREATE TABLE contact_messages (
@@ -208,37 +264,40 @@ CREATE TABLE contact_messages (
 );
 ```
 
-### 4. Update Database Credentials
-
-For **local development**, edit the PHP files and set:
-
-```php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "mr_boy_db";
-```
-
-> The `PHPDATABASE/` folder already uses localhost credentials. The `BREWCODE_GROUP4/` folder uses InfinityFree production credentials.
-
 ---
 
 ## ▶️ Running the Website
 
-### Static HTML (Quick Test)
-
 ```bash
-# From the project root
-python -m http.server 8000 --directory HTML
+# Start XAMPP (Apache + MySQL)
+# Then open:
+http://localhost/comission/
 ```
 
-Then open: **http://localhost:8000/html.html**
+For the sales summary report, navigate to:
+```
+http://localhost/comission/views/admin/sales_summary.php
+```
 
-### With XAMPP (Full Features)
+---
 
-1. Start **Apache** and **MySQL** in XAMPP Control Panel
-2. Navigate to: **http://localhost/comission/BREWCODE_GROUP4.php**
-3. Or if using CPPROG version: **http://localhost/comission/index.php**
+## 🔌 API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/submit_order.php` | Submit a new order (JSON body) |
+| `GET` | `/api/fetch_orders.php` | Fetch all orders |
+| `POST` | `/api/delete_order.php` | Delete a single order by ID |
+| `POST` | `/api/clear_orders.php` | Clear all order records |
+| `POST` | `/api/save_contact.php` | Save a contact form message |
+
+### Example: Submit Order
+
+```bash
+curl -X POST http://localhost/comission/api/submit_order.php \
+  -H "Content-Type: application/json" \
+  -d '{"customer_name":"Juan","order_details":"Matcha 16oz, Okinawa 22oz","total_price":68}'
+```
 
 ---
 
@@ -246,18 +305,18 @@ Then open: **http://localhost:8000/html.html**
 
 **BREWCODE — Group 4**
 
-| Member | Photo |
-|---|---|
-| Apolonio | `TEAM PROFILE/APOLONIO.jpeg` |
-| Apuyan | `TEAM PROFILE/Apuyan.png` |
-| Cañete | `TEAM PROFILE/CAÑETE.jpeg` |
-| Jerez, Ayiza | `TEAM PROFILE/JEREZ, AYIZA.jpg` |
-| Obosa | `TEAM PROFILE/OBOSA.jpeg` |
-| Refalpa, Jona Mae | `TEAM PROFILE/Refalpa, Jona Mae_.jpg` |
-| Ricafranca | `TEAM PROFILE/RICAFRANCA_.jpg` |
-| Rogel | `TEAM PROFILE/ROGEL.jpg` |
-| Toledo | `TEAM PROFILE/TOLEDO.jpg` |
-| Vargas | `TEAM PROFILE/VARGAS.png` |
+| Member |
+|---|
+| Apolonio |
+| Apuyan |
+| Cañete |
+| Jerez, Ayiza |
+| Obosa |
+| Refalpa, Jona Mae |
+| Ricafranca |
+| Rogel |
+| Toledo |
+| Vargas |
 
 ---
 
