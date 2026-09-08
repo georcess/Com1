@@ -172,12 +172,12 @@ export const Home: React.FC<HomeProps> = ({
   const [addedItemName, setAddedItemName] = useState<string | null>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto rotate hero slide every 4 seconds
+  // Auto rotate hero slide every 6 seconds
   useEffect(() => {
     autoPlayRef.current = setInterval(() => {
       setHeroSlideIndex((prev) => (prev + 1) % BEST_SELLERS.length);
       setHeroSelectedSize(0);
-    }, 4000);
+    }, 6000);
 
     return () => {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
@@ -189,7 +189,7 @@ export const Home: React.FC<HomeProps> = ({
     autoPlayRef.current = setInterval(() => {
       setHeroSlideIndex((prev) => (prev + 1) % BEST_SELLERS.length);
       setHeroSelectedSize(0);
-    }, 5000);
+    }, 6500);
   };
 
   const handlePrevSlide = () => {
@@ -415,71 +415,6 @@ export const Home: React.FC<HomeProps> = ({
                   !
                 </p>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-1">
-                <Button
-                  variant="brand"
-                  size="lg"
-                  onClick={onStartOrdering}
-                  className="group relative gap-2.5 rounded-2xl px-8 py-6 text-base font-extrabold shadow-2xl hover:shadow-brand-orange/50 active:scale-95 transition-all bg-gradient-to-r from-brand-orange via-amber-500 to-brand-orange text-white"
-                >
-                  <ShoppingBag className="h-5 w-5 transition-transform group-hover:scale-110" />
-                  <span>Start Ordering Now</span>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => {
-                    const feat = document.getElementById('featured-carousel-sec');
-                    if (feat) feat.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="rounded-2xl px-7 py-6 text-base font-bold text-white border-white/20 bg-white/10 backdrop-blur-md hover:bg-white/20 hover:border-white/40 active:scale-95 transition-all shadow-md"
-                >
-                  <span>🔥 Featured Specials</span>
-                </Button>
-              </div>
-
-              {/* Mini Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10">
-                
-                {/* Metric 1: Customer Rating */}
-                <div className="flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md p-3 border border-white/15 shadow-sm hover:bg-white/15 transition-colors">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-amber/20 text-brand-amber border border-brand-amber/30">
-                    <Star className="h-5 w-5 fill-brand-amber text-brand-amber" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-display text-base font-extrabold text-white leading-tight">4.9 / 5.0</div>
-                    <div className="text-[11px] text-amber-200/80 font-medium">Customer Rating</div>
-                  </div>
-                </div>
-
-                {/* Metric 2: Flavors */}
-                <div className="flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md p-3 border border-white/15 shadow-sm hover:bg-white/15 transition-colors">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500/20 text-green-300 border border-green-500/30">
-                    <CheckCircle className="h-5 w-5 text-green-400" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-display text-base font-extrabold text-white leading-tight">50+ Flavors</div>
-                    <div className="text-[11px] text-amber-200/80 font-medium">Drink Selections</div>
-                  </div>
-                </div>
-
-                {/* Metric 3: Affordable */}
-                <div className="flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md p-3 border border-white/15 shadow-sm hover:bg-white/15 transition-colors">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/20 text-amber-300 border border-amber-300/30">
-                    <Zap className="h-5 w-5 text-brand-amber" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-display text-base font-extrabold text-white leading-tight">₱29 Everyday</div>
-                    <div className="text-[11px] text-amber-200/80 font-medium">Affordable Pricing</div>
-                  </div>
-                </div>
-
-              </div>
-
             </div>
 
             {/* Right Column: Interactive Auto-Sliding Best Seller Showcase (5 cols) */}
