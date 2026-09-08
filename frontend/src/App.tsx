@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './components/Home';
@@ -10,15 +10,34 @@ import { Team } from './components/Team';
 import { AdminDashboard } from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
 import { ReceiptModal } from './components/ReceiptModal';
+import { PageSkeleton } from './components/PageSkeleton';
 import { CartItem, User } from './types';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('home');
+  const [targetTab, setTargetTab] = useState<string>('home');
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(false);
+  const switchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const [selectedMenuCategory, setSelectedMenuCategory] = useState<string>('all');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const handleTabChange = (nextTab: string) => {
+    if (nextTab === activeTab && !isPageLoading) return;
+    if (switchTimerRef.current) clearTimeout(switchTimerRef.current);
+
+    setTargetTab(nextTab);
+    setIsPageLoading(true);
+
+    switchTimerRef.current = setTimeout(() => {
+      setActiveTab(nextTab);
+      setIsPageLoading(false);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }, 280);
+  };
 
   // Modals state
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
@@ -169,7 +188,7 @@ export function App() {
     } finally {
       setCurrentUser(null);
       localStorage.removeItem('mr_boy_user');
-      setActiveTab('home');
+      handleTabChange('home');
     }
   };
 
@@ -177,8 +196,8 @@ export function App() {
     <div className="min-h-screen flex flex-col bg-brand-cream/60 font-sans text-brand-brown">
       {/* Navbar */}
       <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        activeTab={isPageLoading ? targetTab : activeTab}
+        setActiveTab={handleTabChange}
         cartCount={cart.length}
         currentUser={currentUser}
         onOpenAuth={handleOpenAuth}
@@ -186,83 +205,89 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1">
-        {activeTab === 'home' && (
-          <div className="animate-in fade-in duration-300">
-            <Home
-              onStartOrdering={() => {
-                setSelectedMenuCategory('all');
-                setActiveTab('menu');
-              }}
-              onAddToCart={handleAddToCart}
-              onExploreCategory={(cat) => {
-                setSelectedMenuCategory(cat);
-                setActiveTab('menu');
-              }}
-              onOpenAuth={handleOpenAuth}
-            />
-          </div>
-        )}
+      <main className="flex-1 min-h-[60vh]">
+        {isPageLoading ? (
+          <PageSkeleton tab={targetTab} />
+        ) : (
+          <>
+            {activeTab === 'home' && (
+              <div className="animate-in fade-in duration-300">
+                <Home
+                  onStartOrdering={() => {
+                    setSelectedMenuCategory('all');
+                    handleTabChange('menu');
+                  }}
+                  onAddToCart={handleAddToCart}
+                  onExploreCategory={(cat) => {
+                    setSelectedMenuCategory(cat);
+                    handleTabChange('menu');
+                  }}
+                  onOpenAuth={handleOpenAuth}
+                />
+              </div>
+            )}
 
-        {activeTab === 'menu' && (
-          <div className="animate-in fade-in duration-300">
-            <Menu
-              onAddToCart={handleAddToCart}
-              onAddAddonToLast={handleAddAddonToLast}
-              initialCategory={selectedMenuCategory}
-            />
-          </div>
-        )}
+            {activeTab === 'menu' && (
+              <div className="animate-in fade-in duration-300">
+                <Menu
+                  onAddToCart={handleAddToCart}
+                  onAddAddonToLast={handleAddAddonToLast}
+                  initialCategory={selectedMenuCategory}
+                />
+              </div>
+            )}
 
-        {activeTab === 'cart' && (
-          <div className="animate-in fade-in duration-300">
-            <Cart
-              cart={cart}
-              total={cartTotal}
-              customerName={customerName}
-              setCustomerName={setCustomerName}
-              currentUser={currentUser}
-              onAddAddonToLast={handleAddAddonToLast}
-              onRemoveItem={handleRemoveItem}
-              onClearCart={handleClearCart}
-              onOpenMenu={() => setActiveTab('menu')}
-              onOpenAuth={handleOpenAuth}
-              onGenerateReceipt={handleGenerateReceipt}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-        )}
+            {activeTab === 'cart' && (
+              <div className="animate-in fade-in duration-300">
+                <Cart
+                  cart={cart}
+                  total={cartTotal}
+                  customerName={customerName}
+                  setCustomerName={setCustomerName}
+                  currentUser={currentUser}
+                  onAddAddonToLast={handleAddAddonToLast}
+                  onRemoveItem={handleRemoveItem}
+                  onClearCart={handleClearCart}
+                  onOpenMenu={() => handleTabChange('menu')}
+                  onOpenAuth={handleOpenAuth}
+                  onGenerateReceipt={handleGenerateReceipt}
+                  isSubmitting={isSubmitting}
+                />
+              </div>
+            )}
 
-        {activeTab === 'team' && (
-          <div className="animate-in fade-in duration-300">
-            <Team />
-          </div>
-        )}
+            {activeTab === 'team' && (
+              <div className="animate-in fade-in duration-300">
+                <Team />
+              </div>
+            )}
 
-        {activeTab === 'about' && (
-          <div className="animate-in fade-in duration-300">
-            <About />
-          </div>
-        )}
+            {activeTab === 'about' && (
+              <div className="animate-in fade-in duration-300">
+                <About />
+              </div>
+            )}
 
-        {activeTab === 'contact' && (
-          <div className="animate-in fade-in duration-300">
-            <Contact />
-          </div>
-        )}
+            {activeTab === 'contact' && (
+              <div className="animate-in fade-in duration-300">
+                <Contact />
+              </div>
+            )}
 
-        {activeTab === 'admin' && (
-          <div className="animate-in fade-in duration-300">
-            <AdminDashboard
-              currentUser={currentUser}
-              onOpenAuth={handleOpenAuth}
-            />
-          </div>
+            {activeTab === 'admin' && (
+              <div className="animate-in fade-in duration-300">
+                <AdminDashboard
+                  currentUser={currentUser}
+                  onOpenAuth={handleOpenAuth}
+                />
+              </div>
+            )}
+          </>
         )}
       </main>
 
       {/* Footer */}
-      <Footer onNavigate={setActiveTab} />
+      <Footer onNavigate={handleTabChange} />
 
       {/* Modals */}
       <AuthModal
