@@ -1,6 +1,6 @@
 # ☕ Mr. Boy SpecialTea — Online Ordering System
 
-> A web-based ordering system for **Mr. Boy SpecialTea**, a milk tea, coffee, and snack shop located at Dela Costa V, Burgos Montalban, Rodriguez, Rizal, Philippines.
+> A web-based ordering system with User Authentication and Admin Management for **Mr. Boy SpecialTea**, located at Dela Costa V, Burgos Montalban, Rodriguez, Rizal, Philippines.
 
 ---
 
@@ -8,13 +8,14 @@
 
 - [About](#about)
 - [Features](#features)
+- [Authentication & Roles](#-authentication--roles)
 - [Menu Categories](#menu-categories)
 - [Tech Stack](#tech-stack)
 - [Architecture (MVC)](#architecture-mvc)
 - [Project Structure](#project-structure)
 - [Quick Start (Python + SQLite — No XAMPP Needed)](#-quick-start-python--sqlite--no-xampp-needed)
 - [Alternative Setup (PHP + XAMPP / MySQL)](#-alternative-setup-php--xampp--mysql)
-- [Database Configuration](#-database-configuration)
+- [Database Configuration & Schema](#-database-configuration--schema)
 - [API Endpoints](#-api-endpoints)
 - [Team](#-team)
 - [Contact](#-contact)
@@ -24,14 +25,10 @@
 
 ## 📖 About
 
-**Mr. Boy SpecialTea** is a local tea and coffee shop that offers affordable beverages and snacks. This project is an online ordering system that allows customers to:
+**Mr. Boy SpecialTea** is a local tea and coffee shop that offers affordable beverages and snacks. This project is a full-featured online ordering system that allows:
 
-- Browse the full menu with product images
-- Add items to a shopping cart with add-ons (e.g., pearl)
-- Generate a receipt for their order
-- Submit orders directly to a database
-
-An **Admin Dashboard** is included for the shop owner to view, manage, and clear orders, along with a **Sales Summary** page for daily/monthly/yearly reporting.
+- Customers to **register accounts**, **log in**, browse the menu, add items to cart, and generate receipts with automatic customer name filling.
+- Store administrators to **log in securely**, view incoming customer orders in real time, mark orders as done, clear records, and inspect sales revenue summaries.
 
 ---
 
@@ -39,14 +36,35 @@ An **Admin Dashboard** is included for the shop owner to view, manage, and clear
 
 | Feature | Description |
 |---|---|
+| 🔐 **User Authentication** | Tabbed Login & Register popup modal with password hashing |
+| 👤 **User Profiles & Roles** | Automatic distinction between Customers and Administrators |
 | 🏠 **Home Page** | Hero banner with shop logo and branding |
 | 📜 **Menu** | Full menu with 6 categories and product images |
-| 🛒 **Cart & Ordering** | Add items, add-ons (Pearl ₱9), view totals, generate receipt |
+| 🛒 **Cart & Ordering** | Add items, add-ons (Pearl ₱9), auto-fill customer name, view totals |
 | 🧾 **Receipt Generation** | On-screen receipt with customer name and itemized list |
-| 📊 **Admin Dashboard** | View all orders with date, customer, items, and totals |
+| 🔒 **Protected Admin Dashboard** | Restricted to admin users with order management & table actions |
 | 📈 **Sales Summary** | Daily, monthly, and yearly sales reports |
 | 📬 **Contact Form** | Customers can send messages saved to the database |
 | 🎨 **Responsive Design** | Mobile-friendly layout with smooth fade transitions |
+
+---
+
+## 🔐 Authentication & Roles
+
+### Default Admin Account
+
+The system automatically seeds a default administrator account on first run:
+
+| Field | Value |
+|---|---|
+| **Username** | `admin` |
+| **Password** | `admin123` |
+| **Role** | `admin` |
+
+### Customer Registration
+
+- Visitors can click **"🔑 Login / Register"** in the navigation bar to register with their Full Name, Username, Email, and Password (min. 6 characters).
+- Once logged in, their name is pre-filled when placing orders in the Cart.
 
 ---
 
@@ -73,6 +91,7 @@ An **Admin Dashboard** is included for the shop owner to view, manage, and clear
 | **Backend Option 1 (Recommended / Quick)** | Python 3 + Flask + SQLite (Zero config, no XAMPP needed) |
 | **Backend Option 2** | PHP 7+ + MySQL / Apache (XAMPP / InfinityFree) |
 | **Architecture** | MVC (Model–View–Controller) |
+| **Security** | Password Hashing (Werkzeug in Python / `password_hash` in PHP) |
 | **Fonts** | Google Fonts (Lilita One, Playfair Display) |
 
 ---
@@ -84,7 +103,7 @@ This project follows the **Model–View–Controller** pattern:
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     Browser (Client)                    │
-│          app.js handles SPA navigation & cart           │
+│     app.js handles Auth state, Navigation, & Cart       │
 └──────────────┬──────────────────────────┬───────────────┘
                │ Page Load               │ API Calls
                ▼                         ▼
@@ -96,13 +115,13 @@ This project follows the **Model–View–Controller** pattern:
                ▼                         ▼
         ┌─────────────┐         ┌────────────────┐
         │  views/*.php │         │ controllers/   │
-        │  (Templates) │         │  *Controller   │
+        │  (Templates) │         │ *Controller.php│
         └─────────────┘         └───────┬────────┘
                                         │ calls
                                         ▼
                                 ┌────────────────┐
                                 │   models/      │
-                                │  Order / DB    │
+                                │ User/Order/Cont│
                                 └───────┬────────┘
                                         │ queries
                                         ▼
@@ -128,10 +147,12 @@ comission/
 │   └── database.php                  # PHP DB config (local/production toggle)
 │
 ├── models/
-│   ├── Order.php                     # PHP Order model (CRUD + sales summary)
-│   └── Contact.php                   # PHP Contact model
+│   ├── User.php                      # User authentication & registration model
+│   ├── Order.php                     # Order CRUD + sales summary model
+│   └── Contact.php                   # Contact message model
 │
 ├── controllers/
+│   ├── AuthController.php            # Login, Register, Logout, Current User logic
 │   ├── OrderController.php           # Order API logic
 │   └── ContactController.php         # Contact form logic
 │
@@ -139,28 +160,34 @@ comission/
 │   ├── layouts/
 │   │   ├── header.php                # HTML head, meta, CSS link
 │   │   └── footer.php                # Footer, JS script tag
+│   ├── auth/
+│   │   └── modal.php                 # Login / Register tabbed popup modal
 │   ├── home.php                      # Hero, approach cards, CTA
 │   ├── menu.php                      # All menu categories & items
 │   ├── cart.php                      # Shopping cart & receipt
 │   ├── about.php                     # About us section
 │   ├── contact.php                   # Contact form
 │   └── admin/
-│       ├── dashboard.php             # Admin order table
+│       ├── dashboard.php             # Admin order table (role protected)
 │       └── sales_summary.php         # Sales report (daily/monthly/yearly)
 │
 ├── public/
 │   ├── css/
-│   │   └── style.css                 # All styles (organized by component)
+│   │   └── style.css                 # All styles (organized by component + Auth)
 │   ├── js/
-│   │   └── app.js                    # All client-side logic
+│   │   └── app.js                    # All client-side logic & Auth management
 │   └── images/                       # Product & branding images (52 files)
 │
 ├── api/
-│   ├── submit_order.php              # POST  — Create new order
-│   ├── fetch_orders.php              # GET   — List all orders
-│   ├── delete_order.php              # POST  — Delete single order
-│   ├── clear_orders.php              # POST  — Delete all orders
-│   └── save_contact.php              # POST  — Save contact message
+│   ├── register.php                  # POST — Register new user
+│   ├── login.php                     # POST — Log in user
+│   ├── logout.php                    # POST — Log out user
+│   ├── current_user.php              # GET  — Get current session user
+│   ├── submit_order.php              # POST — Create new order
+│   ├── fetch_orders.php              # GET  — List all orders
+│   ├── delete_order.php              # POST — Delete single order
+│   ├── clear_orders.php              # POST — Delete all orders
+│   └── save_contact.php              # POST — Save contact message
 │
 └── team/                             # Team member photos (10 members)
 ```
@@ -169,7 +196,7 @@ comission/
 
 ## ⚡ Quick Start (Python + SQLite — No XAMPP Needed)
 
-The fastest and easiest way to run the entire website with full database functionality without installing XAMPP or setting up MySQL.
+The fastest and easiest way to run the entire website with full database functionality without installing XAMPP.
 
 ### 1. Install Flask
 
@@ -187,8 +214,8 @@ python server.py
 
 Go to: **[http://localhost:5000](http://localhost:5000)**
 
-- Database table creation (`database/mr_boy.db`) is **100% automated on first launch**.
-- Cart ordering, order submission, receipt generation, admin table, and sales summary all work immediately.
+- The SQLite database (`database/mr_boy.db`) and tables (`users`, `orders`, `contact_messages`) are **automatically created**.
+- Default administrator account (`admin` / `admin123`) is seeded automatically.
 
 ---
 
@@ -210,6 +237,16 @@ Open `http://localhost/phpmyadmin` and execute:
 ```sql
 CREATE DATABASE IF NOT EXISTS mr_boy_db;
 USE mr_boy_db;
+
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    fullname VARCHAR(150) NOT NULL,
+    role VARCHAR(20) DEFAULT 'customer',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -241,6 +278,10 @@ http://localhost/comission/
 
 | Method | Endpoint | Description |
 |---|---|---|
+| `POST` | `/api/register.php` | Register new customer account (`username`, `email`, `password`, `fullname`) |
+| `POST` | `/api/login.php` | Authenticate user (`username` or `email`, `password`) |
+| `POST` | `/api/logout.php` | Terminate user session |
+| `GET` | `/api/current_user.php` | Retrieve current authenticated user |
 | `POST` | `/api/submit_order.php` | Submit a new order (JSON body) |
 | `GET` | `/api/fetch_orders.php` | Fetch all orders |
 | `POST` | `/api/delete_order.php` | Delete a single order by ID |

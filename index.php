@@ -12,12 +12,18 @@
 <div class="page-wrapper">
 
   <nav>
-    <button onclick="showSection('home')">Home</button>
-    <button onclick="showSection('menu')">Menu</button>
-    <button onclick="showSection('cart')">Order</button>
-    <button onclick="showSection('about')">About</button>
-    <button onclick="showSection('contact')">Contact</button>
-    <button onclick="showSection('admin')" style="background-color: #3b2f2f; color: white;">Admin</button>
+    <div class="nav-links">
+      <button onclick="showSection('home')">Home</button>
+      <button onclick="showSection('menu')">Menu</button>
+      <button onclick="showSection('cart')">Order</button>
+      <button onclick="showSection('about')">About</button>
+      <button onclick="showSection('contact')">Contact</button>
+      <button onclick="showSection('admin')" style="background-color: #3b2f2f; color: white;">Admin</button>
+    </div>
+    <div class="nav-auth" id="nav-auth">
+      <!-- Injected dynamically by app.js: Login/Register button or User profile badge + Logout -->
+      <button onclick="openAuthModal('login')" class="auth-nav-btn">🔑 Login / Register</button>
+    </div>
   </nav>
 
   <?php include 'views/home.php'; ?>
@@ -26,6 +32,9 @@
   <?php include 'views/about.php'; ?>
   <?php include 'views/contact.php'; ?>
   <?php include 'views/admin/dashboard.php'; ?>
+
+  <!-- Auth Modal -->
+  <?php include 'views/auth/modal.php'; ?>
 
 </div>
 

@@ -1,7 +1,17 @@
 <!-- ===== ADMIN DASHBOARD ===== -->
 <section id="admin" class="section">
   <h2>Admin Dashboard 📊</h2>
-  <div style="overflow-x:auto; padding: 20px;">
+
+  <!-- Admin Gate: Shown if not logged in as admin -->
+  <div id="admin-auth-gate" style="display: none; padding: 40px 20px; max-width: 500px; margin: 20px auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
+    <h3 style="color: #4b2e2e; margin-bottom: 10px;">Admin Access Restricted</h3>
+    <p style="color: #666; margin-bottom: 20px;">You must be logged in as an Administrator to view incoming customer orders and manage store records.</p>
+    <button onclick="openAuthModal('login')" style="background-color: #4b2e2e; color: white;">🔑 Login as Admin</button>
+  </div>
+
+  <!-- Admin Content: Shown only for admins -->
+  <div id="admin-content" style="overflow-x:auto; padding: 20px;">
     <table id="order-table" style="width:100%; border-collapse: collapse; background: white; color: black;">
       <thead>
         <tr style="background-color: #4b2e2e; color: white;">

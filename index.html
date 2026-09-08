@@ -13,12 +13,18 @@
 <div class="page-wrapper">
 
   <nav>
-    <button onclick="showSection('home')">Home</button>
-    <button onclick="showSection('menu')">Menu</button>
-    <button onclick="showSection('cart')">Order</button>
-    <button onclick="showSection('about')">About</button>
-    <button onclick="showSection('contact')">Contact</button>
-    <button onclick="showSection('admin')" style="background-color: #3b2f2f; color: white;">Admin</button>
+    <div class="nav-links">
+      <button onclick="showSection('home')">Home</button>
+      <button onclick="showSection('menu')">Menu</button>
+      <button onclick="showSection('cart')">Order</button>
+      <button onclick="showSection('about')">About</button>
+      <button onclick="showSection('contact')">Contact</button>
+      <button onclick="showSection('admin')" style="background-color: #3b2f2f; color: white;">Admin</button>
+    </div>
+    <div class="nav-auth" id="nav-auth">
+      <!-- Injected dynamically by app.js -->
+      <button onclick="openAuthModal('login')" class="auth-nav-btn">🔑 Login / Register</button>
+    </div>
   </nav>
 
   <!-- ===== HOME SECTION ===== -->
@@ -207,7 +213,17 @@
   <!-- ===== ADMIN DASHBOARD ===== -->
   <section id="admin" class="section">
     <h2>Admin Dashboard 📊</h2>
-    <div style="overflow-x:auto; padding: 20px;">
+
+    <!-- Admin Gate: Shown if not logged in as admin -->
+    <div id="admin-auth-gate" style="display: none; padding: 40px 20px; max-width: 500px; margin: 20px auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="font-size: 48px; margin-bottom: 10px;">🔒</div>
+      <h3 style="color: #4b2e2e; margin-bottom: 10px;">Admin Access Restricted</h3>
+      <p style="color: #666; margin-bottom: 20px;">You must be logged in as an Administrator to view incoming customer orders and manage store records.</p>
+      <button onclick="openAuthModal('login')" style="background-color: #4b2e2e; color: white;">🔑 Login as Admin</button>
+    </div>
+
+    <!-- Admin Content: Shown only for admins -->
+    <div id="admin-content" style="overflow-x:auto; padding: 20px;">
       <table id="order-table" style="width:100%; border-collapse: collapse; background: white; color: black;">
         <thead>
           <tr style="background-color: #4b2e2e; color: white;">
@@ -223,6 +239,64 @@
       <button onclick="clearAllOrders()" style="margin-top: 20px; background: red; color: white;">Clear All Records</button>
     </div>
   </section>
+
+  <!-- ===== AUTH MODAL (LOGIN / REGISTER) ===== -->
+  <div id="auth-modal" class="auth-modal" style="display: none;">
+    <div class="auth-modal-overlay" onclick="closeAuthModal()"></div>
+    <div class="auth-modal-card">
+      <button class="auth-close-btn" onclick="closeAuthModal()">&times;</button>
+      
+      <div class="auth-tabs">
+        <button id="tab-login-btn" class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+        <button id="tab-register-btn" class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+      </div>
+
+      <div id="auth-alert" class="auth-alert" style="display: none;"></div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+        <div class="auth-input-group">
+          <label for="login-username">Username or Email</label>
+          <input type="text" id="login-username" class="auth-input" placeholder="Enter username or email" required autocomplete="username">
+        </div>
+        <div class="auth-input-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" class="auth-input" placeholder="Enter password" required autocomplete="current-password">
+        </div>
+        <button type="submit" id="login-submit-btn" class="auth-submit-btn">Login ☕</button>
+        <p class="auth-footer-text">
+          Don't have an account? <a href="javascript:void(0)" onclick="switchAuthTab('register')">Register here</a>
+        </p>
+        <div class="auth-admin-hint">
+          <small>💡 Default Admin Login: <strong>admin</strong> / <strong>admin123</strong></small>
+        </div>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="register-form" class="auth-form" onsubmit="handleRegister(event)" style="display: none;">
+        <div class="auth-input-group">
+          <label for="reg-fullname">Full Name</label>
+          <input type="text" id="reg-fullname" class="auth-input" placeholder="e.g. Juan Dela Cruz" required autocomplete="name">
+        </div>
+        <div class="auth-input-group">
+          <label for="reg-username">Username</label>
+          <input type="text" id="reg-username" class="auth-input" placeholder="Choose a username" required autocomplete="username">
+        </div>
+        <div class="auth-input-group">
+          <label for="reg-email">Email Address</label>
+          <input type="email" id="reg-email" class="auth-input" placeholder="name@example.com" required autocomplete="email">
+        </div>
+        <div class="auth-input-group">
+          <label for="reg-password">Password (min. 6 characters)</label>
+          <input type="password" id="reg-password" class="auth-input" placeholder="Create a password" required minlength="6" autocomplete="new-password">
+        </div>
+        <button type="submit" id="reg-submit-btn" class="auth-submit-btn">Create Account ✨</button>
+        <p class="auth-footer-text">
+          Already have an account? <a href="javascript:void(0)" onclick="switchAuthTab('login')">Login here</a>
+        </p>
+      </form>
+    </div>
+  </div>
 
 </div>
 

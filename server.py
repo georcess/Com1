@@ -13,11 +13,13 @@ Then open: http://localhost:5000
 import os
 import sqlite3
 from datetime import datetime
-from flask import Flask, request, jsonify, send_from_directory, send_file
+from flask import Flask, request, jsonify, send_from_directory, send_file, session
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # ── App Configuration ──────────────────────────────────────────
 
-app = Flask(__name__, static_folder=None)  # We handle static files manually
+app = Flask(__name__, static_folder=None)
+app.secret_key = os.environ.get('SECRET_KEY', 'mr_boy_specialtea_secret_key_2026_dev')
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH  = os.path.join(BASE_DIR, 'database', 'mr_boy.db')
@@ -33,10 +35,20 @@ def get_db():
 
 
 def init_db():
-    """Create tables if they don't exist."""
+    """Create tables if they don't exist and seed default admin."""
     os.makedirs(os.path.join(BASE_DIR, 'database'), exist_ok=True)
     conn = get_db()
     conn.executescript('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            fullname TEXT NOT NULL,
+            role TEXT DEFAULT 'customer',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             customer_name TEXT NOT NULL,
@@ -54,6 +66,17 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
+
+    # Seed default admin if missing
+    admin = conn.execute("SELECT id FROM users WHERE username = 'admin'").fetchone()
+    if not admin:
+        hashed_pw = generate_password_hash('admin123')
+        conn.execute(
+            "INSERT INTO users (username, email, password, fullname, role) VALUES (?, ?, ?, ?, ?)",
+            ('admin', 'admin@mrboyspecialtea.com', hashed_pw, 'System Administrator', 'admin')
+        )
+        print("[OK] Seeded default admin account (username: admin / password: admin123)")
+
     conn.commit()
     conn.close()
     print(f"[OK] Database ready at: {DB_PATH}")
@@ -63,8 +86,7 @@ def init_db():
 
 @app.route('/')
 def index():
-    """Serve the main page (index.html for static, or rendered index.php)."""
-    # Serve index.html which is a static version of the site
+    """Serve the main page (index.html)."""
     return send_file(os.path.join(BASE_DIR, 'index.html'))
 
 
@@ -72,6 +94,123 @@ def index():
 def serve_public(filename):
     """Serve static assets (CSS, JS, images)."""
     return send_from_directory(os.path.join(BASE_DIR, 'public'), filename)
+
+
+# ── API: Auth (Register / Login / Logout / Current User) ───────
+
+@app.route('/api/register.php', methods=['POST'])
+@app.route('/api/register', methods=['POST'])
+def register():
+    """Register a new customer account."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data received.'}), 400
+
+    username = data.get('username', '').strip()
+    fullname = data.get('fullname', '').strip()
+    email    = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+
+    if not username or not fullname or not email or not password:
+        return jsonify({'status': 'error', 'message': 'All fields are required.'}), 400
+
+    if len(password) < 6:
+        return jsonify({'status': 'error', 'message': 'Password must be at least 6 characters.'}), 400
+
+    if '@' not in email or '.' not in email:
+        return jsonify({'status': 'error', 'message': 'Please enter a valid email address.'}), 400
+
+    conn = get_db()
+    existing = conn.execute(
+        "SELECT id FROM users WHERE username = ? OR email = ?",
+        (username, email)
+    ).fetchone()
+
+    if existing:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'Username or Email is already taken.'}), 400
+
+    hashed_pw = generate_password_hash(password)
+    cur = conn.execute(
+        "INSERT INTO users (username, email, password, fullname, role) VALUES (?, ?, ?, ?, 'customer')",
+        (username, email, hashed_pw, fullname)
+    )
+    user_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+
+    user_data = {
+        'id': user_id,
+        'username': username,
+        'email': email,
+        'fullname': fullname,
+        'role': 'customer'
+    }
+    session['user'] = user_data
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Registration successful! Welcome to Mr. Boy SpecialTea.',
+        'user': user_data
+    })
+
+
+@app.route('/api/login.php', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
+def login():
+    """Login with username or email."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data received.'}), 400
+
+    login_identifier = data.get('username', '').strip()
+    password         = data.get('password', '')
+
+    if not login_identifier or not password:
+        return jsonify({'status': 'error', 'message': 'Username/Email and Password are required.'}), 400
+
+    conn = get_db()
+    user = conn.execute(
+        "SELECT id, username, email, password, fullname, role FROM users WHERE username = ? OR email = ?",
+        (login_identifier, login_identifier.lower())
+    ).fetchone()
+    conn.close()
+
+    if not user or not check_password_hash(user['password'], password):
+        return jsonify({'status': 'error', 'message': 'Invalid username/email or password.'}), 401
+
+    user_data = {
+        'id': user['id'],
+        'username': user['username'],
+        'email': user['email'],
+        'fullname': user['fullname'],
+        'role': user['role']
+    }
+    session['user'] = user_data
+
+    return jsonify({
+        'status': 'success',
+        'message': f'Welcome back, {user["fullname"]}!',
+        'user': user_data
+    })
+
+
+@app.route('/api/logout.php', methods=['POST', 'GET'])
+@app.route('/api/logout', methods=['POST', 'GET'])
+def logout():
+    """Log out current user."""
+    session.pop('user', None)
+    return jsonify({'status': 'success', 'message': 'Logged out successfully.'})
+
+
+@app.route('/api/current_user.php', methods=['GET'])
+@app.route('/api/current_user', methods=['GET'])
+def current_user():
+    """Get current session user."""
+    user = session.get('user')
+    if user:
+        return jsonify({'logged_in': True, 'user': user})
+    return jsonify({'logged_in': False, 'user': None})
 
 
 # ── API: Orders ───────────────────────────────────────────────
