@@ -16,9 +16,7 @@
       <button onclick="showSection('home')">Home</button>
       <button onclick="showSection('menu')">Menu</button>
       <button onclick="showSection('cart')">Order</button>
-      <button onclick="showSection('about')">About</button>
       <button onclick="showSection('contact')">Contact</button>
-      <button onclick="showSection('admin')" style="background-color: #3b2f2f; color: white;">Admin</button>
     </div>
     <div class="nav-auth" id="nav-auth">
       <!-- Injected dynamically by app.js: Login/Register button or User profile badge + Logout -->

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Coffee, User as UserIcon, LogOut, Shield, Users } from 'lucide-react';
+import { ShoppingBag, Coffee, User as UserIcon, LogOut, Shield } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { User } from '../types';
@@ -79,41 +79,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </Button>
 
           <Button
-            variant={activeTab === 'team' ? 'amber' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('team')}
-            className={activeTab === 'team' ? '' : 'text-white hover:bg-white/10 hover:text-white'}
-          >
-            <Users className="h-4 w-4 mr-1" />
-            Team
-          </Button>
-
-          <Button
-            variant={activeTab === 'about' ? 'amber' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('about')}
-            className={activeTab === 'about' ? '' : 'text-white hover:bg-white/10 hover:text-white'}
-          >
-            About
-          </Button>
-
-          <Button
             variant={activeTab === 'contact' ? 'amber' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('contact')}
             className={activeTab === 'contact' ? '' : 'text-white hover:bg-white/10 hover:text-white'}
           >
             Contact
-          </Button>
-
-          <Button
-            variant={activeTab === 'admin' ? 'amber' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('admin')}
-            className={activeTab === 'admin' ? '' : 'text-white hover:bg-white/10 hover:text-white'}
-          >
-            <Shield className="h-3.5 w-3.5 mr-1" />
-            Admin
           </Button>
         </nav>
 
@@ -125,7 +96,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <UserIcon className="h-4 w-4 text-brand-amber" />
                 <span className="max-w-[120px] truncate sm:max-w-[160px]">{currentUser.fullname}</span>
                 {currentUser.role === 'admin' && (
-                  <Badge variant="brand" className="text-[10px] px-1.5 py-0 uppercase">
+                  <Badge 
+                    variant="brand" 
+                    className="text-[10px] px-1.5 py-0 uppercase cursor-pointer hover:bg-brand-orange transition-colors flex items-center gap-0.5"
+                    onClick={() => setActiveTab('admin')}
+                    title="Open Admin Dashboard"
+                  >
+                    <Shield className="h-2.5 w-2.5" />
                     Admin
                   </Badge>
                 )}
