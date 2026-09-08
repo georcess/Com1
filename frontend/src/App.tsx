@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
 import { Home } from './components/Home';
 import { Menu } from './components/Menu';
 import { Cart } from './components/Cart';
@@ -261,12 +262,10 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-brand-brown/10 bg-brand-brown py-6 text-center text-xs text-amber-100/70">
-        <div className="container mx-auto px-4 space-y-1">
-          <p className="font-semibold text-amber-50">Mr. Boy SpecialTea &copy; 2026</p>
-          <p>Crafted with love by BREWCODE Group 4 &bull; Built with React &amp; shadcn/ui</p>
-        </div>
-      </footer>
+      <Footer 
+        onNavigate={setActiveTab} 
+        onSelectCategory={setSelectedMenuCategory} 
+      />
 
       {/* Modals */}
       <AuthModal
