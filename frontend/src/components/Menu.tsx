@@ -149,28 +149,28 @@ export const Menu: React.FC<MenuProps> = ({
       )}
 
       {/* Header & Search */}
-      <div className="text-center space-y-4 max-w-2xl mx-auto">
-        <h2 className="font-display text-3xl font-bold tracking-tight text-brand-brown sm:text-4xl">
+      <div className="text-center space-y-3 sm:space-y-4 max-w-2xl mx-auto">
+        <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-brand-brown">
           Our Delicious Menu
         </h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground px-2">
           Handcrafted drinks and crispy snacks starting at only <strong>₱29</strong>. Click any item for its recipe &amp; details!
         </p>
 
         {/* Search Bar */}
-        <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="relative max-w-md mx-auto px-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search Taro, Matcha, Americano, Fries..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 h-11 rounded-full border-brand-brown/20 bg-white shadow-sm focus-visible:ring-brand-amber text-sm"
+            className="pl-10 pr-8 h-10 sm:h-11 rounded-full border-brand-brown/20 bg-white shadow-sm focus-visible:ring-brand-amber text-xs sm:text-sm"
           />
           {searchQuery && (
             <button 
               onClick={() => setSearchQuery('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground hover:text-brand-brown"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground hover:text-brand-brown p-1"
             >
               ✕
             </button>
@@ -178,8 +178,8 @@ export const Menu: React.FC<MenuProps> = ({
         </div>
       </div>
 
-      {/* Category Pills */}
-      <div className="flex flex-wrap items-center justify-center gap-2 overflow-x-auto pb-2">
+      {/* Category Pills (Smooth horizontal scroll on mobile) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar justify-start sm:justify-center pb-2 px-1">
         {categories.map(cat => {
           const Icon = cat.icon;
           const isActive = selectedCategory === cat.id;
@@ -189,8 +189,8 @@ export const Menu: React.FC<MenuProps> = ({
               variant={isActive ? 'brand' : 'outline'}
               size="sm"
               onClick={() => setSelectedCategory(cat.id)}
-              className={`gap-1.5 rounded-full px-4 shadow-sm transition-all ${
-                isActive ? 'scale-105 shadow-md ring-2 ring-brand-orange/30' : 'bg-white hover:bg-brand-cream'
+              className={`gap-1.5 rounded-full px-3.5 sm:px-4 text-xs shrink-0 shadow-sm transition-all ${
+                isActive ? 'scale-105 shadow-md ring-2 ring-brand-orange/30 font-bold' : 'bg-white hover:bg-brand-cream'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -201,8 +201,8 @@ export const Menu: React.FC<MenuProps> = ({
       </div>
 
       {/* Results Count & Items Per Page Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground px-1 border-b pb-3">
-        <div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-3 text-xs text-muted-foreground px-1 border-b pb-3">
+        <div className="text-xs">
           {filteredItems.length > 0 ? (
             <span>
               Showing <strong className="text-brand-brown">{startIndex + 1}–{endIndex}</strong> of <strong className="text-brand-brown">{filteredItems.length}</strong> items (Page {validCurrentPage} of {totalPages})
@@ -211,7 +211,7 @@ export const Menu: React.FC<MenuProps> = ({
             <span>No items found</span>
           )}
           {searchQuery && (
-            <span className="ml-2 font-medium text-brand-orange">
+            <span className="ml-1.5 font-medium text-brand-orange">
               for &ldquo;{searchQuery}&rdquo;
             </span>
           )}
@@ -219,7 +219,7 @@ export const Menu: React.FC<MenuProps> = ({
 
         {/* Per-page Selector */}
         {filteredItems.length > 0 && (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 self-end sm:self-auto">
             <span className="text-[11px] font-medium">Per page:</span>
             {[8, 12, 16].map(num => (
               <Button
@@ -227,7 +227,7 @@ export const Menu: React.FC<MenuProps> = ({
                 variant={itemsPerPage === num ? 'brand' : 'ghost'}
                 size="sm"
                 onClick={() => setItemsPerPage(num)}
-                className={`h-7 px-2.5 text-xs font-semibold rounded-md ${
+                className={`h-6 sm:h-7 px-2 sm:px-2.5 text-xs font-semibold rounded-md ${
                   itemsPerPage === num ? 'shadow-xs' : 'text-muted-foreground hover:text-brand-brown'
                 }`}
               >
@@ -419,22 +419,22 @@ export const Menu: React.FC<MenuProps> = ({
 
           {/* Pagination Navigation Bar */}
           {totalPages > 1 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 pb-2 border-t border-brand-brown/10">
-              <div className="text-xs text-muted-foreground order-2 sm:order-1">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 pb-2 border-t border-brand-brown/10">
+              <div className="text-xs text-muted-foreground order-2 sm:order-1 text-center sm:text-left">
                 Page <strong className="text-brand-brown">{validCurrentPage}</strong> of <strong className="text-brand-brown">{totalPages}</strong>
               </div>
 
-              <div className="flex items-center gap-1.5 order-1 sm:order-2">
+              <div className="flex items-center gap-1 sm:gap-1.5 order-1 sm:order-2 overflow-x-auto max-w-full pb-1">
                 {/* First Page */}
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => handlePageChange(1)}
                   disabled={validCurrentPage === 1}
-                  className="h-8 w-8 rounded-lg"
+                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg shrink-0"
                   title="First Page"
                 >
-                  <ChevronsLeft className="h-4 w-4" />
+                  <ChevronsLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
 
                 {/* Previous Page */}
@@ -443,18 +443,18 @@ export const Menu: React.FC<MenuProps> = ({
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage - 1)}
                   disabled={validCurrentPage === 1}
-                  className="h-8 gap-1 px-2.5 rounded-lg text-xs"
+                  className="h-7 sm:h-8 gap-1 px-2 sm:px-2.5 rounded-lg text-xs shrink-0"
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   <span className="hidden sm:inline">Prev</span>
                 </Button>
 
                 {/* Number Buttons */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 sm:gap-1">
                   {getPageNumbers().map((pageNum, idx) => {
                     if (pageNum === '...') {
                       return (
-                        <span key={`ellipsis-${idx}`} className="px-1 text-xs text-muted-foreground select-none">
+                        <span key={`ellipsis-${idx}`} className="px-0.5 sm:px-1 text-xs text-muted-foreground select-none">
                           &hellip;
                         </span>
                       );
@@ -467,7 +467,7 @@ export const Menu: React.FC<MenuProps> = ({
                         variant={isCurrent ? 'brand' : 'outline'}
                         size="sm"
                         onClick={() => handlePageChange(pageNum as number)}
-                        className={`h-8 w-8 p-0 rounded-lg text-xs font-bold transition-all ${
+                        className={`h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-lg text-xs font-bold transition-all shrink-0 ${
                           isCurrent 
                             ? 'shadow-md scale-105 bg-brand-brown text-white' 
                             : 'bg-white hover:bg-brand-cream text-brand-brown'
@@ -485,10 +485,10 @@ export const Menu: React.FC<MenuProps> = ({
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage + 1)}
                   disabled={validCurrentPage === totalPages}
-                  className="h-8 gap-1 px-2.5 rounded-lg text-xs"
+                  className="h-7 sm:h-8 gap-1 px-2 sm:px-2.5 rounded-lg text-xs shrink-0"
                 >
                   <span className="hidden sm:inline">Next</span>
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
 
                 {/* Last Page */}
@@ -497,10 +497,10 @@ export const Menu: React.FC<MenuProps> = ({
                   size="icon"
                   onClick={() => handlePageChange(totalPages)}
                   disabled={validCurrentPage === totalPages}
-                  className="h-8 w-8 rounded-lg"
+                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg shrink-0"
                   title="Last Page"
                 >
-                  <ChevronsRight className="h-4 w-4" />
+                  <ChevronsRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>

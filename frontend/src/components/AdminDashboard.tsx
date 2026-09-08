@@ -834,140 +834,253 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <p className="text-xs text-muted-foreground">Try picking a different status tab or clearing your search.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader className="bg-slate-50/80">
-                      <TableRow>
-                        <TableHead className="w-16 font-bold text-xs"># ID</TableHead>
-                        <TableHead className="font-bold text-xs">Customer</TableHead>
-                        <TableHead className="font-bold text-xs">Order Items</TableHead>
-                        <TableHead className="font-bold text-xs">Total</TableHead>
-                        <TableHead className="font-bold text-xs">Status Modifier</TableHead>
-                        <TableHead className="font-bold text-xs">Date &amp; Time</TableHead>
-                        <TableHead className="text-right font-bold text-xs">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrders.map((order) => {
-                        const status = order.status || 'pending';
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-slate-50/80">
+                        <TableRow>
+                          <TableHead className="w-16 font-bold text-xs"># ID</TableHead>
+                          <TableHead className="font-bold text-xs">Customer</TableHead>
+                          <TableHead className="font-bold text-xs">Order Items</TableHead>
+                          <TableHead className="font-bold text-xs">Total</TableHead>
+                          <TableHead className="font-bold text-xs">Status Modifier</TableHead>
+                          <TableHead className="font-bold text-xs">Date &amp; Time</TableHead>
+                          <TableHead className="text-right font-bold text-xs">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredOrders.map((order) => {
+                          const status = order.status || 'pending';
 
-                        return (
-                          <TableRow key={order.id} className="hover:bg-amber-50/40 transition-colors">
-                            {/* Order ID */}
-                            <TableCell className="font-mono text-xs font-bold text-brand-coffee">
-                              #{order.id}
-                            </TableCell>
+                          return (
+                            <TableRow key={order.id} className="hover:bg-amber-50/40 transition-colors">
+                              {/* Order ID */}
+                              <TableCell className="font-mono text-xs font-bold text-brand-coffee">
+                                #{order.id}
+                              </TableCell>
 
-                            {/* Customer info */}
-                            <TableCell>
-                              <div className="space-y-0.5">
-                                <span className="font-bold text-xs text-brand-brown block">
+                              {/* Customer info */}
+                              <TableCell>
+                                <div className="space-y-0.5">
+                                  <span className="font-bold text-xs text-brand-brown block">
+                                    {order.customer_name}
+                                  </span>
+                                  {order.customer_username && (
+                                    <span className="font-mono text-[11px] text-muted-foreground block">
+                                      @{order.customer_username}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableCell>
+
+                              {/* Order items */}
+                              <TableCell className="max-w-xs">
+                                <div 
+                                  className="text-xs text-brand-brown line-clamp-2 cursor-pointer hover:underline"
+                                  onClick={() => setViewingOrder(order)}
+                                  title="Click to view full receipt"
+                                >
+                                  {order.order_details}
+                                </div>
+                              </TableCell>
+
+                              {/* Total Price */}
+                              <TableCell className="font-display font-extrabold text-xs text-brand-coffee">
+                                ₱{Number(order.total_price).toFixed(2)}
+                              </TableCell>
+
+                              {/* Status Modifier Selector */}
+                              <TableCell>
+                                <div className="flex items-center gap-1.5">
+                                  <select
+                                    value={status}
+                                    onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                                    className={`rounded-lg px-2 py-1 text-xs font-bold border transition-colors cursor-pointer ${
+                                      status === 'completed'
+                                        ? 'bg-green-100 text-green-800 border-green-300'
+                                        : status === 'received'
+                                        ? 'bg-blue-100 text-blue-800 border-blue-300'
+                                        : status === 'cancelled'
+                                        ? 'bg-red-100 text-red-800 border-red-300'
+                                        : 'bg-amber-100 text-amber-900 border-amber-300'
+                                    }`}
+                                  >
+                                    <option value="pending">⏳ Pending</option>
+                                    <option value="received">🍵 In Prep (Received)</option>
+                                    <option value="completed">✅ Completed</option>
+                                    <option value="cancelled">❌ Cancelled</option>
+                                  </select>
+
+                                  {/* 1-Click Quick Transition Button */}
+                                  {status === 'pending' && (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleUpdateOrderStatus(order.id, 'received')}
+                                      className="h-6 px-2 text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+                                      title="Mark as Order Received & In Preparation"
+                                    >
+                                      + In Prep
+                                    </Button>
+                                  )}
+                                  {status === 'received' && (
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleUpdateOrderStatus(order.id, 'completed')}
+                                      className="h-6 px-2 text-[10px] font-bold bg-green-600 hover:bg-green-700 text-white rounded-md"
+                                      title="Mark as Ready / Completed"
+                                    >
+                                      + Done
+                                    </Button>
+                                  )}
+                                </div>
+                              </TableCell>
+
+                              {/* Date */}
+                              <TableCell className="text-[11px] text-muted-foreground whitespace-nowrap">
+                                {new Date(order.order_date).toLocaleString()}
+                              </TableCell>
+
+                              {/* Actions */}
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setViewingOrder(order)}
+                                    className="h-7 w-7 p-0 text-brand-brown hover:bg-brand-cream rounded-md"
+                                    title="View Receipt"
+                                  >
+                                    <Eye className="h-3.5 w-3.5" />
+                                  </Button>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => handleDeleteOrder(order.id)}
+                                    className="h-7 w-7 p-0 rounded-md"
+                                    title="Delete Order"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Mobile & Tablet Card List View */}
+                  <div className="block lg:hidden divide-y divide-slate-100 p-3 sm:p-4 space-y-3">
+                    {filteredOrders.map((order) => {
+                      const status = order.status || 'pending';
+
+                      return (
+                        <div 
+                          key={order.id} 
+                          className="rounded-2xl border border-brand-brown/10 bg-white p-4 shadow-xs space-y-3"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-mono text-xs font-bold text-brand-coffee">
+                                  #{order.id}
+                                </span>
+                                <span className="text-slate-300">•</span>
+                                <span className="font-bold text-sm text-brand-brown">
                                   {order.customer_name}
                                 </span>
-                                {order.customer_username && (
-                                  <span className="font-mono text-[11px] text-muted-foreground block">
-                                    @{order.customer_username}
-                                  </span>
-                                )}
                               </div>
-                            </TableCell>
+                              {order.customer_username && (
+                                <span className="font-mono text-[11px] text-muted-foreground block">
+                                  @{order.customer_username}
+                                </span>
+                              )}
+                            </div>
 
-                            {/* Order items */}
-                            <TableCell className="max-w-xs">
-                              <div 
-                                className="text-xs text-brand-brown line-clamp-2 cursor-pointer hover:underline"
-                                onClick={() => setViewingOrder(order)}
-                                title="Click to view full receipt"
-                              >
-                                {order.order_details}
-                              </div>
-                            </TableCell>
-
-                            {/* Total Price */}
-                            <TableCell className="font-display font-extrabold text-xs text-brand-coffee">
+                            <span className="font-display font-extrabold text-sm text-brand-coffee">
                               ₱{Number(order.total_price).toFixed(2)}
-                            </TableCell>
+                            </span>
+                          </div>
 
-                            {/* Status Modifier Selector */}
-                            <TableCell>
-                              <div className="flex items-center gap-1.5">
-                                <select
-                                  value={status}
-                                  onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
-                                  className={`rounded-lg px-2 py-1 text-xs font-bold border transition-colors cursor-pointer ${
-                                    status === 'completed'
-                                      ? 'bg-green-100 text-green-800 border-green-300'
-                                      : status === 'received'
-                                      ? 'bg-blue-100 text-blue-800 border-blue-300'
-                                      : status === 'cancelled'
-                                      ? 'bg-red-100 text-red-800 border-red-300'
-                                      : 'bg-amber-100 text-amber-900 border-amber-300'
-                                  }`}
-                                >
-                                  <option value="pending">⏳ Pending</option>
-                                  <option value="received">🍵 In Prep (Received)</option>
-                                  <option value="completed">✅ Completed</option>
-                                  <option value="cancelled">❌ Cancelled</option>
-                                </select>
+                          <div 
+                            className="rounded-xl bg-brand-cream/40 p-2.5 border border-brand-brown/5 text-xs text-brand-brown leading-relaxed cursor-pointer"
+                            onClick={() => setViewingOrder(order)}
+                          >
+                            {order.order_details}
+                          </div>
 
-                                {/* 1-Click Quick Transition Button */}
-                                {status === 'pending' && (
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleUpdateOrderStatus(order.id, 'received')}
-                                    className="h-6 px-2 text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                                    title="Mark as Order Received & In Preparation"
-                                  >
-                                    + In Prep
-                                  </Button>
-                                )}
-                                {status === 'received' && (
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleUpdateOrderStatus(order.id, 'completed')}
-                                    className="h-6 px-2 text-[10px] font-bold bg-green-600 hover:bg-green-700 text-white rounded-md"
-                                    title="Mark as Ready / Completed"
-                                  >
-                                    + Done
-                                  </Button>
-                                )}
-                              </div>
-                            </TableCell>
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                            <div className="flex items-center gap-1.5">
+                              <select
+                                value={status}
+                                onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                                className={`rounded-lg px-2 py-1 text-xs font-bold border transition-colors cursor-pointer ${
+                                  status === 'completed'
+                                    ? 'bg-green-100 text-green-800 border-green-300'
+                                    : status === 'received'
+                                    ? 'bg-blue-100 text-blue-800 border-blue-300'
+                                    : status === 'cancelled'
+                                    ? 'bg-red-100 text-red-800 border-red-300'
+                                    : 'bg-amber-100 text-amber-900 border-amber-300'
+                                }`}
+                              >
+                                <option value="pending">⏳ Pending</option>
+                                <option value="received">🍵 In Prep</option>
+                                <option value="completed">✅ Done</option>
+                                <option value="cancelled">❌ Cancel</option>
+                              </select>
 
-                            {/* Date */}
-                            <TableCell className="text-[11px] text-muted-foreground whitespace-nowrap">
-                              {new Date(order.order_date).toLocaleString()}
-                            </TableCell>
-
-                            {/* Actions */}
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-1">
+                              {status === 'pending' && (
                                 <Button
-                                  variant="ghost"
                                   size="sm"
-                                  onClick={() => setViewingOrder(order)}
-                                  className="h-7 w-7 p-0 text-brand-brown hover:bg-brand-cream rounded-md"
-                                  title="View Receipt"
+                                  onClick={() => handleUpdateOrderStatus(order.id, 'received')}
+                                  className="h-6 px-2 text-[10px] font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-md"
                                 >
-                                  <Eye className="h-3.5 w-3.5" />
+                                  + In Prep
                                 </Button>
+                              )}
+                              {status === 'received' && (
                                 <Button
-                                  variant="destructive"
                                   size="sm"
-                                  onClick={() => handleDeleteOrder(order.id)}
-                                  className="h-7 w-7 p-0 rounded-md"
-                                  title="Delete Order"
+                                  onClick={() => handleUpdateOrderStatus(order.id, 'completed')}
+                                  className="h-6 px-2 text-[10px] font-bold bg-green-600 hover:bg-green-700 text-white rounded-md"
                                 >
-                                  <Trash2 className="h-3.5 w-3.5" />
+                                  + Done
                                 </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setViewingOrder(order)}
+                                className="h-7 px-2.5 text-xs font-semibold rounded-lg"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Receipt
+                              </Button>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteOrder(order.id)}
+                                className="h-7 w-7 p-0 rounded-lg"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="text-[10px] text-muted-foreground font-mono">
+                            {new Date(order.order_date).toLocaleString()}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

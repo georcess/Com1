@@ -272,16 +272,16 @@ export const Home: React.FC<HomeProps> = ({
     <div className="flex flex-col gap-12 pb-16">
       
       {/* ── 0. TOP BEST SELLERS SMOOTH SLIDING MARQUEE ─────────────── */}
-      <section className="relative overflow-hidden mx-4 sm:mx-6 mt-3 rounded-2xl bg-gradient-to-r from-brand-brown via-[#221510] to-brand-coffee border border-amber-500/20 shadow-xl py-3.5 select-none">
+      <section className="relative overflow-hidden mx-2.5 sm:mx-6 mt-2.5 sm:mt-3 rounded-2xl bg-gradient-to-r from-brand-brown via-[#221510] to-brand-coffee border border-amber-500/20 shadow-xl py-2.5 sm:py-3.5 select-none">
         {/* Subtle Ambient Glow */}
         <div className="absolute -left-10 top-0 h-full w-24 bg-gradient-to-r from-brand-brown to-transparent z-10 pointer-events-none" />
         <div className="absolute -right-10 top-0 h-full w-24 bg-gradient-to-l from-brand-coffee to-transparent z-10 pointer-events-none" />
 
         {/* Marquee Header / Tagline */}
-        <div className="container mx-auto px-4 mb-2 flex items-center justify-between">
+        <div className="container mx-auto px-3 sm:px-4 mb-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-brand-orange animate-ping" />
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-brand-amber/30 px-3 py-0.5 text-xs font-black tracking-wider text-amber-200 uppercase">
+            <span className="flex h-2 w-2 rounded-full bg-brand-orange animate-ping" />
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-brand-amber/30 px-2.5 py-0.5 text-[10px] sm:text-xs font-black tracking-wider text-amber-200 uppercase">
               <Sparkles className="h-3 w-3 text-brand-amber animate-pulse" />
               <span>🔥 Top Best Sellers Live Stream</span>
             </div>
@@ -292,7 +292,7 @@ export const Home: React.FC<HomeProps> = ({
 
           <div className="text-[11px] text-amber-200/80 font-medium flex items-center gap-1">
             <span className="hidden md:inline">Starting at ₱29</span>
-            <Badge variant="outline" className="text-[10px] text-brand-amber border-brand-amber/40 bg-white/5 py-0 px-2">
+            <Badge variant="outline" className="text-[9px] sm:text-[10px] text-brand-amber border-brand-amber/40 bg-white/5 py-0 px-1.5 sm:px-2">
               Hover to Pause
             </Badge>
           </div>
@@ -381,7 +381,7 @@ export const Home: React.FC<HomeProps> = ({
       </section>
 
       {/* ── 1. HERO BANNER SECTION ─────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-brown via-[#221510] to-brand-coffee py-12 sm:py-20 text-white shadow-2xl mx-4 sm:mx-6 border border-brand-brown/40">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-brown via-[#221510] to-brand-coffee py-8 sm:py-20 text-white shadow-2xl mx-2.5 sm:mx-6 border border-brand-brown/40">
         {/* Background Image & Ambient Glow Circles */}
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 transition-transform duration-1000"
@@ -392,26 +392,26 @@ export const Home: React.FC<HomeProps> = ({
         <div className="absolute inset-0 bg-gradient-to-r from-brand-brown/95 via-brand-brown/90 to-brand-coffee/85" />
 
         <div className="relative z-10 container mx-auto px-4 sm:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-center">
             
             {/* Left Column: Hero Text, CTAs & Metrics (7 cols) */}
-            <div className="lg:col-span-7 text-center lg:text-left space-y-6">
+            <div className="lg:col-span-7 text-center lg:text-left space-y-4 sm:space-y-6">
               
               {/* Floating Pill Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-brand-amber/40 px-4 py-1.5 text-xs font-bold text-amber-200 backdrop-blur-md shadow-sm">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-brand-amber/40 px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold text-amber-200 backdrop-blur-md shadow-sm">
                 <span className="flex h-2 w-2 rounded-full bg-brand-orange animate-ping" />
                 <Sparkles className="h-3.5 w-3.5 text-brand-amber" />
                 <span className="tracking-wide uppercase">MONTALBAN&apos;S FAVORITE SPECIALTEA SPOT</span>
               </div>
 
               {/* Main Headline */}
-              <div className="space-y-3">
-                <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] drop-shadow-md">
+              <div className="space-y-2 sm:space-y-3">
+                <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] drop-shadow-md">
                   Taste the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-amber via-amber-200 to-brand-orange underline decoration-brand-orange decoration-wavy decoration-2 underline-offset-8">SpecialTea</span> in Every Sip.
                 </h1>
-                <p className="text-base sm:text-lg text-amber-100/90 max-w-xl leading-relaxed font-normal">
+                <p className="text-sm sm:text-lg text-amber-100/90 max-w-xl leading-relaxed font-normal mx-auto lg:mx-0">
                   Handcrafted Milktea, artisan Iced Coffee, refreshing Fruit Teas, and hot snacks at student-friendly prices. Starting at only{' '}
-                  <span className="inline-flex items-center rounded-lg bg-brand-orange/30 px-2.5 py-0.5 font-mono text-base font-extrabold text-brand-amber border border-brand-orange/40 shadow-xs">
+                  <span className="inline-flex items-center rounded-lg bg-brand-orange/30 px-2 sm:px-2.5 py-0.5 font-mono text-sm sm:text-base font-extrabold text-brand-amber border border-brand-orange/40 shadow-xs">
                     ₱29
                   </span>
                   !
@@ -585,12 +585,12 @@ export const Home: React.FC<HomeProps> = ({
 
 
       {/* ── 2. QUICK CATEGORY DISCOVERY TILES ─────────────────────── */}
-      <section className="container mx-auto px-4 sm:px-6">
-        <div className="text-center space-y-2 mb-8">
-          <Badge variant="outline" className="text-xs font-bold text-brand-coffee border-brand-coffee/20 px-3 py-0.5 uppercase">
+      <section className="container mx-auto px-3 sm:px-6">
+        <div className="text-center space-y-2 mb-6 sm:mb-8">
+          <Badge variant="outline" className="text-[11px] sm:text-xs font-bold text-brand-coffee border-brand-coffee/20 px-3 py-0.5 uppercase">
             Browse By Category
           </Badge>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-brand-brown">
+          <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-brand-brown">
             What Are You Craving Today?
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
@@ -598,7 +598,7 @@ export const Home: React.FC<HomeProps> = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {categories.map((cat) => {
             const Icon = cat.icon;
             return (
@@ -607,7 +607,7 @@ export const Home: React.FC<HomeProps> = ({
                 onClick={() => onExploreCategory(cat.id)}
                 className="group cursor-pointer overflow-hidden rounded-2xl border border-brand-brown/10 bg-white transition-all duration-300 hover:-translate-y-2 hover:shadow-xl text-center"
               >
-                <div className="relative h-28 w-full overflow-hidden bg-brand-cream/60">
+                <div className="relative h-24 sm:h-28 w-full overflow-hidden bg-brand-cream/60">
                   <img
                     src={cat.image}
                     alt={cat.name}
@@ -622,17 +622,17 @@ export const Home: React.FC<HomeProps> = ({
                   </span>
                 </div>
 
-                <CardHeader className="p-3 pb-1">
-                  <CardTitle className="text-sm font-bold text-brand-brown group-hover:text-brand-orange transition-colors flex items-center justify-center gap-1">
+                <CardHeader className="p-2.5 sm:p-3 pb-1">
+                  <CardTitle className="text-xs sm:text-sm font-bold text-brand-brown group-hover:text-brand-orange transition-colors flex items-center justify-center gap-1">
                     <Icon className="h-3.5 w-3.5 text-brand-coffee shrink-0" />
                     <span>{cat.name}</span>
                   </CardTitle>
-                  <CardDescription className="text-[11px] text-muted-foreground font-medium">
+                  <CardDescription className="text-[10px] sm:text-[11px] text-muted-foreground font-medium">
                     {cat.count}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="p-3 pt-0">
+                <CardContent className="p-2.5 sm:p-3 pt-0">
                   <span className="text-[10px] font-bold text-brand-coffee group-hover:underline flex items-center justify-center gap-1">
                     <span>Explore</span>
                     <ArrowRight className="h-3 w-3" />
@@ -653,13 +653,13 @@ export const Home: React.FC<HomeProps> = ({
       </div>
 
       {/* ── 4. WHY CHOOSE MR. BOY (THE SPECIALTEA DIFFERENCE) ───────── */}
-      <section className="container mx-auto px-4 sm:px-6">
-        <div className="rounded-3xl bg-gradient-to-b from-white to-brand-cream/80 p-8 sm:p-12 border border-brand-brown/10 shadow-lg space-y-10">
+      <section className="container mx-auto px-3 sm:px-6">
+        <div className="rounded-3xl bg-gradient-to-b from-white to-brand-cream/80 p-5 sm:p-12 border border-brand-brown/10 shadow-lg space-y-6 sm:space-y-10">
           <div className="text-center space-y-2 max-w-xl mx-auto">
             <Badge variant="brand" className="text-xs font-bold uppercase">
               The Mr. Boy Difference
             </Badge>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-brand-brown">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-brand-brown">
               Why Our Customers Love Us
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
@@ -667,42 +667,42 @@ export const Home: React.FC<HomeProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="rounded-2xl border-none shadow-sm bg-white p-6 text-center space-y-3 hover:shadow-md transition-shadow">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-brand-orange shadow-inner">
-                <Sparkles className="h-7 w-7" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <Card className="rounded-2xl border-none shadow-sm bg-white p-5 sm:p-6 text-center space-y-2 sm:space-y-3 hover:shadow-md transition-shadow">
+              <div className="mx-auto flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-amber-100 text-brand-orange shadow-inner">
+                <Sparkles className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
-              <h3 className="font-bold text-base text-brand-brown">Authentic Tea Brew</h3>
+              <h3 className="font-bold text-sm sm:text-base text-brand-brown">Authentic Tea Brew</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Brewed daily from real, premium loose-leaf teas for that rich and fragrant aroma in every sip.
               </p>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-sm bg-white p-6 text-center space-y-3 hover:shadow-md transition-shadow">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-brand-coffee shadow-inner">
-                <Award className="h-7 w-7" />
+            <Card className="rounded-2xl border-none shadow-sm bg-white p-5 sm:p-6 text-center space-y-2 sm:space-y-3 hover:shadow-md transition-shadow">
+              <div className="mx-auto flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-amber-100 text-brand-coffee shadow-inner">
+                <Award className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
-              <h3 className="font-bold text-base text-brand-brown">Signature Creamcheese</h3>
+              <h3 className="font-bold text-sm sm:text-base text-brand-brown">Signature Creamcheese</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Silky, rich, and savory-sweet cheese foam prepared fresh to pair perfectly with your favorite flavor.
               </p>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-sm bg-white p-6 text-center space-y-3 hover:shadow-md transition-shadow">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-green-700 shadow-inner">
-                <Zap className="h-7 w-7" />
+            <Card className="rounded-2xl border-none shadow-sm bg-white p-5 sm:p-6 text-center space-y-2 sm:space-y-3 hover:shadow-md transition-shadow">
+              <div className="mx-auto flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-green-100 text-green-700 shadow-inner">
+                <Zap className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
-              <h3 className="font-bold text-base text-brand-brown">₱29 Everyday Sulit</h3>
+              <h3 className="font-bold text-sm sm:text-base text-brand-brown">₱29 Everyday Sulit</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Premium café flavors at student and budget-friendly prices. Big taste that doesn't hurt your wallet.
               </p>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-sm bg-white p-6 text-center space-y-3 hover:shadow-md transition-shadow">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 text-red-600 shadow-inner">
-                <Heart className="h-7 w-7" />
+            <Card className="rounded-2xl border-none shadow-sm bg-white p-5 sm:p-6 text-center space-y-2 sm:space-y-3 hover:shadow-md transition-shadow">
+              <div className="mx-auto flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-red-100 text-red-600 shadow-inner">
+                <Heart className="h-6 w-6 sm:h-7 sm:w-7" />
               </div>
-              <h3 className="font-bold text-base text-brand-brown">Balanced Sweetness</h3>
+              <h3 className="font-bold text-sm sm:text-base text-brand-brown">Balanced Sweetness</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Smooth, naturally flavorful, and formulated so you can enjoy every drop without sugary overload.
               </p>
@@ -712,12 +712,12 @@ export const Home: React.FC<HomeProps> = ({
       </section>
 
       {/* ── 5. HOW TO ORDER IN 3 EASY STEPS ────────────────────────── */}
-      <section className="container mx-auto px-4 sm:px-6">
-        <div className="text-center space-y-2 mb-10">
+      <section className="container mx-auto px-3 sm:px-6">
+        <div className="text-center space-y-2 mb-8 sm:mb-10">
           <Badge variant="outline" className="text-xs font-bold text-brand-coffee border-brand-coffee/20 px-3 py-0.5 uppercase">
             Simple &amp; Fast
           </Badge>
-          <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-brand-brown">
+          <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-brand-brown">
             How to Order Online
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground">
@@ -725,41 +725,41 @@ export const Home: React.FC<HomeProps> = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="relative rounded-2xl bg-white p-6 border border-brand-brown/10 shadow-md text-center space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          <div className="relative rounded-2xl bg-white p-5 sm:p-6 border border-brand-brown/10 shadow-md text-center space-y-2 sm:space-y-3">
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-brand-orange font-bold text-white text-xs shadow">
               1
             </span>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-cream text-brand-coffee mt-2">
-              <Coffee className="h-6 w-6" />
+            <div className="mx-auto flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-brand-cream text-brand-coffee mt-2">
+              <Coffee className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <h3 className="font-bold text-base text-brand-brown">Choose Your Drink</h3>
+            <h3 className="font-bold text-sm sm:text-base text-brand-brown">Choose Your Drink</h3>
             <p className="text-xs text-muted-foreground">
               Browse our menu of Milktea, Iced Coffee, Fruit Teas, or snacks and pick your preferred size.
             </p>
           </div>
 
-          <div className="relative rounded-2xl bg-white p-6 border border-brand-brown/10 shadow-md text-center space-y-3">
+          <div className="relative rounded-2xl bg-white p-5 sm:p-6 border border-brand-brown/10 shadow-md text-center space-y-2 sm:space-y-3">
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-brand-orange font-bold text-white text-xs shadow">
               2
             </span>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-cream text-brand-coffee mt-2">
-              <Sparkles className="h-6 w-6" />
+            <div className="mx-auto flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-brand-cream text-brand-coffee mt-2">
+              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <h3 className="font-bold text-base text-brand-brown">Customize &amp; Add-ons</h3>
+            <h3 className="font-bold text-sm sm:text-base text-brand-brown">Customize &amp; Add-ons</h3>
             <p className="text-xs text-muted-foreground">
               Add chewy pearls (+₱9) to customize your drinks and review your cart total.
             </p>
           </div>
 
-          <div className="relative rounded-2xl bg-white p-6 border border-brand-brown/10 shadow-md text-center space-y-3">
+          <div className="relative rounded-2xl bg-white p-5 sm:p-6 border border-brand-brown/10 shadow-md text-center space-y-2 sm:space-y-3">
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-brand-orange font-bold text-white text-xs shadow">
               3
             </span>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-cream text-brand-coffee mt-2">
-              <CheckCircle className="h-6 w-6" />
+            <div className="mx-auto flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-brand-cream text-brand-coffee mt-2">
+              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
-            <h3 className="font-bold text-base text-brand-brown">Get Instant Receipt</h3>
+            <h3 className="font-bold text-sm sm:text-base text-brand-brown">Get Instant Receipt</h3>
             <p className="text-xs text-muted-foreground">
               Submit your order to generate your official printable receipt and pick up fresh at our store!
             </p>
@@ -768,14 +768,14 @@ export const Home: React.FC<HomeProps> = ({
       </section>
 
       {/* ── 6. REAL CUSTOMER REVIEWS & TESTIMONIALS ────────────────── */}
-      <section className="container mx-auto px-4 sm:px-6">
-        <div className="rounded-3xl bg-brand-coffee text-white p-8 sm:p-12 shadow-xl space-y-8">
+      <section className="container mx-auto px-3 sm:px-6">
+        <div className="rounded-3xl bg-brand-coffee text-white p-6 sm:p-12 shadow-xl space-y-6 sm:space-y-8">
           <div className="text-center space-y-2 max-w-xl mx-auto">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-amber uppercase tracking-wider">
               <ThumbsUp className="h-4 w-4" />
               <span>COMMUNITY LOVE</span>
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-white">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-white">
               What Locals Say About Us
             </h2>
             <p className="text-xs sm:text-sm text-amber-100/80">
@@ -783,9 +783,9 @@ export const Home: React.FC<HomeProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {testimonials.map((t, idx) => (
-              <Card key={idx} className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-6 text-white space-y-4 shadow-lg">
+              <Card key={idx} className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-5 sm:p-6 text-white space-y-3 sm:space-y-4 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex text-brand-amber">
                     {[...Array(t.rating)].map((_, i) => (
@@ -813,20 +813,20 @@ export const Home: React.FC<HomeProps> = ({
       </section>
 
       {/* ── 7. STORE VISIT & LOCATION BANNER ──────────────────────── */}
-      <section className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center rounded-3xl bg-white border border-brand-brown/10 p-8 sm:p-10 shadow-lg">
-          <div className="lg:col-span-8 space-y-4 text-left">
+      <section className="container mx-auto px-3 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center rounded-3xl bg-white border border-brand-brown/10 p-6 sm:p-10 shadow-lg">
+          <div className="lg:col-span-8 space-y-3 sm:space-y-4 text-left">
             <Badge variant="outline" className="text-xs font-bold text-brand-coffee border-brand-coffee/20 px-3 py-0.5 uppercase">
               Visit Our Store
             </Badge>
-            <h3 className="font-display text-2xl sm:text-3xl font-bold text-brand-brown">
+            <h3 className="font-display text-xl sm:text-3xl font-bold text-brand-brown">
               Freshly Brewed in Dela Costa Homes V, Montalban
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               Drop by with friends, study over coffee, or order your favorite snack while enjoying our cozy neighborhood vibe.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2 text-xs">
               <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 text-brand-orange shrink-0 mt-0.5" />
                 <span className="text-brand-brown font-medium">Blk 14 Lot 4 Phase 1 Dela Costa Homes V, Burgos Rodriguez Rizal</span>
@@ -851,7 +851,7 @@ export const Home: React.FC<HomeProps> = ({
               variant="brand"
               size="lg"
               onClick={onStartOrdering}
-              className="gap-2 font-bold shadow-lg"
+              className="gap-2 font-bold shadow-lg text-sm sm:text-base py-3"
             >
               <ShoppingBag className="h-5 w-5" />
               Order For Pickup

@@ -358,10 +358,10 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         </div>
 
         {/* Modal Sticky Footer Actions */}
-        <div className="p-4 sm:p-5 bg-brand-cream/50 border-t border-brand-brown/10 flex items-center justify-between gap-4 shrink-0">
-          <div>
+        <div className="p-3.5 sm:p-5 bg-brand-cream/50 border-t border-brand-brown/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 shrink-0">
+          <div className="flex items-center justify-between sm:block">
             <div className="text-[11px] text-muted-foreground font-semibold">Total Price:</div>
-            <div className="font-display text-2xl font-extrabold text-brand-coffee">
+            <div className="font-display text-xl sm:text-2xl font-extrabold text-brand-coffee">
               ₱{totalPrice.toFixed(2)}
             </div>
           </div>
@@ -371,7 +371,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               variant="outline"
               size="sm"
               onClick={onClose}
-              className="px-4 text-xs font-semibold rounded-xl"
+              className="px-3 sm:px-4 text-xs font-semibold rounded-xl flex-1 sm:flex-initial h-10"
             >
               Cancel
             </Button>
@@ -380,7 +380,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               size="default"
               onClick={handleAddToCartClick}
               disabled={!isAvailable || isAdded}
-              className={`gap-2 font-bold px-6 rounded-xl shadow-md transition-all ${
+              className={`flex-2 sm:flex-initial gap-1.5 sm:gap-2 font-bold px-3 sm:px-6 rounded-xl shadow-md transition-all text-xs sm:text-sm h-10 ${
                 !isAvailable
                   ? 'opacity-60 cursor-not-allowed bg-slate-400 hover:bg-slate-400 text-white'
                   : isAdded
@@ -390,17 +390,17 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             >
               {!isAvailable ? (
                 <>
-                  <span>Temporarily Sold Out</span>
+                  <span>Sold Out</span>
                 </>
               ) : isAdded ? (
                 <>
                   <Check className="h-4 w-4" />
-                  Added to Cart!
+                  <span>Added to Cart!</span>
                 </>
               ) : (
                 <>
                   <ShoppingBag className="h-4 w-4" />
-                  Add to Cart &bull; ₱{totalPrice.toFixed(2)}
+                  <span>Add to Cart &bull; ₱{totalPrice.toFixed(2)}</span>
                 </>
               )}
             </Button>

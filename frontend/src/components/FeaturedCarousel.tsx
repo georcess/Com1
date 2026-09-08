@@ -166,23 +166,23 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
   };
 
   return (
-    <section className="container mx-auto px-4 py-8">
+    <section className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
       {/* Section Header */}
-      <div className="text-center space-y-2 mb-8">
-        <div className="inline-flex items-center gap-2 rounded-full bg-brand-amber/20 px-4 py-1 text-xs font-bold text-brand-brown">
+      <div className="text-center space-y-2 mb-6 sm:mb-8">
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-brand-amber/20 px-3.5 py-1 text-[11px] sm:text-xs font-bold text-brand-brown">
           <Sparkles className="h-3.5 w-3.5 text-brand-orange" />
           <span>HIGHLIGHTED CATEGORY FAVORITES</span>
         </div>
-        <h2 className="font-display text-3xl font-bold tracking-tight text-brand-brown sm:text-4xl">
+        <h2 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-brand-brown">
           Featured From Every Category
         </h2>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+        <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
           Explore our top customer choice in each drink &amp; snack line.
         </p>
       </div>
 
-      {/* Category Pills Navigation */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+      {/* Category Pills Navigation (Horizontal scrollable on mobile) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar justify-start sm:justify-center pb-2 px-1 mb-4 sm:mb-6">
         {FEATURED_ITEMS.map((item, idx) => {
           const Icon = item.icon;
           const isActive = idx === currentIndex;
@@ -192,7 +192,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
               variant={isActive ? 'brand' : 'outline'}
               size="sm"
               onClick={() => setCurrentIndex(idx)}
-              className={`gap-1.5 rounded-full px-3.5 py-1.5 text-xs transition-all ${
+              className={`gap-1.5 rounded-full px-3 py-1 text-xs shrink-0 transition-all ${
                 isActive
                   ? 'scale-105 shadow-md ring-2 ring-brand-orange/40 font-bold'
                   : 'bg-white hover:bg-brand-cream text-muted-foreground'
@@ -207,7 +207,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
 
       {/* Carousel Container */}
       <div 
-        className="relative max-w-4xl mx-auto"
+        className="relative max-w-4xl mx-auto px-1 sm:px-0"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
@@ -215,26 +215,26 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
         <button
           onClick={handlePrev}
           aria-label="Previous Slide"
-          className="absolute -left-4 sm:-left-6 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white text-brand-brown shadow-xl hover:bg-brand-cream transition-transform active:scale-95 border border-brand-brown/10"
+          className="absolute -left-2 sm:-left-6 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/90 text-brand-brown shadow-xl hover:bg-brand-cream transition-transform active:scale-95 border border-brand-brown/10 backdrop-blur-xs"
         >
-          <ChevronLeft className="h-6 w-6 text-brand-coffee" />
+          <ChevronLeft className="h-4 w-4 sm:h-6 sm:w-6 text-brand-coffee" />
         </button>
 
         {/* Navigation Arrow Right */}
         <button
           onClick={handleNext}
           aria-label="Next Slide"
-          className="absolute -right-4 sm:-right-6 top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white text-brand-brown shadow-xl hover:bg-brand-cream transition-transform active:scale-95 border border-brand-brown/10"
+          className="absolute -right-2 sm:-right-6 top-1/2 -translate-y-1/2 z-20 flex h-8 w-8 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white/90 text-brand-brown shadow-xl hover:bg-brand-cream transition-transform active:scale-95 border border-brand-brown/10 backdrop-blur-xs"
         >
-          <ChevronRight className="h-6 w-6 text-brand-coffee" />
+          <ChevronRight className="h-4 w-4 sm:h-6 sm:w-6 text-brand-coffee" />
         </button>
 
         {/* Slide Display Card */}
         <div className="overflow-hidden rounded-3xl shadow-2xl border border-brand-brown/10 bg-white">
-          <div className="grid grid-cols-1 md:grid-cols-12 min-h-[380px]">
+          <div className="grid grid-cols-1 md:grid-cols-12 min-h-[360px]">
             {/* Left Column: Product Image with Floating Badges & Preview Trigger */}
             <div 
-              className="relative md:col-span-6 bg-brand-cream/80 overflow-hidden flex items-center justify-center p-6 sm:p-8 cursor-pointer group"
+              className="relative md:col-span-6 bg-brand-cream/80 overflow-hidden flex items-center justify-center p-4 sm:p-8 cursor-pointer group"
               onClick={handleOpenPreview}
               title="Click to view full recipe & what it's made of"
             >
@@ -247,7 +247,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                 <img
                   src={currentItem.image}
                   alt={currentItem.name}
-                  className="h-64 sm:h-72 w-full object-cover rounded-2xl shadow-xl ring-4 ring-white/80"
+                  className="h-52 sm:h-72 w-full object-cover rounded-2xl shadow-xl ring-4 ring-white/80"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                   }}
@@ -264,21 +264,21 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                 {/* Floating Tag Badge */}
                 <Badge
                   variant="brand"
-                  className="absolute top-3 left-3 bg-brand-orange text-white font-bold text-xs px-3 py-1 shadow-lg z-10"
+                  className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 bg-brand-orange text-white font-bold text-[11px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 shadow-lg z-10"
                 >
                   {currentItem.tag}
                 </Badge>
 
                 {/* Price Pill */}
-                <div className="absolute bottom-3 right-3 rounded-full bg-brand-brown/90 text-amber-200 px-3 py-1 text-xs font-bold backdrop-blur shadow-md z-10">
+                <div className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 rounded-full bg-brand-brown/90 text-amber-200 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[11px] sm:text-xs font-bold backdrop-blur shadow-md z-10">
                   Starts ₱{currentItem.prices[0].price}
                 </div>
               </div>
             </div>
 
             {/* Right Column: Details, Size Picker & Add Action */}
-            <div className="md:col-span-6 p-6 sm:p-8 flex flex-col justify-between space-y-6 bg-white">
-              <div className="space-y-3">
+            <div className="md:col-span-6 p-4 sm:p-8 flex flex-col justify-between space-y-4 sm:space-y-6 bg-white">
+              <div className="space-y-2 sm:space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-bold text-brand-orange uppercase tracking-wider">
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-brand-coffee">
@@ -297,7 +297,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                 </div>
 
                 <h3 
-                  className="font-display text-2xl sm:text-3xl font-bold text-brand-brown cursor-pointer hover:text-brand-orange transition-colors"
+                  className="font-display text-xl sm:text-3xl font-bold text-brand-brown cursor-pointer hover:text-brand-orange transition-colors leading-tight"
                   onClick={handleOpenPreview}
                   title="Click to view details"
                 >
@@ -313,46 +313,46 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
               </div>
 
               {/* Size & Pricing Selectors */}
-              <div className="space-y-3 pt-2">
-                <div className="text-xs font-bold text-brand-brown uppercase tracking-wider">
+              <div className="space-y-2 pt-1">
+                <div className="text-[11px] sm:text-xs font-bold text-brand-brown uppercase tracking-wider">
                   Select Size &amp; Quantity:
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {currentItem.prices.map((p, idx) => (
                     <button
                       key={p.size}
                       type="button"
                       onClick={() => setSelectedSizeIndex(idx)}
-                      className={`flex-1 rounded-xl p-2.5 text-xs font-bold transition-all border ${
+                      className={`rounded-xl p-2 sm:p-2.5 text-xs font-bold transition-all border text-center ${
                         selectedSizeIndex === idx
                           ? 'bg-brand-coffee text-white border-brand-coffee shadow-md scale-102'
                           : 'bg-slate-50 hover:bg-slate-100 text-brand-brown border-slate-200'
                       }`}
                     >
-                      <div className="text-[11px] opacity-80">{p.size}</div>
-                      <div className="text-sm text-brand-amber font-extrabold">₱{p.price}</div>
+                      <div className="text-[10px] sm:text-[11px] opacity-80">{p.size}</div>
+                      <div className="text-xs sm:text-sm text-brand-amber font-extrabold">₱{p.price}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-1">
                 <Button
                   variant="brand"
-                  size="lg"
+                  size="default"
                   onClick={handleAddCurrent}
-                  className="flex-1 gap-2 font-bold shadow-lg active:scale-95 transition-transform"
+                  className="flex-1 gap-2 font-bold shadow-lg active:scale-95 transition-transform text-xs sm:text-sm py-2.5"
                 >
                   {addedSuccess ? (
                     <>
-                      <Check className="h-5 w-5 text-green-200" />
+                      <Check className="h-4 w-4 text-green-200" />
                       <span>Added to Cart!</span>
                     </>
                   ) : (
                     <>
-                      <Plus className="h-5 w-5" />
+                      <Plus className="h-4 w-4" />
                       <span>Add to Cart &bull; ₱{currentItem.prices[selectedSizeIndex]?.price || currentItem.prices[0].price}</span>
                     </>
                   )}
@@ -360,9 +360,9 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
 
                 <Button
                   variant="outline"
-                  size="lg"
+                  size="default"
                   onClick={() => onExploreCategory(currentItem.category)}
-                  className="gap-1.5 text-xs text-brand-coffee hover:bg-brand-cream border-brand-coffee/20"
+                  className="gap-1.5 text-xs text-brand-coffee hover:bg-brand-cream border-brand-coffee/20 py-2.5"
                 >
                   <span>View All</span>
                   <ArrowRight className="h-4 w-4" />
@@ -373,16 +373,16 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
         </div>
 
         {/* Carousel Pagination Dots */}
-        <div className="flex items-center justify-center gap-2 mt-5">
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-4 sm:mt-5">
           {FEATURED_ITEMS.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIndex(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`h-2.5 rounded-full transition-all duration-300 ${
+              className={`h-2 sm:h-2.5 rounded-full transition-all duration-300 ${
                 idx === currentIndex
-                  ? 'w-8 bg-brand-orange shadow'
-                  : 'w-2.5 bg-brand-brown/20 hover:bg-brand-brown/40'
+                  ? 'w-6 sm:w-8 bg-brand-orange shadow'
+                  : 'w-2 sm:w-2.5 bg-brand-brown/20 hover:bg-brand-brown/40'
               }`}
             />
           ))}

@@ -18,35 +18,35 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <div className="flex flex-col gap-8 pb-12">
       {/* Hero Banner */}
-      <section className="relative overflow-hidden rounded-3xl bg-brand-brown py-16 sm:py-20 text-center text-white shadow-xl mx-4 mt-4">
+      <section className="relative overflow-hidden rounded-3xl bg-brand-brown py-12 sm:py-20 text-center text-white shadow-xl mx-2.5 sm:mx-4 mt-2.5 sm:mt-4">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-35 mix-blend-overlay"
           style={{ backgroundImage: "url('/images/Boy.jpeg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-brown via-brand-brown/85 to-brand-brown/60" />
 
-        <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-6 px-4">
+        <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-5 sm:gap-6 px-4">
           <div className="relative">
             <img
               src="/images/IMG_2476.jpeg"
               alt="Mr. Boy SpecialTea Logo"
-              className="h-28 w-28 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-brand-amber/50"
+              className="h-20 w-20 sm:h-28 sm:w-28 rounded-full border-3 sm:border-4 border-white shadow-2xl object-cover ring-4 ring-brand-amber/50"
             />
-            <span className="absolute -bottom-1 -right-1 rounded-full bg-brand-orange p-1.5 text-white shadow">
-              <Sparkles className="h-4 w-4" />
+            <span className="absolute -bottom-1 -right-1 rounded-full bg-brand-orange p-1 sm:p-1.5 text-white shadow">
+              <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </span>
           </div>
 
-          <div className="space-y-2">
-            <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-amber-50 drop-shadow">
+          <div className="space-y-1.5 sm:space-y-2">
+            <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl text-amber-50 drop-shadow leading-tight">
               Mr. Boy SpecialTea
             </h1>
-            <p className="text-base text-amber-100/90 sm:text-lg">
+            <p className="text-xs sm:text-lg text-amber-100/90 font-medium">
               Dela Costa V, Burgos Montalban, Rodriguez Rizal
             </p>
           </div>
 
-          <p className="max-w-xl text-sm italic text-amber-200/80 sm:text-base leading-relaxed">
+          <p className="max-w-xl text-xs sm:text-base italic text-amber-200/80 leading-relaxed px-2">
             “Welcome to Mr.Boy SpecialTea. Enjoy the taste of our drinks at an affordable price! From Milk Tea, Fruit Tea, to freshly brewed Coffee!”
           </p>
 
@@ -54,7 +54,7 @@ export const Hero: React.FC<HeroProps> = ({
             variant="brand"
             size="lg"
             onClick={onStartOrdering}
-            className="group gap-2 rounded-full px-8 py-6 text-lg shadow-lg hover:shadow-xl active:scale-95 transition-transform"
+            className="group gap-2 rounded-full px-6 py-5 sm:px-8 sm:py-6 text-base sm:text-lg shadow-lg hover:shadow-xl active:scale-95 transition-transform"
           >
             Start Ordering Now
             <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
