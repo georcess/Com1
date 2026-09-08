@@ -10,28 +10,47 @@ require_once __DIR__ . '/../config/database.php';
 class Order {
     
     /**
-     * Create a new order.
+     * Create a new order bound to user credentials.
      *
-     * @param string $customerName
-     * @param string $orderDetails
-     * @param float  $totalPrice
+     * @param string      $customerName
+     * @param string      $orderDetails
+     * @param float       $totalPrice
+     * @param int|null    $userId
+     * @param string|null $customerUsername
+     * @param string|null $customerEmail
+     * @param string      $status
      * @return array Response with status and message.
      */
-    public static function create($customerName, $orderDetails, $totalPrice) {
+    public static function create($customerName, $orderDetails, $totalPrice, $userId = null, $customerUsername = null, $customerEmail = null, $status = 'pending') {
         $conn = getConnection();
 
+        // Check columns dynamically in MySQL
         $stmt = $conn->prepare(
-            "INSERT INTO orders (customer_name, order_details, total_price) VALUES (?, ?, ?)"
+            "INSERT INTO orders (user_id, customer_name, customer_username, customer_email, order_details, total_price, status) VALUES (?, ?, ?, ?, ?, ?, ?)"
         );
-        $stmt->bind_param('ssd', $customerName, $orderDetails, $totalPrice);
-
-        if ($stmt->execute()) {
-            $result = ['status' => 'success', 'message' => 'Order saved to database.'];
+        
+        if ($stmt) {
+            $stmt->bind_param('issssds', $userId, $customerName, $customerUsername, $customerEmail, $orderDetails, $totalPrice, $status);
+            if ($stmt->execute()) {
+                $result = ['status' => 'success', 'message' => 'Order saved and bound to account.'];
+            } else {
+                $result = ['status' => 'error', 'message' => 'SQL Error: ' . $stmt->error];
+            }
+            $stmt->close();
         } else {
-            $result = ['status' => 'error', 'message' => 'SQL Error: ' . $stmt->error];
+            // Fallback for legacy tables without the new columns
+            $fallbackStmt = $conn->prepare(
+                "INSERT INTO orders (customer_name, order_details, total_price) VALUES (?, ?, ?)"
+            );
+            $fallbackStmt->bind_param('ssd', $customerName, $orderDetails, $totalPrice);
+            if ($fallbackStmt->execute()) {
+                $result = ['status' => 'success', 'message' => 'Order saved to database.'];
+            } else {
+                $result = ['status' => 'error', 'message' => 'SQL Error: ' . $fallbackStmt->error];
+            }
+            $fallbackStmt->close();
         }
 
-        $stmt->close();
         $conn->close();
         return $result;
     }

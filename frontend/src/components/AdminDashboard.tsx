@@ -49,6 +49,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   }, [currentUser]);
 
+  const handleToggleStatus = async (order: Order) => {
+    const nextStatus = order.status === 'completed' ? 'pending' : 'completed';
+    try {
+      const res = await fetch('/api/update_order_status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: order.id, status: nextStatus }),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === order.id ? { ...o, status: nextStatus } : o))
+        );
+      } else {
+        alert(data.message || 'Failed to update order status.');
+      }
+    } catch (err) {
+      alert('Error connecting to server.');
+    }
+  };
+
   const handleDeleteOrder = async (id: number) => {
     try {
       const res = await fetch('/api/delete_order.php', {
@@ -208,41 +229,90 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <Table>
               <TableHeader>
                 <TableRow className="bg-slate-50">
-                  <TableHead className="w-[180px]">Date / Time</TableHead>
-                  <TableHead className="w-[180px]">Customer</TableHead>
+                  <TableHead className="w-[160px]">Date / Time</TableHead>
+                  <TableHead className="w-[200px]">Customer Account</TableHead>
                   <TableHead>Order Details</TableHead>
-                  <TableHead className="w-[120px]">Total Price</TableHead>
-                  <TableHead className="w-[100px] text-right">Action</TableHead>
+                  <TableHead className="w-[110px]">Total Price</TableHead>
+                  <TableHead className="w-[100px] text-center">Status</TableHead>
+                  <TableHead className="w-[130px] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orders.map((order) => (
-                  <TableRow key={order.id} className="hover:bg-slate-50/80">
-                    <TableCell className="font-mono text-xs text-muted-foreground">
-                      {order.order_date}
-                    </TableCell>
-                    <TableCell className="font-semibold text-brand-brown">
-                      {order.customer_name}
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {order.order_details}
-                    </TableCell>
-                    <TableCell className="font-bold text-brand-orange">
-                      ₱{Number(order.total_price).toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => handleDeleteOrder(order.id)}
-                        className="h-8 gap-1 bg-green-700 hover:bg-green-800 text-white text-xs px-2.5"
-                      >
-                        <Check className="h-3.5 w-3.5" />
-                        Done
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {orders.map((order) => {
+                  const isCompleted = order.status === 'completed';
+                  return (
+                    <TableRow key={order.id} className="hover:bg-slate-50/80">
+                      <TableCell className="font-mono text-xs text-muted-foreground">
+                        {order.order_date}
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-0.5">
+                          <div className="font-semibold text-brand-brown text-sm">
+                            {order.customer_name}
+                          </div>
+                          {order.customer_username && (
+                            <div className="inline-flex items-center gap-1 rounded bg-brand-cream px-1.5 py-0.2 text-[10px] font-bold text-brand-coffee">
+                              @{order.customer_username}
+                            </div>
+                          )}
+                          {order.customer_email && (
+                            <div className="text-[11px] text-muted-foreground truncate max-w-[180px]">
+                              {order.customer_email}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {order.order_details}
+                      </TableCell>
+                      <TableCell className="font-bold text-brand-orange">
+                        ₱{Number(order.total_price).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={isCompleted ? 'default' : 'outline'}
+                          className={`text-[10px] uppercase font-bold cursor-pointer ${
+                            isCompleted
+                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              : 'text-amber-600 border-amber-300 bg-amber-50 hover:bg-amber-100'
+                          }`}
+                          onClick={() => handleToggleStatus(order)}
+                          title="Click to toggle status"
+                        >
+                          {order.status || 'pending'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            variant={isCompleted ? 'outline' : 'default'}
+                            size="sm"
+                            onClick={() => handleToggleStatus(order)}
+                            className={`h-7 gap-1 text-xs px-2 ${
+                              isCompleted
+                                ? 'border-slate-300 text-slate-600 hover:bg-slate-100'
+                                : 'bg-green-700 hover:bg-green-800 text-white'
+                            }`}
+                            title={isCompleted ? 'Mark as Pending' : 'Mark as Completed'}
+                          >
+                            <Check className="h-3 w-3" />
+                            <span>{isCompleted ? 'Undo' : 'Done'}</span>
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteOrder(order.id)}
+                            className="h-7 w-7 text-red-500 hover:bg-red-50 hover:text-red-700"
+                            title="Delete order record"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           )}

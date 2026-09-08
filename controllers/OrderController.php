@@ -28,22 +28,27 @@ class OrderController {
             session_start();
         }
 
-        if (empty($_SESSION['user']) && empty($data['user_id'])) {
+        $sessionUser = $_SESSION['user'] ?? null;
+        $userId = $data['user_id'] ?? ($sessionUser['id'] ?? null);
+
+        if (empty($sessionUser) && empty($userId)) {
             http_response_code(401);
             echo json_encode(['status' => 'error', 'message' => 'Please log in before submitting your order.', 'require_auth' => true]);
             return;
         }
 
-        $customerName = $data['customer_name'] ?? ($_SESSION['user']['fullname'] ?? '');
-        $orderDetails = $data['order_details'] ?? '';
-        $totalPrice   = $data['total_price']   ?? 0;
+        $customerName     = $sessionUser['fullname'] ?? ($data['customer_name'] ?? '');
+        $customerUsername = $sessionUser['username'] ?? ($data['customer_username'] ?? '');
+        $customerEmail    = $sessionUser['email'] ?? ($data['customer_email'] ?? '');
+        $orderDetails     = trim($data['order_details'] ?? '');
+        $totalPrice       = floatval($data['total_price'] ?? 0);
 
-        if (empty($customerName) || empty($orderDetails)) {
-            echo json_encode(['status' => 'error', 'message' => 'Missing required fields.']);
+        if (empty($customerName) || empty($orderDetails) || $totalPrice <= 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields or empty order.']);
             return;
         }
 
-        $result = Order::create($customerName, $orderDetails, $totalPrice);
+        $result = Order::create($customerName, $orderDetails, $totalPrice, $userId, $customerUsername, $customerEmail, 'pending');
         echo json_encode($result);
     }
 

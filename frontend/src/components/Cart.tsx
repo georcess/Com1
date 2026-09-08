@@ -94,44 +94,59 @@ export const Cart: React.FC<CartProps> = ({
           )}
 
           {/* Customer Name / Account Info */}
-          <div className="space-y-2 rounded-xl bg-brand-cream/60 p-4 border border-brand-brown/10">
-            <Label htmlFor="cust-name" className="flex items-center justify-between text-brand-brown font-semibold">
-              <span className="flex items-center gap-1.5">
+          <div className="space-y-3 rounded-xl bg-brand-cream/60 p-4 border border-brand-brown/10">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-sm font-bold text-brand-brown">
                 <UserIcon className="h-4 w-4 text-brand-coffee" />
-                Customer Name:
+                Order Placed By:
               </span>
               {currentUser ? (
-                <span className="text-xs text-green-700 font-medium flex items-center gap-1">
-                  <CheckCircle className="h-3.5 w-3.5" /> Logged In
+                <span className="text-xs text-green-700 font-bold flex items-center gap-1 bg-green-100/80 px-2 py-0.5 rounded-full border border-green-200">
+                  <CheckCircle className="h-3.5 w-3.5" /> Account Bound &amp; Verified
                 </span>
               ) : (
-                <span className="text-xs text-amber-700 font-medium flex items-center gap-1">
-                  <Lock className="h-3 w-3" /> Login Required
+                <span className="text-xs text-amber-800 font-bold flex items-center gap-1 bg-amber-100/80 px-2 py-0.5 rounded-full border border-amber-300">
+                  <Lock className="h-3.5 w-3.5" /> Login Required
                 </span>
               )}
-            </Label>
-            <Input
-              id="cust-name"
-              placeholder={currentUser ? "Enter customer name" : "Please log in first"}
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              disabled={!currentUser}
-              className={`bg-white ${!currentUser ? 'opacity-60 cursor-not-allowed' : ''}`}
-            />
+            </div>
+
             {currentUser ? (
-              <p className="text-[11px] text-muted-foreground italic">
-                Logged in as <strong>{currentUser.fullname}</strong> ({currentUser.email})
-              </p>
+              <div className="rounded-xl bg-white p-3.5 border border-brand-brown/10 shadow-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-display font-bold text-brand-brown text-base">
+                    {currentUser.fullname}
+                  </span>
+                  <span className="inline-flex items-center rounded-md bg-brand-cream px-2 py-0.5 text-xs font-bold text-brand-coffee">
+                    @{currentUser.username}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground font-mono">
+                  {currentUser.email}
+                </p>
+                <p className="text-[11px] text-green-700 pt-1 font-medium">
+                  🔒 This order will be recorded under this authenticated account.
+                </p>
+              </div>
             ) : (
-              <p className="text-[11px] text-amber-800">
-                <button 
-                  type="button" 
-                  onClick={() => onOpenAuth('login')}
-                  className="font-semibold underline hover:text-brand-orange"
-                >
-                  Click here to sign in
-                </button> to auto-fill your profile details.
-              </p>
+              <div className="space-y-2">
+                <Input
+                  id="cust-name"
+                  placeholder="Please log in first"
+                  value=""
+                  disabled={true}
+                  className="bg-white/50 opacity-60 cursor-not-allowed text-xs"
+                />
+                <p className="text-[11px] text-amber-800">
+                  <button 
+                    type="button" 
+                    onClick={() => onOpenAuth('login')}
+                    className="font-bold underline hover:text-brand-orange"
+                  >
+                    Click here to log in / register
+                  </button> to link and protect your orders.
+                </p>
+              </div>
             )}
           </div>
 

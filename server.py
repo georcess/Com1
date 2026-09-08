@@ -51,10 +51,15 @@ def init_db():
 
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
             customer_name TEXT NOT NULL,
+            customer_username TEXT,
+            customer_email TEXT,
             order_details TEXT NOT NULL,
             total_price REAL NOT NULL,
-            order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            status TEXT DEFAULT 'pending',
+            order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
         );
 
         CREATE TABLE IF NOT EXISTS contact_messages (
@@ -66,6 +71,17 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
+
+    # Migration for existing orders table
+    order_cols = [col[1] for col in conn.execute("PRAGMA table_info(orders)").fetchall()]
+    if 'user_id' not in order_cols:
+        conn.execute("ALTER TABLE orders ADD COLUMN user_id INTEGER")
+    if 'customer_username' not in order_cols:
+        conn.execute("ALTER TABLE orders ADD COLUMN customer_username TEXT")
+    if 'customer_email' not in order_cols:
+        conn.execute("ALTER TABLE orders ADD COLUMN customer_email TEXT")
+    if 'status' not in order_cols:
+        conn.execute("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'pending'")
 
     # Seed default admin if missing
     admin = conn.execute("SELECT id FROM users WHERE username = 'admin'").fetchone()
@@ -228,12 +244,12 @@ def current_user():
 @app.route('/api/submit_order.php', methods=['POST'])
 @app.route('/api/submit_order', methods=['POST'])
 def submit_order():
-    """Create a new order. Requires authenticated user."""
+    """Create a new order bound strictly to authenticated user credentials."""
     data = request.get_json()
     if not data:
         return jsonify({'status': 'error', 'message': 'No data received.'}), 400
 
-    # Verify user authentication via session or provided user_id
+    # Verify user authentication via session or verified user_id
     session_user = session.get('user')
     user_id = data.get('user_id')
 
@@ -241,9 +257,11 @@ def submit_order():
 
     authenticated_user = None
     if session_user and session_user.get('id'):
-        authenticated_user = session_user
+        user_row = conn.execute("SELECT id, fullname, username, email, role FROM users WHERE id = ?", (session_user['id'],)).fetchone()
+        if user_row:
+            authenticated_user = dict(user_row)
     elif user_id:
-        user_row = conn.execute("SELECT id, fullname, username, role FROM users WHERE id = ?", (user_id,)).fetchone()
+        user_row = conn.execute("SELECT id, fullname, username, email, role FROM users WHERE id = ?", (user_id,)).fetchone()
         if user_row:
             authenticated_user = dict(user_row)
 
@@ -255,45 +273,89 @@ def submit_order():
             'require_auth': True
         }), 401
 
-    customer_name = data.get('customer_name', '').strip() or authenticated_user.get('fullname', '')
+    # Bind order to authenticated user credentials
+    bound_user_id = authenticated_user['id']
+    customer_name = authenticated_user['fullname']
+    customer_username = authenticated_user['username']
+    customer_email = authenticated_user['email']
     order_details = data.get('order_details', '').strip()
-    total_price   = data.get('total_price', 0)
+    total_price   = float(data.get('total_price', 0))
 
-    if not customer_name or not order_details:
+    if not order_details or total_price <= 0:
         conn.close()
-        return jsonify({'status': 'error', 'message': 'Missing required fields.'}), 400
+        return jsonify({'status': 'error', 'message': 'Cart is empty or missing order details.'}), 400
 
-    conn.execute(
-        'INSERT INTO orders (customer_name, order_details, total_price) VALUES (?, ?, ?)',
-        (customer_name, order_details, total_price)
+    cursor = conn.execute(
+        '''INSERT INTO orders (user_id, customer_name, customer_username, customer_email, order_details, total_price, status)
+           VALUES (?, ?, ?, ?, ?, ?, 'pending')''',
+        (bound_user_id, customer_name, customer_username, customer_email, order_details, total_price)
     )
+    new_order_id = cursor.lastrowid
     conn.commit()
     conn.close()
 
-    return jsonify({'status': 'success', 'message': 'Order saved to database.'})
+    return jsonify({
+        'status': 'success',
+        'message': f'Order #{new_order_id} successfully bound to account @{customer_username}!',
+        'order_id': new_order_id
+    })
 
 
 @app.route('/api/fetch_orders.php', methods=['GET'])
+@app.route('/api/fetch_orders', methods=['GET'])
 def fetch_orders():
-    """Fetch all orders, newest first."""
+    """Fetch orders. If user_id provided, filter by user; otherwise return all."""
+    user_id_param = request.args.get('user_id')
     conn = get_db()
-    rows = conn.execute('SELECT * FROM orders ORDER BY order_date DESC').fetchall()
+
+    if user_id_param:
+        rows = conn.execute(
+            'SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC', 
+            (user_id_param,)
+        ).fetchall()
+    else:
+        rows = conn.execute('SELECT * FROM orders ORDER BY order_date DESC').fetchall()
+    
     conn.close()
 
     orders = []
     for row in rows:
         orders.append({
             'id': row['id'],
+            'user_id': row['user_id'] if 'user_id' in row.keys() else None,
             'customer_name': row['customer_name'],
+            'customer_username': row['customer_username'] if 'customer_username' in row.keys() else None,
+            'customer_email': row['customer_email'] if 'customer_email' in row.keys() else None,
             'order_details': row['order_details'],
             'total_price': row['total_price'],
+            'status': row['status'] if 'status' in row.keys() else 'pending',
             'order_date': row['order_date'],
         })
 
     return jsonify(orders)
 
 
+@app.route('/api/update_order_status.php', methods=['POST'])
+@app.route('/api/update_order_status', methods=['POST'])
+def update_order_status():
+    """Update order status (pending / completed)."""
+    data = request.get_json() or {}
+    order_id = data.get('id', 0)
+    status = data.get('status', 'completed')
+
+    if not order_id:
+        return jsonify({'status': 'error', 'message': 'Invalid order ID.'}), 400
+
+    conn = get_db()
+    conn.execute('UPDATE orders SET status = ? WHERE id = ?', (status, order_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'status': 'success', 'message': f'Order #{order_id} marked as {status}.'})
+
+
 @app.route('/api/delete_order.php', methods=['POST'])
+@app.route('/api/delete_order', methods=['POST'])
 def delete_order():
     """Delete a single order by ID."""
     data = request.get_json()
@@ -311,6 +373,7 @@ def delete_order():
 
 
 @app.route('/api/clear_orders.php', methods=['POST'])
+@app.route('/api/clear_orders', methods=['POST'])
 def clear_orders():
     """Delete all orders."""
     conn = get_db()

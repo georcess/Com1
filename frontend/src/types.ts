@@ -32,8 +32,12 @@ export interface User {
 
 export interface Order {
   id: number;
+  user_id?: number;
   customer_name: string;
+  customer_username?: string;
+  customer_email?: string;
   order_details: string;
   total_price: number;
+  status?: string;
   order_date: string;
 }

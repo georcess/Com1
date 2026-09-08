@@ -2,12 +2,13 @@ import React from 'react';
 import { CheckCircle2, Printer, Coffee } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
-import { CartItem } from '../types';
+import { CartItem, User } from '../types';
 
 interface ReceiptModalProps {
   isOpen: boolean;
   onClose: () => void;
   customerName: string;
+  currentUser?: User | null;
   cartItems: CartItem[];
   total: number;
 }
@@ -16,6 +17,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
   isOpen,
   onClose,
   customerName,
+  currentUser,
   cartItems,
   total,
 }) => {
@@ -48,8 +50,17 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({
 
           <div className="flex justify-between border-b pb-2">
             <span className="text-muted-foreground">Customer:</span>
-            <span className="font-bold text-brand-brown">{customerName || 'Walk-in Customer'}</span>
+            <span className="font-bold text-brand-brown">{customerName}</span>
           </div>
+
+          {currentUser && (
+            <div className="flex justify-between border-b pb-2 text-[11px]">
+              <span className="text-muted-foreground">Account:</span>
+              <span className="text-brand-coffee font-semibold">
+                @{currentUser.username} ({currentUser.email})
+              </span>
+            </div>
+          )}
 
           <div className="space-y-2 py-1">
             <div className="font-semibold text-muted-foreground uppercase text-[10px]">

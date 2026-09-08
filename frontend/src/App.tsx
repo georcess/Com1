@@ -148,7 +148,9 @@ export function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: currentUser.id,
-          customer_name: nameToUse,
+          customer_name: currentUser.fullname,
+          customer_username: currentUser.username,
+          customer_email: currentUser.email,
           order_details: orderDetails,
           total_price: cartTotal,
         }),
@@ -303,7 +305,8 @@ export function App() {
           setIsReceiptOpen(false);
           setCart([]);
         }}
-        customerName={customerName}
+        customerName={currentUser?.fullname || customerName}
+        currentUser={currentUser}
         cartItems={cart}
         total={cartTotal}
       />
