@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ArrowRight, Sparkles, Heart, Leaf, ShieldCheck, 
   Coffee, CupSoda, Flame, Cookie, Star, Clock, 
   MapPin, Phone, ShoppingBag, CheckCircle, Award, 
-  Zap, Gift, ThumbsUp 
+  Zap, Gift, ThumbsUp, ChevronLeft, ChevronRight,
+  Eye, Check
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Badge } from './ui/badge';
 import { FeaturedCarousel } from './FeaturedCarousel';
+import { ProductModal } from './ProductModal';
+import { MenuItem } from '../types';
 
 interface HomeProps {
   onStartOrdering: () => void;
@@ -17,12 +20,213 @@ interface HomeProps {
   onOpenAuth: (tab: 'login' | 'register') => void;
 }
 
+interface BestSellerItem {
+  id: string;
+  name: string;
+  category: 'milktea' | 'coffee' | 'fruit' | 'frappe' | 'hot' | 'snack';
+  categoryLabel: string;
+  badge: string;
+  rating: number;
+  orderCount: string;
+  description: string;
+  image: string;
+  prices: { size: string; price: number }[];
+}
+
+const BEST_SELLERS: BestSellerItem[] = [
+  {
+    id: 'bs-1',
+    name: 'CreamCheese Purple Taro',
+    category: 'milktea',
+    categoryLabel: 'Milktea',
+    badge: '👑 #1 Best Seller',
+    rating: 5.0,
+    orderCount: '480+ ordered',
+    description: 'Creamy premium purple taro infused with rich artisan cream cheese foam swirl.',
+    image: '/public/images/Taro.jpeg',
+    prices: [
+      { size: '16oz', price: 29 },
+      { size: '22oz', price: 39 },
+    ],
+  },
+  {
+    id: 'bs-2',
+    name: 'Caramel Macchiato',
+    category: 'coffee',
+    categoryLabel: 'Iced Coffee',
+    badge: '🔥 Top Coffee Pick',
+    rating: 4.9,
+    orderCount: '390+ ordered',
+    description: 'Bold dark espresso layered over chilled fresh milk and golden caramel drizzle.',
+    image: '/public/images/caramelmacchiato.jpg',
+    prices: [
+      { size: '16oz', price: 29 },
+      { size: '22oz', price: 39 },
+    ],
+  },
+  {
+    id: 'bs-3',
+    name: 'Wintermelon Milk Tea',
+    category: 'milktea',
+    categoryLabel: 'Milktea',
+    badge: '⭐ Crowd Favorite',
+    rating: 4.9,
+    orderCount: '340+ ordered',
+    description: 'Authentic caramelized brown sugar wintermelon brew blended with silky black tea.',
+    image: '/public/images/wintermelon.jpg',
+    prices: [
+      { size: '16oz', price: 29 },
+      { size: '22oz', price: 39 },
+    ],
+  },
+  {
+    id: 'bs-4',
+    name: 'Matcha Green Tea',
+    category: 'milktea',
+    categoryLabel: 'Milktea',
+    badge: '🍵 Japanese Classic',
+    rating: 4.9,
+    orderCount: '290+ ordered',
+    description: 'Earthy stone-ground Uji matcha whisked smoothly with fresh creamy milk.',
+    image: '/public/images/matcha.jpeg',
+    prices: [
+      { size: '16oz', price: 29 },
+      { size: '22oz', price: 39 },
+    ],
+  },
+  {
+    id: 'bs-5',
+    name: 'Passion Fruit Tea',
+    category: 'fruit',
+    categoryLabel: 'Fruit Tea',
+    badge: '🌴 Refreshing',
+    rating: 4.8,
+    orderCount: '270+ ordered',
+    description: 'Zesty tropical passion fruit infused with freshly brewed fragrant jasmine tea.',
+    image: '/public/images/passionfruit.jpg',
+    prices: [
+      { size: '16oz', price: 29 },
+      { size: '22oz', price: 39 },
+    ],
+  },
+  {
+    id: 'bs-6',
+    name: 'Blueberry Burst Frappé',
+    category: 'frappe',
+    categoryLabel: 'Frappé',
+    badge: '✨ Sweet Bliss',
+    rating: 4.9,
+    orderCount: '240+ ordered',
+    description: 'Decadent ice-blended blueberry cream confection with whipped cream swirls.',
+    image: '/public/images/blueberryburstfrappee.jpg',
+    prices: [
+      { size: '16oz', price: 29 },
+      { size: '22oz', price: 39 },
+    ],
+  },
+  {
+    id: 'bs-7',
+    name: 'Dark Chocolate',
+    category: 'milktea',
+    categoryLabel: 'Milktea',
+    badge: '🍫 Choco Treat',
+    rating: 4.9,
+    orderCount: '285+ ordered',
+    description: 'Deep, bittersweet European dark cocoa melted into velvety smooth milk tea.',
+    image: '/public/images/dark choco.jpg',
+    prices: [
+      { size: '16oz', price: 29 },
+      { size: '22oz', price: 39 },
+    ],
+  },
+  {
+    id: 'bs-8',
+    name: 'Crispy French Fries',
+    category: 'snack',
+    categoryLabel: 'Snacks',
+    badge: '🍟 Perfect Match',
+    rating: 4.8,
+    orderCount: '350+ ordered',
+    description: 'Golden crunchy potato fries tossed in savory seasonings, served hot & crispy.',
+    image: '/public/images/fries.jpeg',
+    prices: [
+      { size: 'Medium', price: 29 },
+      { size: 'Large', price: 39 },
+    ],
+  },
+];
+
 export const Home: React.FC<HomeProps> = ({
   onStartOrdering,
   onAddToCart,
   onExploreCategory,
   onOpenAuth,
 }) => {
+  // Modal Preview state
+  const [modalItem, setModalItem] = useState<MenuItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  // Hero auto-slider state
+  const [heroSlideIndex, setHeroSlideIndex] = useState<number>(0);
+  const [heroSelectedSize, setHeroSelectedSize] = useState<number>(0);
+  const [addedItemName, setAddedItemName] = useState<string | null>(null);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto rotate hero slide every 4 seconds
+  useEffect(() => {
+    autoPlayRef.current = setInterval(() => {
+      setHeroSlideIndex((prev) => (prev + 1) % BEST_SELLERS.length);
+      setHeroSelectedSize(0);
+    }, 4000);
+
+    return () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+  }, []);
+
+  const resetAutoPlay = () => {
+    if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    autoPlayRef.current = setInterval(() => {
+      setHeroSlideIndex((prev) => (prev + 1) % BEST_SELLERS.length);
+      setHeroSelectedSize(0);
+    }, 5000);
+  };
+
+  const handlePrevSlide = () => {
+    resetAutoPlay();
+    setHeroSlideIndex((prev) => (prev === 0 ? BEST_SELLERS.length - 1 : prev - 1));
+    setHeroSelectedSize(0);
+  };
+
+  const handleNextSlide = () => {
+    resetAutoPlay();
+    setHeroSlideIndex((prev) => (prev + 1) % BEST_SELLERS.length);
+    setHeroSelectedSize(0);
+  };
+
+  const currentHeroItem = BEST_SELLERS[heroSlideIndex];
+  const activeHeroPriceObj = currentHeroItem.prices[heroSelectedSize] || currentHeroItem.prices[0];
+
+  const handleQuickAdd = (item: BestSellerItem, size: string, price: number) => {
+    onAddToCart(item.name, size, price);
+    setAddedItemName(item.name);
+    setTimeout(() => {
+      setAddedItemName((current) => (current === item.name ? null : current));
+    }, 1600);
+  };
+
+  const handleOpenProductModal = (item: BestSellerItem) => {
+    const menuItem: MenuItem = {
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      image: item.image,
+      prices: item.prices,
+    };
+    setModalItem(menuItem);
+    setIsModalOpen(true);
+  };
+
   const categories = [
     { id: 'milktea', name: 'Milktea', count: '19 Flavors', price: 'From ₱29', image: '/public/images/Taro.jpeg', icon: Sparkles, tag: 'Bestseller' },
     { id: 'coffee', name: 'Iced Coffee', count: '6 Variants', price: 'From ₱29', image: '/public/images/caramelmacchiato.jpg', icon: Coffee, tag: 'Daily Energy' },
@@ -59,10 +263,123 @@ export const Home: React.FC<HomeProps> = ({
     },
   ];
 
+  // Duplicate items 3 times for a seamless infinite marquee ribbon
+  const marqueeItems = [...BEST_SELLERS, ...BEST_SELLERS, ...BEST_SELLERS];
+
   return (
-    <div className="flex flex-col gap-16 pb-16">
+    <div className="flex flex-col gap-12 pb-16">
+      
+      {/* ── 0. TOP BEST SELLERS SMOOTH SLIDING MARQUEE ─────────────── */}
+      <section className="relative overflow-hidden mx-4 sm:mx-6 mt-3 rounded-2xl bg-gradient-to-r from-brand-brown via-[#221510] to-brand-coffee border border-amber-500/20 shadow-xl py-3.5 select-none">
+        {/* Subtle Ambient Glow */}
+        <div className="absolute -left-10 top-0 h-full w-24 bg-gradient-to-r from-brand-brown to-transparent z-10 pointer-events-none" />
+        <div className="absolute -right-10 top-0 h-full w-24 bg-gradient-to-l from-brand-coffee to-transparent z-10 pointer-events-none" />
+
+        {/* Marquee Header / Tagline */}
+        <div className="container mx-auto px-4 mb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-brand-orange animate-ping" />
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-brand-amber/30 px-3 py-0.5 text-xs font-black tracking-wider text-amber-200 uppercase">
+              <Sparkles className="h-3 w-3 text-brand-amber animate-pulse" />
+              <span>🔥 Top Best Sellers Live Stream</span>
+            </div>
+            <span className="hidden sm:inline text-xs text-amber-100/70 font-medium">
+              • Tap any drink to preview ingredients or quick-add
+            </span>
+          </div>
+
+          <div className="text-[11px] text-amber-200/80 font-medium flex items-center gap-1">
+            <span className="hidden md:inline">Starting at ₱29</span>
+            <Badge variant="outline" className="text-[10px] text-brand-amber border-brand-amber/40 bg-white/5 py-0 px-2">
+              Hover to Pause
+            </Badge>
+          </div>
+        </div>
+
+        {/* Continuous 60fps Sliding Track */}
+        <div className="overflow-hidden py-1">
+          <div className="animate-marquee flex items-center gap-4">
+            {marqueeItems.map((item, idx) => {
+              const basePrice = item.prices[0].price;
+              const isAdded = addedItemName === item.name;
+
+              return (
+                <div
+                  key={`${item.id}-${idx}`}
+                  className="group relative flex items-center gap-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md p-2.5 pr-4 border border-white/15 hover:border-brand-amber/60 shadow-md hover:shadow-xl transition-all duration-300 shrink-0 cursor-pointer"
+                  onClick={() => handleOpenProductModal(item)}
+                >
+                  {/* Thumbnail Image */}
+                  <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl bg-black/40">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                    <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 text-[9px] font-bold text-amber-300">
+                      ★ {item.rating}
+                    </span>
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex flex-col text-left">
+                    <div className="flex items-center gap-1.5">
+                      <span className="rounded-full bg-brand-orange/30 border border-brand-orange/50 px-1.5 py-0.2 text-[9px] font-bold text-amber-200">
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    <h4 className="font-display text-xs sm:text-sm font-bold text-white group-hover:text-amber-200 transition-colors line-clamp-1 max-w-[150px] sm:max-w-[170px]">
+                      {item.name}
+                    </h4>
+
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="font-mono text-xs sm:text-sm font-extrabold text-brand-amber">
+                        ₱{basePrice}
+                      </span>
+                      <span className="text-[10px] text-amber-100/60 font-medium">
+                        {item.prices.length > 1 ? '16oz / 22oz' : 'Standard'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Quick Add Button */}
+                  <Button
+                    size="sm"
+                    variant={isAdded ? 'outline' : 'amber'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleQuickAdd(item, item.prices[0].size, basePrice);
+                    }}
+                    className={`h-8 px-2.5 text-xs font-bold rounded-xl shadow transition-transform active:scale-90 ${
+                      isAdded 
+                        ? 'bg-green-600 text-white border-green-500' 
+                        : 'bg-brand-orange hover:bg-brand-amber text-white'
+                    }`}
+                  >
+                    {isAdded ? (
+                      <span className="flex items-center gap-1">
+                        <Check className="h-3.5 w-3.5" /> Added
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        + ₱{basePrice}
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* ── 1. HERO BANNER SECTION ─────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-brown via-[#221510] to-brand-coffee py-16 sm:py-24 text-white shadow-2xl mx-4 sm:mx-6 mt-4 border border-brand-brown/40">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-brown via-[#221510] to-brand-coffee py-12 sm:py-20 text-white shadow-2xl mx-4 sm:mx-6 border border-brand-brown/40">
         {/* Background Image & Ambient Glow Circles */}
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 transition-transform duration-1000"
@@ -125,7 +442,7 @@ export const Home: React.FC<HomeProps> = ({
                 </Button>
               </div>
 
-              {/* Redesigned Mini Metric Cards */}
+              {/* Mini Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10">
                 
                 {/* Metric 1: Customer Rating */}
@@ -165,48 +482,162 @@ export const Home: React.FC<HomeProps> = ({
 
             </div>
 
-            {/* Right Column: Hero Visual Card with Glowing Badge (5 cols) */}
+            {/* Right Column: Interactive Auto-Sliding Best Seller Showcase (5 cols) */}
             <div className="lg:col-span-5 flex justify-center">
-              <div className="relative group">
+              <div className="relative group w-full max-w-sm">
                 <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-brand-amber via-brand-orange to-amber-600 opacity-50 blur-xl group-hover:opacity-85 transition duration-700" />
                 
-                <div className="relative rounded-3xl bg-white/10 backdrop-blur-md p-4 border border-white/20 shadow-2xl max-w-sm">
-                  <div className="relative overflow-hidden rounded-2xl h-80 w-72 sm:w-80">
+                <div className="relative rounded-3xl bg-white/10 backdrop-blur-md p-4 border border-white/20 shadow-2xl overflow-hidden">
+                  
+                  {/* Slider Control Navigation Header */}
+                  <div className="flex items-center justify-between pb-3 px-1 border-b border-white/10 mb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-2 w-2 rounded-full bg-brand-orange animate-ping" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-amber-200">
+                        Featured Best Seller ({heroSlideIndex + 1}/{BEST_SELLERS.length})
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={handlePrevSlide}
+                        aria-label="Previous Slide"
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 hover:bg-white/25 text-white transition-all active:scale-90"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={handleNextSlide}
+                        aria-label="Next Slide"
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 hover:bg-white/25 text-white transition-all active:scale-90"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Main Product Image with Smooth Transition */}
+                  <div 
+                    className="relative overflow-hidden rounded-2xl h-72 w-full cursor-pointer"
+                    onClick={() => handleOpenProductModal(currentHeroItem)}
+                  >
                     <img
-                      src="/public/images/Taro.jpeg"
-                      alt="Signature Mr. Boy Taro Milk Tea"
-                      className="h-full w-full object-cover rounded-2xl transition-transform duration-700 group-hover:scale-105"
+                      key={currentHeroItem.id}
+                      src={currentHeroItem.image}
+                      alt={currentHeroItem.name}
+                      className="h-full w-full object-cover rounded-2xl transition-all duration-700 ease-out group-hover:scale-105 animate-in fade-in"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                      }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
                     
                     {/* Floating Bestseller Tag */}
                     <Badge variant="brand" className="absolute top-3 left-3 bg-brand-orange text-white font-bold px-3 py-1 shadow-lg z-10 flex items-center gap-1">
                       <Sparkles className="h-3 w-3" />
-                      <span>🔥 Top Seller</span>
+                      <span>{currentHeroItem.badge}</span>
                     </Badge>
 
-                    {/* Logo Overlay */}
-                    <div className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white p-0.5 shadow-md z-10">
-                      <img src="/public/images/IMG_2476.jpeg" alt="Logo" className="h-full w-full rounded-full object-cover" />
-                    </div>
+                    {/* Quick Preview Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenProductModal(currentHeroItem);
+                      }}
+                      className="absolute top-3 right-3 flex h-8 items-center gap-1 rounded-full bg-black/60 hover:bg-black/80 px-2.5 text-[11px] font-bold text-white border border-white/20 backdrop-blur-md shadow-md z-10 transition-transform active:scale-95"
+                    >
+                      <Eye className="h-3.5 w-3.5 text-brand-amber" />
+                      <span>Preview</span>
+                    </button>
 
-                    {/* Bottom Card Caption */}
+                    {/* Bottom Card Caption & Interactive Add */}
                     <div className="absolute bottom-3 left-3 right-3 text-left text-white z-10">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-brand-amber">Signature Special</div>
-                      <div className="font-display text-lg font-bold">CreamCheese Purple Taro</div>
-                      <div className="flex items-center justify-between mt-1.5 text-xs">
-                        <span className="text-amber-200 font-semibold">16oz ₱29 &bull; 22oz ₱39</span>
+                      <div className="flex items-center justify-between">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-brand-amber">
+                          {currentHeroItem.categoryLabel}
+                        </div>
+                        <div className="text-[11px] text-amber-200/90 font-medium">
+                          ★ {currentHeroItem.rating} ({currentHeroItem.orderCount})
+                        </div>
+                      </div>
+
+                      <div className="font-display text-lg font-bold line-clamp-1">
+                        {currentHeroItem.name}
+                      </div>
+
+                      {/* Size Selector Chips */}
+                      <div className="flex items-center gap-1.5 my-2">
+                        {currentHeroItem.prices.map((p, idx) => (
+                          <button
+                            key={idx}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setHeroSelectedSize(idx);
+                            }}
+                            className={`rounded-lg px-2.5 py-0.5 text-xs font-bold transition-all ${
+                              heroSelectedSize === idx
+                                ? 'bg-brand-amber text-brand-brown shadow-sm scale-105'
+                                : 'bg-white/20 text-white hover:bg-white/30'
+                            }`}
+                          >
+                            {p.size} ₱{p.price}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Quick Add Button */}
+                      <div className="flex items-center justify-between pt-1 text-xs">
+                        <span className="text-amber-200 font-semibold font-mono text-sm">
+                          Total: ₱{activeHeroPriceObj.price}
+                        </span>
+
                         <Button 
                           size="sm" 
-                          variant="amber" 
-                          onClick={() => onAddToCart('CreamCheese Purple Taro', '16oz', 29)}
-                          className="h-7 text-xs px-3 font-bold shadow-md active:scale-95 transition-transform"
+                          variant={addedItemName === currentHeroItem.name ? 'outline' : 'amber'}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQuickAdd(currentHeroItem, activeHeroPriceObj.size, activeHeroPriceObj.price);
+                          }}
+                          className={`h-8 text-xs px-4 font-bold shadow-md active:scale-95 transition-all ${
+                            addedItemName === currentHeroItem.name
+                              ? 'bg-green-600 text-white border-green-500'
+                              : 'bg-brand-orange hover:bg-brand-amber text-white'
+                          }`}
                         >
-                          + Quick Add
+                          {addedItemName === currentHeroItem.name ? (
+                            <span className="flex items-center gap-1">
+                              <Check className="h-3.5 w-3.5" /> Added to Cart!
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1">
+                              <ShoppingBag className="h-3.5 w-3.5" /> + Quick Add
+                            </span>
+                          )}
                         </Button>
                       </div>
                     </div>
                   </div>
+
+                  {/* Slide Indicators Dots */}
+                  <div className="flex items-center justify-center gap-1.5 pt-3">
+                    {BEST_SELLERS.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          resetAutoPlay();
+                          setHeroSlideIndex(idx);
+                          setHeroSelectedSize(0);
+                        }}
+                        aria-label={`Jump to slide ${idx + 1}`}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          heroSlideIndex === idx
+                            ? 'w-6 bg-brand-orange shadow'
+                            : 'w-2 bg-white/30 hover:bg-white/60'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -214,6 +645,7 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </div>
       </section>
+
 
       {/* ── 2. QUICK CATEGORY DISCOVERY TILES ─────────────────────── */}
       <section className="container mx-auto px-4 sm:px-6">
@@ -500,6 +932,17 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         </div>
       </section>
+
+      {/* ── 8. PRODUCT MODAL PREVIEW ──────────────────────────────── */}
+      {modalItem && (
+        <ProductModal
+          item={modalItem}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onAddToCart={onAddToCart}
+        />
+      )}
     </div>
   );
 };
+
