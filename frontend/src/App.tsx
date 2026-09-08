@@ -262,10 +262,7 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <Footer 
-        onNavigate={setActiveTab} 
-        onSelectCategory={setSelectedMenuCategory} 
-      />
+      <Footer onNavigate={setActiveTab} />
 
       {/* Modals */}
       <AuthModal

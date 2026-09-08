@@ -4,7 +4,6 @@ import {
   Clock, 
   Phone, 
   Mail, 
-  Coffee, 
   Sparkles, 
   Heart, 
   Facebook, 
@@ -15,26 +14,19 @@ import {
   ShieldCheck, 
   Truck, 
   CreditCard,
-  Utensils
+  Utensils,
+  Navigation
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
-  onSelectCategory?: (category: string) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCategoryClick = (category: string) => {
-    if (onSelectCategory) {
-      onSelectCategory(category);
-    }
-    onNavigate('menu');
   };
 
   return (
@@ -65,8 +57,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
       <div className="container mx-auto px-4 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
-          {/* Column 1: Brand Info & Bio (4 cols) */}
-          <div className="lg:col-span-4 space-y-4">
+          {/* Column 1: Brand Info & Bio (5 cols) */}
+          <div className="lg:col-span-5 space-y-4">
             <div 
               className="flex items-center gap-3 cursor-pointer group w-fit"
               onClick={() => onNavigate('home')}
@@ -84,7 +76,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
               </div>
             </div>
 
-            <p className="text-xs text-amber-100/80 leading-relaxed">
+            <p className="text-xs text-amber-100/80 leading-relaxed max-w-md">
               Dela Costa V&apos;s favorite neighborhood milktea &amp; coffee sanctuary. 
               We serve freshly brewed tea, bold barista espresso, ice-blended frappés, 
               and piping-hot crispy snacks starting at only <strong>₱29</strong>!
@@ -149,117 +141,21 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
             </div>
           </div>
 
-          {/* Column 2: Quick Links & Categories (3 cols) */}
-          <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-display text-base font-bold text-brand-amber border-b border-white/10 pb-2">
-              Menu Categories
-            </h4>
-            <ul className="space-y-2 text-xs text-amber-100/80">
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryClick('milktea')}
-                  className="hover:text-brand-amber hover:underline transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-brand-orange">&bull;</span> Milktea Series (₱29 - ₱39)
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryClick('coffee')}
-                  className="hover:text-brand-amber hover:underline transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-brand-orange">&bull;</span> Iced Coffee Blends (₱29 - ₱39)
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryClick('fruit')}
-                  className="hover:text-brand-amber hover:underline transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-brand-orange">&bull;</span> Refreshing Fruit Teas (₱29 - ₱39)
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryClick('frappe')}
-                  className="hover:text-brand-amber hover:underline transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-brand-orange">&bull;</span> Ice-Blended Frappés (₱29 - ₱39)
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryClick('hot')}
-                  className="hover:text-brand-amber hover:underline transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-brand-orange">&bull;</span> Steaming Hot Cups (₱35 Flat)
-                </button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={() => handleCategoryClick('snack')}
-                  className="hover:text-brand-amber hover:underline transition-colors flex items-center gap-1.5"
-                >
-                  <span className="text-brand-orange">&bull;</span> Crispy French Fries (₱29 - ₱49)
-                </button>
-              </li>
-            </ul>
-
-            <div className="pt-2 border-t border-white/10 flex flex-wrap gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => onNavigate('home')}
-                className="text-amber-200 hover:text-white transition-colors"
-              >
-                Home
-              </button>
-              <span className="text-white/30">&bull;</span>
-              <button
-                type="button"
-                onClick={() => onNavigate('menu')}
-                className="text-amber-200 hover:text-white transition-colors"
-              >
-                Order Online
-              </button>
-              <span className="text-white/30">&bull;</span>
-              <button
-                type="button"
-                onClick={() => onNavigate('cart')}
-                className="text-amber-200 hover:text-white transition-colors"
-              >
-                My Cart
-              </button>
-              <span className="text-white/30">&bull;</span>
-              <button
-                type="button"
-                onClick={() => onNavigate('contact')}
-                className="text-amber-200 hover:text-white transition-colors"
-              >
-                Contact
-              </button>
-            </div>
-          </div>
-
-          {/* Column 3: Store Location & Operating Hours (3 cols) */}
-          <div className="lg:col-span-3 space-y-4">
-            <h4 className="font-display text-base font-bold text-brand-amber border-b border-white/10 pb-2">
-              Store Location &amp; Hours
+          {/* Column 2: Store Location & Operating Hours (4 cols) */}
+          <div className="lg:col-span-4 space-y-4">
+            <h4 className="font-display text-base font-bold text-brand-amber border-b border-white/10 pb-2 flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-brand-orange" />
+              <span>Store Location &amp; Hours</span>
             </h4>
             
-            <div className="space-y-3 text-xs text-amber-100/80">
+            <div className="space-y-3.5 text-xs text-amber-100/80">
               <div className="flex items-start gap-2.5">
-                <MapPin className="h-4 w-4 text-brand-orange shrink-0 mt-0.5" />
+                <Navigation className="h-4 w-4 text-brand-orange shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-white block font-semibold">Montalban Main Branch:</strong>
                   <span>Dela Costa Homes V, Burgos, Montalban, Rodriguez, Rizal 1860</span>
                   <span className="block text-[11px] text-amber-300/80 italic mt-0.5">
-                    (Near Dela Costa Phase 1 Clubhouse)
+                    (Near Dela Costa Phase 1 Clubhouse &amp; Basketball Court)
                   </span>
                 </div>
               </div>
@@ -285,10 +181,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
             </div>
           </div>
 
-          {/* Column 4: Catering & Contact Info (2 cols) */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="font-display text-base font-bold text-brand-amber border-b border-white/10 pb-2">
-              Get in Touch
+          {/* Column 3: Catering & Direct Inquiries (3 cols) */}
+          <div className="lg:col-span-3 space-y-4">
+            <h4 className="font-display text-base font-bold text-brand-amber border-b border-white/10 pb-2 flex items-center gap-2">
+              <Phone className="h-4 w-4 text-brand-orange" />
+              <span>Get in Touch</span>
             </h4>
 
             <div className="space-y-2.5 text-xs text-amber-100/80">
@@ -302,11 +199,46 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
               </div>
             </div>
 
+            {/* Quick Navigation Links */}
+            <div className="pt-1 flex flex-wrap gap-2 text-xs">
+              <button
+                type="button"
+                onClick={() => onNavigate('home')}
+                className="text-amber-200 hover:text-white hover:underline transition-colors"
+              >
+                Home
+              </button>
+              <span className="text-white/30">&bull;</span>
+              <button
+                type="button"
+                onClick={() => onNavigate('menu')}
+                className="text-amber-200 hover:text-white hover:underline transition-colors"
+              >
+                Menu
+              </button>
+              <span className="text-white/30">&bull;</span>
+              <button
+                type="button"
+                onClick={() => onNavigate('cart')}
+                className="text-amber-200 hover:text-white hover:underline transition-colors"
+              >
+                Order Cart
+              </button>
+              <span className="text-white/30">&bull;</span>
+              <button
+                type="button"
+                onClick={() => onNavigate('contact')}
+                className="text-amber-200 hover:text-white hover:underline transition-colors"
+              >
+                Contact
+              </button>
+            </div>
+
             {/* Catering Callout Box */}
-            <div className="rounded-xl bg-black/20 p-3 border border-white/10 space-y-1.5">
+            <div className="rounded-xl bg-black/20 p-3.5 border border-white/10 space-y-2">
               <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
                 <Sparkles className="h-3.5 w-3.5 text-brand-orange" />
-                <span>Bulk &amp; Events</span>
+                <span>Bulk &amp; Party Events</span>
               </div>
               <p className="text-[11px] text-amber-100/70 leading-relaxed">
                 Hosting a birthday, school festival, or party? Inquire for special bulk cup pricing!
@@ -315,7 +247,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onSelectCategory }) 
                 variant="amber"
                 size="sm"
                 onClick={() => onNavigate('contact')}
-                className="w-full h-7 text-xs font-bold"
+                className="w-full h-8 text-xs font-bold shadow-sm"
               >
                 Inquire Now
               </Button>
