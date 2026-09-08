@@ -62,43 +62,52 @@ export const Home: React.FC<HomeProps> = ({
   return (
     <div className="flex flex-col gap-16 pb-16">
       {/* ── 1. HERO BANNER SECTION ─────────────────────────────────── */}
-      <section className="relative overflow-hidden rounded-3xl bg-brand-brown py-16 sm:py-24 text-white shadow-2xl mx-4 sm:mx-6 mt-4 border border-brand-brown/30">
-        {/* Background Image with Dark Gradient Mesh */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-brown via-[#221510] to-brand-coffee py-16 sm:py-24 text-white shadow-2xl mx-4 sm:mx-6 mt-4 border border-brand-brown/40">
+        {/* Background Image & Ambient Glow Circles */}
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-luminosity scale-105 transition-transform duration-1000"
+          className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 transition-transform duration-1000"
           style={{ backgroundImage: "url('/public/images/Boy.jpeg')" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-brown via-brand-brown/90 to-brand-coffee/85" />
+        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-brand-amber/15 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-brand-orange/20 blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-brown/95 via-brand-brown/90 to-brand-coffee/85" />
 
         <div className="relative z-10 container mx-auto px-4 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left Column: Hero Text & Call to Action */}
+            
+            {/* Left Column: Hero Text, CTAs & Metrics (7 cols) */}
             <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-              {/* Pill Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-brand-amber/20 border border-brand-amber/40 px-4 py-1.5 text-xs font-bold text-brand-amber backdrop-blur shadow-sm">
-                <Sparkles className="h-4 w-4 text-brand-orange animate-spin" style={{ animationDuration: '4s' }} />
-                <span>MONTALBAN'S FAVORITE SPECIALTEA SPOT</span>
+              
+              {/* Floating Pill Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/20 border border-brand-amber/40 px-4 py-1.5 text-xs font-bold text-amber-200 backdrop-blur-md shadow-sm">
+                <span className="flex h-2 w-2 rounded-full bg-brand-orange animate-ping" />
+                <Sparkles className="h-3.5 w-3.5 text-brand-amber" />
+                <span className="tracking-wide uppercase">MONTALBAN&apos;S FAVORITE SPECIALTEA SPOT</span>
               </div>
 
               {/* Main Headline */}
               <div className="space-y-3">
-                <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white drop-shadow-md leading-tight">
-                  Taste the <span className="text-brand-amber underline decoration-brand-orange decoration-wavy underline-offset-8">SpecialTea</span> in Every Sip.
+                <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] drop-shadow-md">
+                  Taste the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-amber via-amber-200 to-brand-orange underline decoration-brand-orange decoration-wavy decoration-2 underline-offset-8">SpecialTea</span> in Every Sip.
                 </h1>
-                <p className="text-base sm:text-lg text-amber-100/90 max-w-xl leading-relaxed">
-                  Handcrafted Milktea, artisan Iced Coffee, refreshing Fruit Teas, and hot snacks at student-friendly prices. Starting at only <strong>₱29</strong>!
+                <p className="text-base sm:text-lg text-amber-100/90 max-w-xl leading-relaxed font-normal">
+                  Handcrafted Milktea, artisan Iced Coffee, refreshing Fruit Teas, and hot snacks at student-friendly prices. Starting at only{' '}
+                  <span className="inline-flex items-center rounded-lg bg-brand-orange/30 px-2.5 py-0.5 font-mono text-base font-extrabold text-brand-amber border border-brand-orange/40 shadow-xs">
+                    ₱29
+                  </span>
+                  !
                 </p>
               </div>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 pt-2">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-1">
                 <Button
                   variant="brand"
                   size="lg"
                   onClick={onStartOrdering}
-                  className="group gap-2.5 rounded-full px-8 py-6 text-base font-extrabold shadow-xl hover:shadow-2xl active:scale-95 transition-all bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-orange/90 hover:to-amber-600/90"
+                  className="group relative gap-2.5 rounded-2xl px-8 py-6 text-base font-extrabold shadow-2xl hover:shadow-brand-orange/50 active:scale-95 transition-all bg-gradient-to-r from-brand-orange via-amber-500 to-brand-orange text-white"
                 >
-                  <ShoppingBag className="h-5 w-5" />
+                  <ShoppingBag className="h-5 w-5 transition-transform group-hover:scale-110" />
                   <span>Start Ordering Now</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
@@ -110,33 +119,56 @@ export const Home: React.FC<HomeProps> = ({
                     const feat = document.getElementById('featured-carousel-sec');
                     if (feat) feat.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="rounded-full px-6 py-6 text-base font-bold text-white border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 active:scale-95"
+                  className="rounded-2xl px-7 py-6 text-base font-bold text-white border-white/20 bg-white/10 backdrop-blur-md hover:bg-white/20 hover:border-white/40 active:scale-95 transition-all shadow-md"
                 >
                   <span>🔥 Featured Specials</span>
                 </Button>
               </div>
 
-              {/* Social Proof Mini Stats */}
-              <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-amber-100/80 border-t border-white/10">
-                <div className="flex items-center gap-1.5 font-semibold">
-                  <Star className="h-4 w-4 fill-brand-amber text-brand-amber" />
-                  <span><strong>4.9/5</strong> Customer Rating</span>
+              {/* Redesigned Mini Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-white/10">
+                
+                {/* Metric 1: Customer Rating */}
+                <div className="flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md p-3 border border-white/15 shadow-sm hover:bg-white/15 transition-colors">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-amber/20 text-brand-amber border border-brand-amber/30">
+                    <Star className="h-5 w-5 fill-brand-amber text-brand-amber" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-display text-base font-extrabold text-white leading-tight">4.9 / 5.0</div>
+                    <div className="text-[11px] text-amber-200/80 font-medium">Customer Rating</div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 font-semibold">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                  <span><strong>50+</strong> Drink Flavors</span>
+
+                {/* Metric 2: Flavors */}
+                <div className="flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md p-3 border border-white/15 shadow-sm hover:bg-white/15 transition-colors">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500/20 text-green-300 border border-green-500/30">
+                    <CheckCircle className="h-5 w-5 text-green-400" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-display text-base font-extrabold text-white leading-tight">50+ Flavors</div>
+                    <div className="text-[11px] text-amber-200/80 font-medium">Drink Selections</div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 font-semibold">
-                  <Zap className="h-4 w-4 text-brand-amber" />
-                  <span><strong>₱29</strong> Everyday Affordable</span>
+
+                {/* Metric 3: Affordable */}
+                <div className="flex items-center gap-3 rounded-2xl bg-white/10 backdrop-blur-md p-3 border border-white/15 shadow-sm hover:bg-white/15 transition-colors">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-400/20 text-amber-300 border border-amber-300/30">
+                    <Zap className="h-5 w-5 text-brand-amber" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-display text-base font-extrabold text-white leading-tight">₱29 Everyday</div>
+                    <div className="text-[11px] text-amber-200/80 font-medium">Affordable Pricing</div>
+                  </div>
                 </div>
+
               </div>
+
             </div>
 
-            {/* Right Column: Hero Visual Card with Glowing Badge */}
+            {/* Right Column: Hero Visual Card with Glowing Badge (5 cols) */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="relative group">
-                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-brand-amber to-brand-orange opacity-40 blur-xl group-hover:opacity-75 transition duration-700" />
+                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-brand-amber via-brand-orange to-amber-600 opacity-50 blur-xl group-hover:opacity-85 transition duration-700" />
                 
                 <div className="relative rounded-3xl bg-white/10 backdrop-blur-md p-4 border border-white/20 shadow-2xl max-w-sm">
                   <div className="relative overflow-hidden rounded-2xl h-80 w-72 sm:w-80">
@@ -145,29 +177,30 @@ export const Home: React.FC<HomeProps> = ({
                       alt="Signature Mr. Boy Taro Milk Tea"
                       className="h-full w-full object-cover rounded-2xl transition-transform duration-700 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
                     
                     {/* Floating Bestseller Tag */}
-                    <Badge variant="brand" className="absolute top-3 left-3 bg-brand-orange text-white font-bold px-3 py-1 shadow-lg">
-                      🔥 Top Seller
+                    <Badge variant="brand" className="absolute top-3 left-3 bg-brand-orange text-white font-bold px-3 py-1 shadow-lg z-10 flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" />
+                      <span>🔥 Top Seller</span>
                     </Badge>
 
                     {/* Logo Overlay */}
-                    <div className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white p-0.5 shadow-md">
+                    <div className="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-white p-0.5 shadow-md z-10">
                       <img src="/public/images/IMG_2476.jpeg" alt="Logo" className="h-full w-full rounded-full object-cover" />
                     </div>
 
                     {/* Bottom Card Caption */}
-                    <div className="absolute bottom-3 left-3 right-3 text-left text-white">
+                    <div className="absolute bottom-3 left-3 right-3 text-left text-white z-10">
                       <div className="text-[11px] font-bold uppercase tracking-wider text-brand-amber">Signature Special</div>
                       <div className="font-display text-lg font-bold">CreamCheese Purple Taro</div>
-                      <div className="flex items-center justify-between mt-1 text-xs">
-                        <span className="text-amber-200">16oz ₱29 / 22oz ₱39</span>
+                      <div className="flex items-center justify-between mt-1.5 text-xs">
+                        <span className="text-amber-200 font-semibold">16oz ₱29 &bull; 22oz ₱39</span>
                         <Button 
                           size="sm" 
                           variant="amber" 
                           onClick={() => onAddToCart('CreamCheese Purple Taro', '16oz', 29)}
-                          className="h-7 text-xs px-2.5 font-bold shadow"
+                          className="h-7 text-xs px-3 font-bold shadow-md active:scale-95 transition-transform"
                         >
                           + Quick Add
                         </Button>
@@ -177,6 +210,7 @@ export const Home: React.FC<HomeProps> = ({
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
