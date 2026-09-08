@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
+import { Home } from './components/Home';
 import { Menu } from './components/Menu';
 import { Cart } from './components/Cart';
 import { About } from './components/About';
@@ -176,7 +176,7 @@ export function App() {
       <main className="flex-1">
         {activeTab === 'home' && (
           <div className="animate-in fade-in duration-300">
-            <Hero
+            <Home
               onStartOrdering={() => {
                 setSelectedMenuCategory('all');
                 setActiveTab('menu');
@@ -186,6 +186,7 @@ export function App() {
                 setSelectedMenuCategory(cat);
                 setActiveTab('menu');
               }}
+              onOpenAuth={handleOpenAuth}
             />
           </div>
         )}
