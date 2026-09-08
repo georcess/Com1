@@ -87,7 +87,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, theme = 'light', onT
               onClick={() => onNavigate('home')}
             >
               <img 
-                src="/public/images/IMG_2476.jpeg" 
+                src="/images/IMG_2476.jpeg" 
                 alt="Mr. Boy SpecialTea Logo" 
                 className="h-12 w-12 rounded-2xl border-2 border-brand-amber/60 object-cover shadow-md group-hover:scale-105 transition-transform"
               />

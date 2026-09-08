@@ -38,7 +38,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => setActiveTab('home')}
         >
           <img 
-            src="/public/images/IMG_2476.jpeg" 
+            src="/images/IMG_2476.jpeg" 
             alt="Mr. Boy SpecialTea Logo" 
             className="h-10 w-10 rounded-full border-2 border-brand-amber object-cover shadow"
           />

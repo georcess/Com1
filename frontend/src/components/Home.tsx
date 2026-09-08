@@ -44,7 +44,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 5.0,
     orderCount: '480+ ordered',
     description: 'Creamy premium purple taro infused with rich artisan cream cheese foam swirl.',
-    image: '/public/images/Taro.jpeg',
+    image: '/images/Taro.jpeg',
     prices: [
       { size: '16oz', price: 29 },
       { size: '22oz', price: 39 },
@@ -59,7 +59,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 4.9,
     orderCount: '390+ ordered',
     description: 'Bold dark espresso layered over chilled fresh milk and golden caramel drizzle.',
-    image: '/public/images/caramelmacchiato.jpg',
+    image: '/images/caramelmacchiato.jpg',
     prices: [
       { size: '16oz', price: 29 },
       { size: '22oz', price: 39 },
@@ -74,7 +74,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 4.9,
     orderCount: '340+ ordered',
     description: 'Authentic caramelized brown sugar wintermelon brew blended with silky black tea.',
-    image: '/public/images/wintermelon.jpg',
+    image: '/images/wintermelon.jpg',
     prices: [
       { size: '16oz', price: 29 },
       { size: '22oz', price: 39 },
@@ -89,7 +89,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 4.9,
     orderCount: '290+ ordered',
     description: 'Earthy stone-ground Uji matcha whisked smoothly with fresh creamy milk.',
-    image: '/public/images/matcha.jpeg',
+    image: '/images/matcha.jpeg',
     prices: [
       { size: '16oz', price: 29 },
       { size: '22oz', price: 39 },
@@ -104,7 +104,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 4.8,
     orderCount: '270+ ordered',
     description: 'Zesty tropical passion fruit infused with freshly brewed fragrant jasmine tea.',
-    image: '/public/images/passionfruit.jpg',
+    image: '/images/passionfruit.jpg',
     prices: [
       { size: '16oz', price: 29 },
       { size: '22oz', price: 39 },
@@ -119,7 +119,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 4.9,
     orderCount: '240+ ordered',
     description: 'Decadent ice-blended blueberry cream confection with whipped cream swirls.',
-    image: '/public/images/blueberryburstfrappee.jpg',
+    image: '/images/blueberryburstfrappee.jpg',
     prices: [
       { size: '16oz', price: 29 },
       { size: '22oz', price: 39 },
@@ -134,7 +134,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 4.9,
     orderCount: '285+ ordered',
     description: 'Deep, bittersweet European dark cocoa melted into velvety smooth milk tea.',
-    image: '/public/images/dark choco.jpg',
+    image: '/images/dark choco.jpg',
     prices: [
       { size: '16oz', price: 29 },
       { size: '22oz', price: 39 },
@@ -149,7 +149,7 @@ const BEST_SELLERS: BestSellerItem[] = [
     rating: 4.8,
     orderCount: '350+ ordered',
     description: 'Golden crunchy potato fries tossed in savory seasonings, served hot & crispy.',
-    image: '/public/images/fries.jpeg',
+    image: '/images/fries.jpeg',
     prices: [
       { size: 'Medium', price: 29 },
       { size: 'Large', price: 39 },
@@ -230,12 +230,12 @@ export const Home: React.FC<HomeProps> = ({
   };
 
   const categories = [
-    { id: 'milktea', name: 'Milktea', count: '19 Flavors', price: 'From ₱29', image: '/public/images/Taro.jpeg', icon: Sparkles, tag: 'Bestseller' },
-    { id: 'coffee', name: 'Iced Coffee', count: '6 Variants', price: 'From ₱29', image: '/public/images/caramelmacchiato.jpg', icon: Coffee, tag: 'Daily Energy' },
-    { id: 'fruit', name: 'Fruit Tea', count: '7 Flavors', price: 'From ₱29', image: '/public/images/passionfruit.jpg', icon: CupSoda, tag: 'Refreshing' },
-    { id: 'frappe', name: 'Frappé', count: '5 Flavors', price: 'From ₱29', image: '/public/images/blueberryburstfrappee.jpg', icon: Flame, tag: 'Cream-based' },
-    { id: 'hot', name: 'Hot Cups', count: '6 Choices', price: '₱35 Flat', image: '/public/images/Hotcoffee.jpeg', icon: Coffee, tag: 'Cozy Morning' },
-    { id: 'snack', name: 'Snacks', count: 'Crispy Fries', price: 'From ₱29', image: '/public/images/fries.jpeg', icon: Cookie, tag: 'Perfect Pair' },
+    { id: 'milktea', name: 'Milktea', count: '19 Flavors', price: 'From ₱29', image: '/images/Taro.jpeg', icon: Sparkles, tag: 'Bestseller' },
+    { id: 'coffee', name: 'Iced Coffee', count: '6 Variants', price: 'From ₱29', image: '/images/caramelmacchiato.jpg', icon: Coffee, tag: 'Daily Energy' },
+    { id: 'fruit', name: 'Fruit Tea', count: '7 Flavors', price: 'From ₱29', image: '/images/passionfruit.jpg', icon: CupSoda, tag: 'Refreshing' },
+    { id: 'frappe', name: 'Frappé', count: '5 Flavors', price: 'From ₱29', image: '/images/blueberryburstfrappee.jpg', icon: Flame, tag: 'Cream-based' },
+    { id: 'hot', name: 'Hot Cups', count: '6 Choices', price: '₱35 Flat', image: '/images/Hotcoffee.jpeg', icon: Coffee, tag: 'Cozy Morning' },
+    { id: 'snack', name: 'Snacks', count: 'Crispy Fries', price: 'From ₱29', image: '/images/fries.jpeg', icon: Cookie, tag: 'Perfect Pair' },
   ];
 
   const testimonials = [
@@ -318,7 +318,7 @@ export const Home: React.FC<HomeProps> = ({
                       alt={item.name}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                        (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                       }}
                     />
                     <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
@@ -385,7 +385,7 @@ export const Home: React.FC<HomeProps> = ({
         {/* Background Image & Ambient Glow Circles */}
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-luminosity scale-105 transition-transform duration-1000"
-          style={{ backgroundImage: "url('/public/images/Boy.jpeg')" }}
+          style={{ backgroundImage: "url('/images/Boy.jpeg')" }}
         />
         <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-brand-amber/15 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-brand-orange/20 blur-3xl pointer-events-none" />
@@ -464,7 +464,7 @@ export const Home: React.FC<HomeProps> = ({
                       alt={currentHeroItem.name}
                       className="h-full w-full object-cover rounded-2xl transition-all duration-700 ease-out group-hover:scale-105 animate-in fade-in"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                        (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
@@ -613,7 +613,7 @@ export const Home: React.FC<HomeProps> = ({
                     alt={cat.name}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                      (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

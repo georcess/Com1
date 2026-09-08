@@ -21,14 +21,14 @@ export const Hero: React.FC<HeroProps> = ({
       <section className="relative overflow-hidden rounded-3xl bg-brand-brown py-16 sm:py-20 text-center text-white shadow-xl mx-4 mt-4">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-35 mix-blend-overlay"
-          style={{ backgroundImage: "url('/public/images/Boy.jpeg')" }}
+          style={{ backgroundImage: "url('/images/Boy.jpeg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-brown via-brand-brown/85 to-brand-brown/60" />
 
         <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-6 px-4">
           <div className="relative">
             <img
-              src="/public/images/IMG_2476.jpeg"
+              src="/images/IMG_2476.jpeg"
               alt="Mr. Boy SpecialTea Logo"
               className="h-28 w-28 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-brand-amber/50"
             />

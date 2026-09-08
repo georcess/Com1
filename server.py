@@ -130,8 +130,21 @@ def serve_dist_assets(filename):
 
 @app.route('/public/<path:filename>')
 def serve_public(filename):
-    """Serve static media assets (images, team photos, etc.)."""
+    """Serve static media assets from public folder."""
     return send_from_directory(os.path.join(BASE_DIR, 'public'), filename)
+
+
+@app.route('/images/<path:filename>')
+def serve_images(filename):
+    """Serve product and branding images."""
+    for folder in [
+        os.path.join(BASE_DIR, 'frontend', 'public', 'images'),
+        os.path.join(BASE_DIR, 'public', 'images'),
+        os.path.join(DIST_DIR, 'images'),
+    ]:
+        if os.path.exists(os.path.join(folder, filename)):
+            return send_from_directory(folder, filename)
+    return ('Image not found', 404)
 
 
 # ── API: Auth (Register / Login / Logout / Current User) ───────

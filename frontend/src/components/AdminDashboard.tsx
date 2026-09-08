@@ -1059,7 +1059,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         !isAvailable ? 'grayscale-70 opacity-60' : ''
                       }`}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                        (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                       }}
                     />
                     <Badge 

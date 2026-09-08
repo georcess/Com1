@@ -35,7 +35,7 @@ export const EditCartItemModal: React.FC<EditCartItemModalProps> = ({
     { size: '22oz', price: 39 },
   ];
 
-  const productImage = matchedMenu?.image || '/public/images/IMG_2476.jpeg';
+  const productImage = matchedMenu?.image || '/images/IMG_2476.jpeg';
 
   const [selectedSizeIndex, setSelectedSizeIndex] = useState<number>(0);
   const [hasPearl, setHasPearl] = useState<boolean>(false);
@@ -88,7 +88,7 @@ export const EditCartItemModal: React.FC<EditCartItemModalProps> = ({
                 alt={cartItem.item}
                 className="h-full w-full object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                  (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                 }}
               />
             </div>

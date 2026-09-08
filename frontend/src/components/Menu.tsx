@@ -279,7 +279,7 @@ export const Menu: React.FC<MenuProps> = ({
                         !isAvailable ? 'grayscale-70 opacity-60' : ''
                       }`}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                        (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />

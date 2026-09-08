@@ -6,7 +6,6 @@ import { Menu } from './components/Menu';
 import { Cart } from './components/Cart';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
-import { Team } from './components/Team';
 import { AdminDashboard } from './components/AdminDashboard';
 import { OrderHistory } from './components/OrderHistory';
 import { AuthModal } from './components/AuthModal';
@@ -339,12 +338,6 @@ export function App() {
                   onOpenAuth={handleOpenAuth}
                   onOpenMenu={() => handleTabChange('menu')}
                 />
-              </div>
-            )}
-
-            {activeTab === 'team' && (
-              <div className="animate-in fade-in duration-300">
-                <Team />
               </div>
             )}
 

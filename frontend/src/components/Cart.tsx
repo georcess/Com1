@@ -254,7 +254,7 @@ export const Cart: React.FC<CartProps> = ({
                   const matched = MENU_ITEMS.find(
                     (m) => m.name.toLowerCase() === item.item.toLowerCase()
                   );
-                  const itemImg = matched?.image || '/public/images/IMG_2476.jpeg';
+                  const itemImg = matched?.image || '/images/IMG_2476.jpeg';
                   const itemTotal = item.price + item.addons.reduce((sum, a) => sum + a.price, 0);
 
                   return (
@@ -272,7 +272,7 @@ export const Cart: React.FC<CartProps> = ({
                             alt={item.item}
                             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                              (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                             }}
                           />
                         </div>

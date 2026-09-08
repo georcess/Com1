@@ -198,7 +198,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             alt={item.name}
             className="h-full w-full object-cover opacity-90 transition-transform duration-700 hover:scale-105"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+              (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />

@@ -116,12 +116,6 @@ export const PageSkeleton: React.FC<PageSkeletonProps> = ({ tab = 'home' }) => {
     );
   }
 
-  if (tab === 'team') {
-    return (
-      <div className="container mx-auto px-4 py-16 min-h-[50vh] animate-in fade-in duration-200" />
-    );
-  }
-
   if (tab === 'about' || tab === 'contact' || tab === 'admin') {
     return (
       <div className="container mx-auto px-4 py-10 max-w-4xl space-y-8 animate-in fade-in duration-200">

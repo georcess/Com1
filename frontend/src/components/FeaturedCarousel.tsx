@@ -30,7 +30,7 @@ const FEATURED_ITEMS: FeaturedProduct[] = [
     icon: Sparkles,
     name: 'CreamCheese Purple Taro',
     description: 'Rich, velvety purple taro blended with our signature silky creamcheese foam. A crowd favorite with balanced sweetness.',
-    image: '/public/images/Taro.jpeg',
+    image: '/images/Taro.jpeg',
     tag: '⭐ Bestseller',
     prices: [
       { size: '16oz', price: 29 },
@@ -43,7 +43,7 @@ const FEATURED_ITEMS: FeaturedProduct[] = [
     icon: Coffee,
     name: 'Caramel Macchiato',
     description: 'Bold dark espresso layered over chilled fresh milk and crowned with luscious handcrafted golden caramel drizzle.',
-    image: '/public/images/caramelmacchiato.jpg',
+    image: '/images/caramelmacchiato.jpg',
     tag: '🔥 Top Pick',
     prices: [
       { size: '16oz', price: 29 },
@@ -56,7 +56,7 @@ const FEATURED_ITEMS: FeaturedProduct[] = [
     icon: CupSoda,
     name: 'Passion Fruit Tea',
     description: 'Zesty and tangy tropical passion fruit infused with freshly brewed fragrant jasmine tea. Refreshingly crisp.',
-    image: '/public/images/passionfruit.jpg',
+    image: '/images/passionfruit.jpg',
     tag: '🌴 Refreshing',
     prices: [
       { size: '16oz', price: 29 },
@@ -69,7 +69,7 @@ const FEATURED_ITEMS: FeaturedProduct[] = [
     icon: Flame,
     name: 'Blueberry Burst Frappé',
     description: 'Decadent cream-based blueberry ice blend with rich berry swirls, topped with fluffy whipped cream.',
-    image: '/public/images/blueberryburstfrappee.jpg',
+    image: '/images/blueberryburstfrappee.jpg',
     tag: '✨ Creamy Delight',
     prices: [
       { size: '16oz', price: 29 },
@@ -82,7 +82,7 @@ const FEATURED_ITEMS: FeaturedProduct[] = [
     icon: Coffee,
     name: 'Hot Caramel Macchiato',
     description: 'Warm, aromatic brewed espresso with steamed velvety milk and soothing caramel notes to comfort your morning.',
-    image: '/public/images/hotcaramelmacchiato.jpg',
+    image: '/images/hotcaramelmacchiato.jpg',
     tag: '☕ Warm Comfort',
     prices: [
       { size: '12oz', price: 35 },
@@ -94,7 +94,7 @@ const FEATURED_ITEMS: FeaturedProduct[] = [
     icon: Cookie,
     name: 'Crispy French Fries',
     description: 'Golden, crispy seasoned fries fried fresh to perfection. The ultimate companion to your favorite drinks.',
-    image: '/public/images/fries.jpeg',
+    image: '/images/fries.jpeg',
     tag: '🍟 Perfect Pair',
     prices: [
       { size: 'Medium', price: 29 },
@@ -249,7 +249,7 @@ export const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                   alt={currentItem.name}
                   className="h-64 sm:h-72 w-full object-cover rounded-2xl shadow-xl ring-4 ring-white/80"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                    (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                   }}
                 />
 
