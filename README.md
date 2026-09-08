@@ -12,14 +12,13 @@
 - [Tech Stack](#tech-stack)
 - [Architecture (MVC)](#architecture-mvc)
 - [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Setup & Installation](#setup--installation)
-- [Database Setup](#database-setup)
-- [Running the Website](#running-the-website)
-- [API Endpoints](#api-endpoints)
-- [Team](#team)
-- [Contact](#contact)
-- [License](#license)
+- [Quick Start (Python + SQLite — No XAMPP Needed)](#-quick-start-python--sqlite--no-xampp-needed)
+- [Alternative Setup (PHP + XAMPP / MySQL)](#-alternative-setup-php--xampp--mysql)
+- [Database Configuration](#-database-configuration)
+- [API Endpoints](#-api-endpoints)
+- [Team](#-team)
+- [Contact](#-contact)
+- [License](#-license)
 
 ---
 
@@ -30,7 +29,7 @@
 - Browse the full menu with product images
 - Add items to a shopping cart with add-ons (e.g., pearl)
 - Generate a receipt for their order
-- Submit orders directly to a MySQL database
+- Submit orders directly to a database
 
 An **Admin Dashboard** is included for the shop owner to view, manage, and clear orders, along with a **Sales Summary** page for daily/monthly/yearly reporting.
 
@@ -68,14 +67,13 @@ An **Admin Dashboard** is included for the shop owner to view, manage, and clear
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
+| Layer | Options |
 |---|---|
 | **Frontend** | HTML5, CSS3, JavaScript (Vanilla) |
-| **Backend** | PHP 7+ |
-| **Database** | MySQL (via MySQLi with Prepared Statements) |
-| **Fonts** | Google Fonts (Lilita One, Playfair Display) |
+| **Backend Option 1 (Recommended / Quick)** | Python 3 + Flask + SQLite (Zero config, no XAMPP needed) |
+| **Backend Option 2** | PHP 7+ + MySQL / Apache (XAMPP / InfinityFree) |
 | **Architecture** | MVC (Model–View–Controller) |
-| **Hosting** | InfinityFree (production) / XAMPP (local development) |
+| **Fonts** | Google Fonts (Lilita One, Playfair Display) |
 
 ---
 
@@ -92,7 +90,7 @@ This project follows the **Model–View–Controller** pattern:
                ▼                         ▼
          ┌───────────┐           ┌──────────────┐
          │ index.php │           │  api/*.php   │
-         │  (Router) │           │ (Endpoints)  │
+         │  or Flask │           │ (Endpoints)  │
          └─────┬─────┘           └──────┬───────┘
                │ includes                │ delegates
                ▼                         ▼
@@ -104,22 +102,14 @@ This project follows the **Model–View–Controller** pattern:
                                         ▼
                                 ┌────────────────┐
                                 │   models/      │
-                                │  Order.php     │
-                                │  Contact.php   │
+                                │  Order / DB    │
                                 └───────┬────────┘
                                         │ queries
                                         ▼
                                 ┌────────────────┐
-                                │    MySQL DB    │
-                                │  (mr_boy_db)   │
+                                │ SQLite / MySQL │
                                 └────────────────┘
 ```
-
-- **Models** (`models/`) — Data access layer. Each model encapsulates all SQL queries for its entity using prepared statements.
-- **Views** (`views/`) — Presentation layer. Broken into reusable partials (header, footer, home, menu, cart, etc.).
-- **Controllers** (`controllers/`) — Business logic. Validates input, calls models, and returns responses.
-- **API** (`api/`) — Thin endpoint files that route HTTP requests to the appropriate controller method.
-- **Public** (`public/`) — Static assets (CSS, JS, images) served directly to the browser.
 
 ---
 
@@ -129,15 +119,17 @@ This project follows the **Model–View–Controller** pattern:
 comission/
 ├── .htaccess                         # Apache DirectoryIndex config
 ├── .gitignore                        # Git ignore rules
-├── README.md                         # This file
-├── index.php                         # 🎯 Main entry point (front controller)
+├── README.md                         # Project documentation
+├── server.py                         # 🚀 Python + Flask + SQLite backend (Zero XAMPP)
+├── index.html                        # Main frontend HTML
+├── index.php                         # PHP front controller
 │
 ├── config/
-│   └── database.php                  # DB connection (local/production toggle)
+│   └── database.php                  # PHP DB config (local/production toggle)
 │
 ├── models/
-│   ├── Order.php                     # Order CRUD + sales summary
-│   └── Contact.php                   # Contact message creation
+│   ├── Order.php                     # PHP Order model (CRUD + sales summary)
+│   └── Contact.php                   # PHP Contact model
 │
 ├── controllers/
 │   ├── OrderController.php           # Order API logic
@@ -175,73 +167,50 @@ comission/
 
 ---
 
-## 📋 Prerequisites
+## ⚡ Quick Start (Python + SQLite — No XAMPP Needed)
 
-1. **[XAMPP](https://www.apachefriends.org/)** (includes Apache, PHP, MySQL, phpMyAdmin)
-   - Or any PHP 7+ environment with MySQL support
-2. **Web Browser** (Chrome, Firefox, Edge, etc.)
+The fastest and easiest way to run the entire website with full database functionality without installing XAMPP or setting up MySQL.
+
+### 1. Install Flask
+
+```bash
+pip install flask
+```
+
+### 2. Start the Server
+
+```bash
+python server.py
+```
+
+### 3. Open in Browser
+
+Go to: **[http://localhost:5000](http://localhost:5000)**
+
+- Database table creation (`database/mr_boy.db`) is **100% automated on first launch**.
+- Cart ordering, order submission, receipt generation, admin table, and sales summary all work immediately.
 
 ---
 
-## 🚀 Setup & Installation
+## 🐘 Alternative Setup (PHP + XAMPP / MySQL)
 
-### 1. Clone the Repository
+If you prefer or are required to use PHP & MySQL:
 
-```bash
-git clone https://github.com/Kiro2-3/Comission1.git
-cd Comission1
-```
+### 1. Copy Files to `htdocs`
 
-### 2. Copy to XAMPP Web Root
-
+Copy the `comission` folder to:
 ```
 C:\xampp\htdocs\comission\
 ```
 
-Copy all project files into this directory.
+### 2. Database Setup in phpMyAdmin
 
-### 3. Configure Database Connection
-
-Edit `config/database.php` and set the environment:
-
-```php
-// For local development:
-define('ENVIRONMENT', 'local');
-
-// For InfinityFree production:
-define('ENVIRONMENT', 'production');
-```
-
-### 4. Start XAMPP
-
-Launch **Apache** and **MySQL** from the XAMPP Control Panel.
-
-### 5. Set Up the Database
-
-See [Database Setup](#database-setup) below.
-
-### 6. Open in Browser
-
-```
-http://localhost/comission/
-```
-
----
-
-## 🗄 Database Setup
-
-Open **phpMyAdmin** (`http://localhost/phpmyadmin`) and run:
-
-### Create Database
+Open `http://localhost/phpmyadmin` and execute:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS mr_boy_db;
 USE mr_boy_db;
-```
 
-### Create `orders` Table
-
-```sql
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_name VARCHAR(255) NOT NULL,
@@ -249,11 +218,7 @@ CREATE TABLE orders (
     total_price DECIMAL(10, 2) NOT NULL,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-### Create `contact_messages` Table
-
-```sql
 CREATE TABLE contact_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -264,19 +229,10 @@ CREATE TABLE contact_messages (
 );
 ```
 
----
+### 3. Open in Browser
 
-## ▶️ Running the Website
-
-```bash
-# Start XAMPP (Apache + MySQL)
-# Then open:
+```
 http://localhost/comission/
-```
-
-For the sales summary report, navigate to:
-```
-http://localhost/comission/views/admin/sales_summary.php
 ```
 
 ---
@@ -290,14 +246,7 @@ http://localhost/comission/views/admin/sales_summary.php
 | `POST` | `/api/delete_order.php` | Delete a single order by ID |
 | `POST` | `/api/clear_orders.php` | Clear all order records |
 | `POST` | `/api/save_contact.php` | Save a contact form message |
-
-### Example: Submit Order
-
-```bash
-curl -X POST http://localhost/comission/api/submit_order.php \
-  -H "Content-Type: application/json" \
-  -d '{"customer_name":"Juan","order_details":"Matcha 16oz, Okinawa 22oz","total_price":68}'
-```
+| `GET` | `/views/admin/sales_summary.php` | Sales report (today, month, year) |
 
 ---
 

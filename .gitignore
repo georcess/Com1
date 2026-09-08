@@ -14,3 +14,9 @@ desktop.ini
 
 # Environment
 .env
+
+# Python / SQLite
+__pycache__/
+*.pyc
+*.db
+database/
