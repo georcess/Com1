@@ -1,0 +1,12 @@
+# 1. Force HTTP
+RewriteEngine On
+RewriteCond %{HTTPS} on
+RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 2. Set Home Page
+DirectoryIndex BREWCODE_GROUP4.php index.php index.html index.htm index2.html
+
+# 3. Default Error Pages
+ErrorDocument 403 https://errors.infinityfree.net/errors/403/
+ErrorDocument 404 https://errors.infinityfree.net/errors/404/
+ErrorDocument 500 https://errors.infinityfree.net/errors/500/
