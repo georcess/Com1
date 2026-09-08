@@ -324,14 +324,25 @@ def clear_orders():
 # ── API: Contact ──────────────────────────────────────────────
 
 @app.route('/api/save_contact.php', methods=['POST'])
+@app.route('/api/save_contact', methods=['POST'])
 def save_contact():
-    """Save a contact form message."""
-    name    = request.form.get('name', '').strip()
-    email   = request.form.get('email', '').strip()
-    contact = request.form.get('contact', '').strip()
-    message = request.form.get('message', '').strip()
+    """Save a contact form message (supports both JSON and form data)."""
+    is_json = request.is_json or request.content_type == 'application/json'
+    if is_json:
+        data = request.get_json() or {}
+        name    = data.get('name', '').strip()
+        email   = data.get('email', '').strip()
+        contact = data.get('contact', '').strip()
+        message = data.get('message', '').strip()
+    else:
+        name    = request.form.get('name', '').strip()
+        email   = request.form.get('email', '').strip()
+        contact = request.form.get('contact', '').strip()
+        message = request.form.get('message', '').strip()
 
     if not name or not email or not message:
+        if is_json:
+            return jsonify({'status': 'error', 'message': 'Please fill in all required fields.'}), 400
         return '''<script>
             alert("Please fill in all required fields.");
             window.history.back();
@@ -344,6 +355,9 @@ def save_contact():
     )
     conn.commit()
     conn.close()
+
+    if is_json:
+        return jsonify({'status': 'success', 'message': 'Thank you! Your message has been sent.'})
 
     return '''<script>
         alert("Thank you! Your message has been sent.");
