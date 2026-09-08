@@ -156,4 +156,54 @@ class User {
         $conn->close();
         return $user;
     }
+
+    /**
+     * Change user password after verifying current password.
+     *
+     * @param int $id
+     * @param string $currentPassword
+     * @param string $newPassword
+     * @return array
+     */
+    public static function changePassword($id, $currentPassword, $newPassword) {
+        self::initTable();
+        $conn = getConnection();
+
+        $stmt = $conn->prepare("SELECT id, password FROM users WHERE id = ?");
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+
+        if (!$res || !$row = $res->fetch_assoc()) {
+            $stmt->close();
+            $conn->close();
+            return ['status' => 'error', 'message' => 'User account not found.'];
+        }
+        $stmt->close();
+
+        if (!password_verify($currentPassword, $row['password'])) {
+            $conn->close();
+            return ['status' => 'error', 'message' => 'Current password is incorrect. Please try again.'];
+        }
+
+        if ($currentPassword === $newPassword) {
+            $conn->close();
+            return ['status' => 'error', 'message' => 'New password cannot be identical to current password.'];
+        }
+
+        $newHashed = password_hash($newPassword, PASSWORD_DEFAULT);
+        $updateStmt = $conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $updateStmt->bind_param('si', $newHashed, $id);
+
+        if ($updateStmt->execute()) {
+            $updateStmt->close();
+            $conn->close();
+            return ['status' => 'success', 'message' => 'Password updated successfully!'];
+        } else {
+            $err = $updateStmt->error;
+            $updateStmt->close();
+            $conn->close();
+            return ['status' => 'error', 'message' => 'Failed to update password: ' . $err];
+        }
+    }
 }

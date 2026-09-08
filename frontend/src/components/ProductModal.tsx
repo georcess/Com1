@@ -23,6 +23,7 @@ interface ProductModalProps {
   onClose: () => void;
   onAddToCart: (itemName: string, size: string, price: number) => void;
   onAddAddonToLast?: (name: string, price: number) => void;
+  isAvailable?: boolean;
 }
 
 export const ProductModal: React.FC<ProductModalProps> = ({
@@ -31,6 +32,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   onClose,
   onAddToCart,
   onAddAddonToLast,
+  isAvailable = true,
 }) => {
   const [selectedSizeIndex, setSelectedSizeIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
@@ -374,15 +376,23 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               Cancel
             </Button>
             <Button
-              variant="brand"
+              variant={isAvailable ? 'brand' : 'destructive'}
               size="default"
               onClick={handleAddToCartClick}
-              disabled={isAdded}
+              disabled={!isAvailable || isAdded}
               className={`gap-2 font-bold px-6 rounded-xl shadow-md transition-all ${
-                isAdded ? 'bg-green-600 hover:bg-green-600' : ''
+                !isAvailable
+                  ? 'opacity-60 cursor-not-allowed bg-slate-400 hover:bg-slate-400 text-white'
+                  : isAdded
+                  ? 'bg-green-600 hover:bg-green-600'
+                  : ''
               }`}
             >
-              {isAdded ? (
+              {!isAvailable ? (
+                <>
+                  <span>Temporarily Sold Out</span>
+                </>
+              ) : isAdded ? (
                 <>
                   <Check className="h-4 w-4" />
                   Added to Cart!

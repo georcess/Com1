@@ -1,6 +1,6 @@
 # ☕ Mr. Boy SpecialTea — Online Ordering System
 
-> A full-stack web ordering system built with **React, Tailwind CSS & shadcn/ui**, featuring User Authentication, Product Search, Shopping Cart, Receipt Generation, and Protected Admin Order Management for **Mr. Boy SpecialTea** (Dela Costa V, Burgos Montalban, Rodriguez, Rizal, Philippines).
+> A full-stack web ordering system built with **React, Tailwind CSS & shadcn/ui**, featuring User Authentication, Product Search, Shopping Cart, Receipt Generation, Dark Theme Mode, and Protected Admin Order Management for **Mr. Boy SpecialTea** (Dela Costa V, Burgos Montalban, Rodriguez, Rizal, Philippines).
 
 ---
 
@@ -18,7 +18,6 @@
 - [Frontend Development Mode](#-frontend-development-mode)
 - [Alternative Setup (PHP + XAMPP / MySQL)](#-alternative-setup-php--xampp--mysql)
 - [API Endpoints](#-api-endpoints)
-- [Development Team](#-development-team)
 - [Contact](#-contact)
 - [License](#-license)
 
@@ -28,8 +27,8 @@
 
 **Mr. Boy SpecialTea** is a beloved local tea and coffee shop offering premium handcrafted drinks at affordable everyday prices. This project delivers a high-performance, responsive web application where:
 
-- Customers can **register accounts**, **log in**, **search flavors live**, add items with customized sizes & add-ons to their cart, and generate formatted printable receipts.
-- Store administrators can **log in securely**, view incoming customer orders in real time, mark orders as done, clear records, and monitor revenue analytics.
+- Customers can **register accounts**, **log in**, **search flavors live**, customize sweetness & add-ons in their cart, and generate formatted printable receipts.
+- Store administrators can **log in securely**, view incoming customer orders in real time, update order status, toggle product availability, manage contact inquiries with mark-as-read status, and monitor revenue analytics.
 
 ---
 
@@ -39,8 +38,8 @@ The frontend has been rebuilt from the ground up using **shadcn/ui** and **Tailw
 
 - 💎 **shadcn UI Components:** Cards, Dialogs, Buttons, Tabs, Inputs, Badges, and Tables built on accessible Radix UI primitives.
 - 🔍 **Live Search:** Instant filtering across all 45+ flavors and categories.
-- ⚡ **Toast Notifications:** Instant feedback when items are added to the cart.
-- 👥 **Team Showcase:** Dedicated section honoring the 10 student creators from BREWCODE Group 4 with their actual photos.
+- 🌙 **Dark Theme Toggle:** Integrated Light & Dark Theme modes with smooth transitions.
+- 🛒 **Floating Mini Cart:** Interactive sticky cart notification widget that provides instant cart overview and 1-click checkout.
 - 📱 **Fully Responsive:** Seamless layout across mobile phones, tablets, laptops, and wide screens.
 
 ---
@@ -53,31 +52,27 @@ The frontend has been rebuilt from the ground up using **shadcn/ui** and **Tailw
 | 🔍 **Live Menu Search** | Real-time search across Milktea, Coffee, Fruit Tea, Frappe, Hot Cups, and Snacks |
 | 🔐 **User Authentication** | Tabbed Login & Register modal with password hashing & session management |
 | 👤 **User Profiles & Roles** | Automatic distinction between Customers and Administrators |
-| 🏠 **Interactive Hero** | Modern banner with drink badges, logo, and "Our Approach" grid |
-| 🛒 **Cart & Stepper** | Add items, pearl add-ons (₱9), auto-fill customer name, view totals |
+| 🏠 **Interactive Hero** | Modern banner with drink badges, logo, and featured carousel |
+| 🛒 **Cart & Stepper** | Add items, pearl add-ons (₱9), clickable cart item editing, and totals calculation |
+| 🛍️ **Mini Cart Widget** | Floating bottom bar for fast checkout access whenever products are added |
+| 🌙 **Dark Mode Support** | Sun/Moon toggle with persistent preference and custom roasted coffee palette |
 | 🧾 **Receipt Generation** | On-screen official receipt popup with itemized list & print support |
-| 🔒 **Admin Dashboard** | Order table with live KPIs, completion action, and clear-all records |
-| 👥 **Team Showcase** | Dedicated profile cards with photos for BREWCODE Group 4 |
-| 📬 **Contact Form** | Customer inquiry form with input validation and feedback |
+| 🔒 **Admin Dashboard** | Live sales analytics, order management, menu availability toggling, and inquiries inbox |
+| 📬 **Inquiries Inbox** | Contact form with mark-as-read/unread tracking and filtering |
 
 ---
 
 ## 🔐 Authentication & Roles
 
-### Default Admin Account
+### Administrator Account
 
-The system automatically seeds a default administrator account on first run:
-
-| Field | Value |
-|---|---|
-| **Username** | `admin` |
-| **Password** | `admin123` |
-| **Role** | `admin` |
+- Authorized administrators can access the **Admin Control Center** by signing in with their credentials.
+- The Admin Control Center provides sales KPI summaries, order status updates, menu stock availability toggles, and inquiry management.
 
 ### Customer Registration
 
-- Visitors can click **"🔑 Login / Register"** in the navigation bar to register with their Full Name, Username, Email, and Password (min. 6 characters).
-- Once logged in, their name is pre-filled when placing orders in the Cart.
+- Visitors can click **"Login / Register"** in the navigation bar to register with their Full Name, Username, Email, and Password (min. 6 characters).
+- Once logged in, their name and credentials are automatically bound when placing orders in the Cart and viewing Order History.
 
 ---
 
@@ -129,23 +124,24 @@ comission/
 │       ├── data/menu.ts              # Complete 45+ drink & snack data
 │       ├── components/
 │       │   ├── ui/                   # shadcn primitives (Button, Card, Dialog, Tabs, etc.)
-│       │   ├── Navbar.tsx            # Sticky header with cart badge & auth profile
-│       │   ├── Hero.tsx              # Modern hero banner & Approach grid
+│       │   ├── Navbar.tsx            # Sticky header with cart badge, auth, and theme toggle
+│       │   ├── Hero.tsx              # Modern hero banner
 │       │   ├── Menu.tsx              # Live search, category pills, product cards
-│       │   ├── Cart.tsx              # Cart review, add-ons, name autofill
+│       │   ├── Cart.tsx              # Cart review, clickable item modal, name autofill
+│       │   ├── MiniCart.tsx          # Floating bottom cart widget
+│       │   ├── ThemeToggle.tsx       # Sun/Moon theme switcher
 │       │   ├── ReceiptModal.tsx      # Printable receipt dialog
-│       │   ├── Team.tsx              # BREWCODE Group 4 showcase
 │       │   ├── About.tsx             # Mission & store location
-│       │   ├── Contact.tsx           # Contact message form
-│       │   ├── AdminDashboard.tsx    # Role-protected order manager & KPIs
+│       │   ├── Contact.tsx           # Contact message form & admin inbox
+│       │   ├── AdminDashboard.tsx    # Role-protected order manager, sales KPIs & inquiries
 │       │   └── AuthModal.tsx         # Login / Register tabbed dialog
-│       ├── App.tsx                   # Main state & view coordinator
+│       ├── App.tsx                   # Main state, router & view coordinator
 │       └── main.tsx                  # React DOM mount
 │
 ├── config/
 │   └── database.php                  # PHP DB config (local/production toggle)
 ├── models/                           # PHP MVC models (User, Order, Contact)
-├── controllers/                      # PHP MVC controllers (AuthController, OrderController)
+├── controllers/                      # PHP MVC controllers (AuthController, OrderController, ContactController)
 ├── views/                            # PHP MVC view partials
 ├── api/                              # REST API endpoints (PHP)
 │   ├── register.php
@@ -156,12 +152,12 @@ comission/
 │   ├── fetch_orders.php
 │   ├── delete_order.php
 │   ├── clear_orders.php
-│   └── save_contact.php
+│   ├── save_contact.php
+│   ├── fetch_contacts.php
+│   └── mark_contact_read.php
 │
-├── public/
-│   ├── images/                       # Product & branding pictures (52 files)
-│   └── team/                         # Team member photos (10 members)
-└── team/                             # Original team photos
+└── public/
+    └── images/                       # Product & branding pictures
 ```
 
 ---
@@ -225,29 +221,13 @@ If running in a PHP/XAMPP environment:
 | `GET` | `/api/current_user.php` | Retrieve current authenticated user |
 | `POST` | `/api/submit_order.php` | Submit a new order (JSON body) |
 | `GET` | `/api/fetch_orders.php` | Fetch all orders |
+| `POST` | `/api/update_order_status.php` | Update order status (`pending`, `received`, `completed`, `cancelled`) |
 | `POST` | `/api/delete_order.php` | Delete a single order by ID |
 | `POST` | `/api/clear_orders.php` | Clear all order records |
 | `POST` | `/api/save_contact.php` | Save a contact form message |
-| `GET` | `/views/admin/sales_summary.php` | Sales report (today, month, year) |
-
----
-
-## 👥 Development Team
-
-**BREWCODE — Group 4**
-
-| Member | Role |
-|---|---|
-| **Apolonio** | Project Developer |
-| **Apuyan** | Full Stack & UI |
-| **Cañete** | Frontend Specialist |
-| **Jerez, Ayiza** | System Architect |
-| **Obosa** | Database Engineer |
-| **Refalpa, Jona Mae** | UI/UX Designer |
-| **Ricafranca** | Quality Assurance |
-| **Rogel** | Backend Developer |
-| **Toledo** | System Documentation |
-| **Vargas** | Lead Developer |
+| `GET` | `/api/fetch_contacts.php` | Fetch customer contact inquiries |
+| `POST` | `/api/mark_contact_read.php` | Mark inquiries as read/unread |
+| `GET` | `/api/sales_analytics.php` | Detailed sales reports & KPI metrics |
 
 ---
 
@@ -262,7 +242,5 @@ If running in a PHP/XAMPP environment:
 ---
 
 ## 📄 License
-
-This project was created as a school/group commission project by **BREWCODE Group 4**.
 
 © Mr. Boy SpecialTea 2026. All rights reserved.

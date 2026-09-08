@@ -34,6 +34,36 @@
 
     --radius: 0.75rem;
   }
+
+  .dark {
+    --background: 24 20% 8%;
+    --foreground: 35 30% 95%;
+
+    --card: 24 22% 12%;
+    --card-foreground: 35 30% 95%;
+
+    --popover: 24 22% 12%;
+    --popover-foreground: 35 30% 95%;
+
+    --primary: 30 85% 62%;
+    --primary-foreground: 24 25% 10%;
+
+    --secondary: 24 16% 18%;
+    --secondary-foreground: 35 30% 95%;
+
+    --muted: 24 16% 17%;
+    --muted-foreground: 30 15% 65%;
+
+    --accent: 30 85% 62%;
+    --accent-foreground: 24 25% 10%;
+
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 24 15% 20%;
+    --input: 24 15% 20%;
+    --ring: 30 85% 62%;
+  }
 }
 
 @layer base {
@@ -41,9 +71,86 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased selection:bg-brand-amber selection:text-brand-brown;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-brand-amber selection:text-brand-brown transition-colors duration-300;
     background-color: #f6f1ec;
   }
+  .dark body {
+    background-color: #140e0b;
+    color: #f7f2eb;
+  }
+}
+
+/* Dark mode enhancements for roasted cafe aesthetic */
+.dark {
+  color-scheme: dark;
+}
+
+.dark .bg-white {
+  background-color: #211914;
+}
+
+.dark .bg-brand-cream,
+.dark .bg-brand-cream\/50,
+.dark .bg-brand-cream\/60,
+.dark .bg-brand-cream\/80 {
+  background-color: #2b211a;
+}
+
+.dark .text-brand-brown {
+  color: #f5ebe0;
+}
+
+.dark .border-brand-brown\/10,
+.dark .border-brand-brown\/15,
+.dark .border-brand-brown\/20 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-100 {
+  background-color: #19130f;
+}
+
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/70 {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .text-muted-foreground {
+  color: #bfaea0;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #19130f;
+  color: #f7f2eb;
+  border-color: #3d2e24;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #8c7b6f;
+}
+
+.dark table thead tr {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark table tbody tr {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.dark .shadow-xl,
+.dark .shadow-2xl,
+.dark .shadow-md {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes marquee {

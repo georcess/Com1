@@ -118,23 +118,7 @@ export const PageSkeleton: React.FC<PageSkeletonProps> = ({ tab = 'home' }) => {
 
   if (tab === 'team') {
     return (
-      <div className="container mx-auto px-4 py-10 space-y-10 animate-in fade-in duration-200">
-        <div className="text-center space-y-3 max-w-md mx-auto">
-          <Skeleton className="h-6 w-28 mx-auto rounded-full" />
-          <Skeleton className="h-9 w-64 mx-auto" />
-          <Skeleton className="h-4 w-80 mx-auto" />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-            <div key={i} className="rounded-3xl bg-white/70 p-4 border border-brand-brown/10 shadow-sm text-center space-y-3">
-              <Skeleton className="h-36 w-full rounded-2xl" />
-              <Skeleton className="h-4 w-3/4 mx-auto" />
-              <Skeleton className="h-3 w-1/2 mx-auto" />
-            </div>
-          ))}
-        </div>
-      </div>
+      <div className="container mx-auto px-4 py-16 min-h-[50vh] animate-in fade-in duration-200" />
     );
   }
 

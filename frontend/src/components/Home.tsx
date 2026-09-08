@@ -18,6 +18,7 @@ interface HomeProps {
   onAddToCart: (itemName: string, size: string, price: number) => void;
   onExploreCategory: (category: string) => void;
   onOpenAuth: (tab: 'login' | 'register') => void;
+  productAvailability?: Record<string, boolean>;
 }
 
 interface BestSellerItem {
@@ -161,6 +162,7 @@ export const Home: React.FC<HomeProps> = ({
   onAddToCart,
   onExploreCategory,
   onOpenAuth,
+  productAvailability = {},
 }) => {
   // Modal Preview state
   const [modalItem, setModalItem] = useState<MenuItem | null>(null);
@@ -875,6 +877,7 @@ export const Home: React.FC<HomeProps> = ({
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onAddToCart={onAddToCart}
+          isAvailable={productAvailability[modalItem.id] !== false}
         />
       )}
     </div>

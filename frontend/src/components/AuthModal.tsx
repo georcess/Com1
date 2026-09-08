@@ -195,10 +195,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 {isLoading ? 'Logging in...' : 'Sign In'}
               </Button>
             </form>
-
-            <div className="rounded-xl bg-amber-50/80 p-2.5 text-center text-[11px] text-amber-900 border border-amber-200">
-              💡 Default Admin: <strong>admin</strong> / <strong>admin123</strong>
-            </div>
           </TabsContent>
 
           {/* REGISTER TAB */}

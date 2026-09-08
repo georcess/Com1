@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Trash2, Plus, Receipt, Sparkles, User as UserIcon, Lock, LogIn, CheckCircle, Clock } from 'lucide-react';
+import { ShoppingBag, Trash2, Plus, Receipt, Sparkles, User as UserIcon, Lock, LogIn, CheckCircle, Clock, Edit3, KeyRound } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { OrderHistory } from './OrderHistory';
+import { EditCartItemModal } from './EditCartItemModal';
 import { CartItem, User } from '../types';
+import { MENU_ITEMS } from '../data/menu';
 
 interface CartProps {
   cart: CartItem[];
@@ -15,9 +17,11 @@ interface CartProps {
   currentUser: User | null;
   onAddAddonToLast: (name: string, price: number) => void;
   onRemoveItem: (index: number) => void;
+  onUpdateItem?: (index: number, updatedItem: CartItem) => void;
   onClearCart: () => void;
   onOpenMenu: () => void;
   onOpenAuth: (tab: 'login' | 'register') => void;
+  onOpenProfile?: () => void;
   onGenerateReceipt: () => void;
   isSubmitting: boolean;
   initialTab?: 'cart' | 'history';
@@ -31,14 +35,31 @@ export const Cart: React.FC<CartProps> = ({
   currentUser,
   onAddAddonToLast,
   onRemoveItem,
+  onUpdateItem,
   onClearCart,
   onOpenMenu,
   onOpenAuth,
+  onOpenProfile,
   onGenerateReceipt,
   isSubmitting,
   initialTab = 'cart',
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'cart' | 'history'>(initialTab);
+  const [editingItem, setEditingItem] = useState<CartItem | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+
+  const handleOpenEditItem = (item: CartItem, index: number) => {
+    setEditingItem(item);
+    setEditingIndex(index);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveItemEdit = (index: number, updatedItem: CartItem) => {
+    if (onUpdateItem) {
+      onUpdateItem(index, updatedItem);
+    }
+  };
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 space-y-6 animate-in fade-in duration-300">
@@ -160,19 +181,32 @@ export const Cart: React.FC<CartProps> = ({
             </div>
 
             {currentUser ? (
-              <div className="rounded-xl bg-white p-3.5 border border-brand-brown/10 shadow-xs space-y-1">
+              <div className="rounded-xl bg-white p-3.5 border border-brand-brown/10 shadow-xs space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="font-display font-bold text-brand-brown text-base">
                     {currentUser.fullname}
                   </span>
-                  <span className="inline-flex items-center rounded-md bg-brand-cream px-2 py-0.5 text-xs font-bold text-brand-coffee">
-                    @{currentUser.username}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center rounded-md bg-brand-cream px-2 py-0.5 text-xs font-bold text-brand-coffee">
+                      @{currentUser.username}
+                    </span>
+                    {onOpenProfile && (
+                      <button
+                        type="button"
+                        onClick={onOpenProfile}
+                        className="inline-flex items-center gap-1 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 px-2 py-0.5 text-[11px] font-bold transition-colors cursor-pointer"
+                        title="Change password and view profile"
+                      >
+                        <KeyRound className="h-3 w-3 text-brand-orange" />
+                        <span>Profile / Security</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground font-mono">
                   {currentUser.email}
                 </p>
-                <p className="text-[11px] text-green-700 pt-1 font-medium">
+                <p className="text-[11px] text-green-700 pt-0.5 font-medium">
                   🔒 This order will be recorded under this authenticated account.
                 </p>
               </div>
@@ -215,40 +249,86 @@ export const Cart: React.FC<CartProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="divide-y rounded-xl border border-brand-brown/10 bg-white">
-                {cart.map((item, idx) => (
-                  <div key={item.id} className="flex items-start justify-between p-4 transition-colors hover:bg-slate-50">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-brand-brown text-base">
-                          {item.item} ({item.size})
-                        </span>
-                        <span className="rounded-full bg-brand-cream px-2 py-0.5 text-xs font-semibold text-brand-coffee">
-                          ₱{item.price}
-                        </span>
-                      </div>
-                      {item.addons.length > 0 && (
-                        <div className="space-y-0.5 pl-3 border-l-2 border-brand-amber">
-                          {item.addons.map((add, aIdx) => (
-                            <div key={aIdx} className="text-xs text-amber-800 flex items-center gap-1">
-                              <Sparkles className="h-3 w-3" />
-                              <span>+ {add.name} (₱{add.price})</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onRemoveItem(idx)}
-                      className="text-red-500 hover:bg-red-50 hover:text-red-700"
-                      title="Remove item"
+              <div className="divide-y rounded-2xl border border-brand-brown/10 bg-white overflow-hidden shadow-xs">
+                {cart.map((item, idx) => {
+                  const matched = MENU_ITEMS.find(
+                    (m) => m.name.toLowerCase() === item.item.toLowerCase()
+                  );
+                  const itemImg = matched?.image || '/public/images/IMG_2476.jpeg';
+                  const itemTotal = item.price + item.addons.reduce((sum, a) => sum + a.price, 0);
+
+                  return (
+                    <div
+                      key={`${item.id}-${idx}`}
+                      onClick={() => handleOpenEditItem(item, idx)}
+                      className="group relative flex items-center justify-between p-4 transition-all hover:bg-amber-50/60 cursor-pointer"
+                      title="Click to modify drink size or add-ons"
                     >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+                      <div className="flex items-center gap-3.5">
+                        {/* Product Thumbnail */}
+                        <div className="relative h-14 w-14 rounded-2xl overflow-hidden bg-brand-cream shrink-0 border border-brand-brown/10 shadow-xs">
+                          <img
+                            src={itemImg}
+                            alt={item.item}
+                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                            }}
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-display font-bold text-brand-brown text-base group-hover:text-brand-orange transition-colors">
+                              {item.item}
+                            </span>
+                            <span className="rounded-lg bg-brand-cream px-2 py-0.5 text-xs font-extrabold text-brand-coffee">
+                              {item.size} &bull; ₱{item.price}
+                            </span>
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100/90 px-2 py-0.5 text-[10px] font-bold text-amber-900 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                              <Edit3 className="h-2.5 w-2.5" /> Tap to modify
+                            </span>
+                          </div>
+
+                          {item.addons.length > 0 && (
+                            <div className="space-y-0.5 pl-2 border-l-2 border-brand-amber">
+                              {item.addons.map((add, aIdx) => (
+                                <div key={aIdx} className="text-xs text-amber-900 font-medium flex items-center gap-1">
+                                  <Sparkles className="h-3 w-3 text-brand-orange" />
+                                  <span>+ {add.name} (₱{add.price})</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="text-right hidden sm:block">
+                          <div className="font-mono text-sm font-extrabold text-brand-orange">
+                            ₱{itemTotal.toFixed(2)}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground group-hover:text-brand-orange transition-colors flex items-center justify-end gap-0.5">
+                            <Edit3 className="h-2.5 w-2.5" /> Click to edit
+                          </div>
+                        </div>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onRemoveItem(idx);
+                          }}
+                          className="text-red-400 hover:bg-red-50 hover:text-red-700 h-9 w-9 rounded-xl"
+                          title="Remove item"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* Add-ons section */}
@@ -313,6 +393,25 @@ export const Cart: React.FC<CartProps> = ({
         )}
       </Card>
       )}
+
+      {/* Edit Cart Item Modal */}
+      <EditCartItemModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingItem(null);
+          setEditingIndex(null);
+        }}
+        cartItem={editingItem}
+        itemIndex={editingIndex}
+        onSave={handleSaveItemEdit}
+        onRemove={(idx) => {
+          onRemoveItem(idx);
+          setIsEditModalOpen(false);
+          setEditingItem(null);
+          setEditingIndex(null);
+        }}
+      />
     </div>
   );
 };

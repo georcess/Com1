@@ -68,7 +68,14 @@ def init_db():
             email TEXT NOT NULL,
             contact TEXT NOT NULL,
             message TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS product_availability (
+            product_id TEXT PRIMARY KEY,
+            is_available INTEGER DEFAULT 1,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
 
@@ -82,6 +89,11 @@ def init_db():
         conn.execute("ALTER TABLE orders ADD COLUMN customer_email TEXT")
     if 'status' not in order_cols:
         conn.execute("ALTER TABLE orders ADD COLUMN status TEXT DEFAULT 'pending'")
+
+    # Migration for contact_messages table (is_read column)
+    contact_cols = [col[1] for col in conn.execute("PRAGMA table_info(contact_messages)").fetchall()]
+    if 'is_read' not in contact_cols:
+        conn.execute("ALTER TABLE contact_messages ADD COLUMN is_read INTEGER DEFAULT 0")
 
     # Seed default admin if missing
     admin = conn.execute("SELECT id FROM users WHERE username = 'admin'").fetchone()
@@ -237,6 +249,54 @@ def current_user():
     if user:
         return jsonify({'logged_in': True, 'user': user})
     return jsonify({'logged_in': False, 'user': None})
+
+
+@app.route('/api/change_password.php', methods=['POST'])
+@app.route('/api/change_password', methods=['POST'])
+def change_password():
+    """Change user password after verifying current password."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'status': 'error', 'message': 'No data received.'}), 400
+
+    session_user = session.get('user')
+    user_id = data.get('user_id') or (session_user.get('id') if session_user else None)
+    current_password = data.get('current_password', '')
+    new_password = data.get('new_password', '')
+
+    if not user_id:
+        return jsonify({'status': 'error', 'message': 'You must be logged in to change your password.'}), 401
+
+    if not current_password or not new_password:
+        return jsonify({'status': 'error', 'message': 'Both current and new password are required.'}), 400
+
+    if len(new_password) < 6:
+        return jsonify({'status': 'error', 'message': 'New password must be at least 6 characters long.'}), 400
+
+    conn = get_db()
+    user = conn.execute("SELECT id, password, fullname, username FROM users WHERE id = ?", (user_id,)).fetchone()
+
+    if not user:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'User account not found.'}), 404
+
+    if not check_password_hash(user['password'], current_password):
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'Current password is incorrect. Please try again.'}), 400
+
+    if current_password == new_password:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'New password cannot be the same as your old password.'}), 400
+
+    hashed_pw = generate_password_hash(new_password)
+    conn.execute("UPDATE users SET password = ? WHERE id = ?", (hashed_pw, user_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        'status': 'success',
+        'message': 'Password changed successfully! You can now use your new password.'
+    })
 
 
 # ── API: Orders ───────────────────────────────────────────────
@@ -422,54 +482,231 @@ def save_contact():
     if is_json:
         return jsonify({'status': 'success', 'message': 'Thank you! Your message has been sent.'})
 
-    return '''<script>
-        alert("Thank you! Your message has been sent.");
-        window.location.href="/";
-    </script>'''
+# ── API: Product Availability ─────────────────────────────────
+
+@app.route('/api/product_availability.php', methods=['GET'])
+@app.route('/api/product_availability', methods=['GET'])
+def get_product_availability():
+    """Fetch availability status of all products."""
+    conn = get_db()
+    rows = conn.execute('SELECT product_id, is_available FROM product_availability').fetchall()
+    conn.close()
+
+    availability = {}
+    for row in rows:
+        availability[row['product_id']] = bool(row['is_available'])
+
+    return jsonify(availability)
 
 
-# ── API: Sales Summary ────────────────────────────────────────
+@app.route('/api/toggle_product_availability.php', methods=['POST'])
+@app.route('/api/toggle_product_availability', methods=['POST'])
+def toggle_product_availability():
+    """Toggle or set product availability status (1 = Available, 0 = Sold Out)."""
+    data = request.get_json() or {}
+    product_id = data.get('product_id', '').strip()
+    is_available = data.get('is_available', True)
 
-@app.route('/views/admin/sales_summary.php')
-def sales_summary():
-    """Sales summary page."""
+    if not product_id:
+        return jsonify({'status': 'error', 'message': 'Product ID is required.'}), 400
+
+    int_val = 1 if is_available else 0
+    conn = get_db()
+    conn.execute(
+        '''INSERT INTO product_availability (product_id, is_available, updated_at)
+           VALUES (?, ?, CURRENT_TIMESTAMP)
+           ON CONFLICT(product_id) DO UPDATE SET is_available = excluded.is_available, updated_at = CURRENT_TIMESTAMP''',
+        (product_id, int_val)
+    )
+    conn.commit()
+    conn.close()
+
+    status_text = 'available' if is_available else 'sold out / unavailable'
+    return jsonify({
+        'status': 'success',
+        'message': f'Product "{product_id}" is now marked as {status_text}.',
+        'product_id': product_id,
+        'is_available': bool(is_available)
+    })
+
+
+# ── API: Contact Messages Fetch, Read Status & Delete ────────
+
+@app.route('/api/fetch_contacts.php', methods=['GET'])
+@app.route('/api/fetch_contacts', methods=['GET'])
+def fetch_contacts():
+    """Fetch all submitted customer contact inquiries."""
+    conn = get_db()
+    rows = conn.execute('SELECT * FROM contact_messages ORDER BY created_at DESC').fetchall()
+    conn.close()
+
+    contacts = []
+    for r in rows:
+        contacts.append({
+            'id': r['id'],
+            'name': r['name'],
+            'email': r['email'],
+            'contact': r['contact'],
+            'message': r['message'],
+            'is_read': bool(r['is_read']) if 'is_read' in r.keys() else False,
+            'created_at': r['created_at'],
+        })
+
+    return jsonify(contacts)
+
+
+@app.route('/api/mark_contact_read.php', methods=['POST'])
+@app.route('/api/mark_contact_read', methods=['POST'])
+def mark_contact_read():
+    """Mark a contact message (or all) as read/unread."""
+    data = request.get_json() or {}
     conn = get_db()
 
-    today = conn.execute(
-        "SELECT COALESCE(SUM(total_price), 0) as total FROM orders WHERE DATE(order_date) = DATE('now')"
-    ).fetchone()['total']
+    if data.get('mark_all'):
+        conn.execute('UPDATE contact_messages SET is_read = 1')
+        conn.commit()
+        conn.close()
+        return jsonify({'status': 'success', 'message': 'All contact messages marked as read.'})
 
-    month = conn.execute(
-        "SELECT COALESCE(SUM(total_price), 0) as total FROM orders "
+    message_id = data.get('id')
+    is_read = data.get('is_read', True)
+
+    if not message_id:
+        conn.close()
+        return jsonify({'status': 'error', 'message': 'Invalid message ID.'}), 400
+
+    int_val = 1 if is_read else 0
+    conn.execute('UPDATE contact_messages SET is_read = ? WHERE id = ?', (int_val, message_id))
+    conn.commit()
+    conn.close()
+
+    read_label = 'read' if is_read else 'unread'
+    return jsonify({
+        'status': 'success',
+        'message': f'Message #{message_id} marked as {read_label}.',
+        'id': message_id,
+        'is_read': bool(is_read)
+    })
+
+
+@app.route('/api/delete_contact.php', methods=['POST'])
+@app.route('/api/delete_contact', methods=['POST'])
+def delete_contact():
+    """Delete a contact message by ID."""
+    data = request.get_json() or {}
+    message_id = data.get('id')
+
+    if not message_id:
+        return jsonify({'status': 'error', 'message': 'Invalid message ID.'}), 400
+
+    conn = get_db()
+    conn.execute('DELETE FROM contact_messages WHERE id = ?', (message_id,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'status': 'success', 'message': f'Contact message #{message_id} deleted.'})
+
+
+# ── API: Sales Analytics ──────────────────────────────────────
+
+@app.route('/api/sales_analytics.php', methods=['GET'])
+@app.route('/api/sales_analytics', methods=['GET'])
+def sales_analytics():
+    """Comprehensive sales analytics for admin dashboard."""
+    conn = get_db()
+
+    # Total orders & gross revenue
+    total_row = conn.execute(
+        "SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total FROM orders WHERE status != 'cancelled'"
+    ).fetchone()
+    all_orders_count = conn.execute("SELECT COUNT(*) as count FROM orders").fetchone()['count']
+
+    today_row = conn.execute(
+        "SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total FROM orders WHERE DATE(order_date) = DATE('now') AND status != 'cancelled'"
+    ).fetchone()
+
+    month_row = conn.execute(
+        "SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total FROM orders "
         "WHERE strftime('%m', order_date) = strftime('%m', 'now') "
-        "AND strftime('%Y', order_date) = strftime('%Y', 'now')"
-    ).fetchone()['total']
+        "AND strftime('%Y', order_date) = strftime('%Y', 'now') AND status != 'cancelled'"
+    ).fetchone()
 
-    year = conn.execute(
-        "SELECT COALESCE(SUM(total_price), 0) as total FROM orders "
-        "WHERE strftime('%Y', order_date) = strftime('%Y', 'now')"
-    ).fetchone()['total']
+    # Status counts
+    status_rows = conn.execute(
+        "SELECT status, COUNT(*) as count, COALESCE(SUM(total_price), 0) as revenue FROM orders GROUP BY status"
+    ).fetchall()
+
+    status_counts = {'pending': 0, 'received': 0, 'completed': 0, 'cancelled': 0}
+    status_revenue = {'pending': 0.0, 'received': 0.0, 'completed': 0.0, 'cancelled': 0.0}
+
+    for sr in status_rows:
+        s = sr['status'] or 'pending'
+        status_counts[s] = sr['count']
+        status_revenue[s] = float(sr['revenue'])
+
+    # Parse best selling items from non-cancelled order_details
+    order_details_rows = conn.execute(
+        "SELECT order_details, total_price FROM orders WHERE status != 'cancelled'"
+    ).fetchall()
+
+    item_popularity = {}
+    for od in order_details_rows:
+        raw_text = od['order_details'] or ''
+        parts = [p.strip() for p in raw_text.split(',') if p.strip()]
+        for p in parts:
+            # Extract main name before parentheses
+            main_name = p.split('(')[0].strip()
+            if main_name:
+                item_popularity[main_name] = item_popularity.get(main_name, 0) + 1
+
+    sorted_items = sorted(
+        [{'name': k, 'count': v} for k, v in item_popularity.items()],
+        key=lambda x: x['count'],
+        reverse=True
+    )[:10]
+
+    # Recent orders summary
+    recent_orders = conn.execute(
+        "SELECT id, customer_name, total_price, status, order_date FROM orders ORDER BY order_date DESC LIMIT 5"
+    ).fetchall()
+
+    recent_list = []
+    for ro in recent_orders:
+        recent_list.append({
+            'id': ro['id'],
+            'customer_name': ro['customer_name'],
+            'total_price': ro['total_price'],
+            'status': ro['status'],
+            'order_date': ro['order_date']
+        })
 
     conn.close()
 
-    return f'''<!DOCTYPE html>
-    <html>
-    <head><title>Mr. Boy Sales Report</title>
-    <style>
-        body {{ font-family: sans-serif; background: #f6f1ec; padding: 50px; text-align: center; }}
-        .box {{ background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; }}
-        h1 {{ color: #4b2e2e; }}
-        .price {{ font-size: 24px; color: #e04300; font-weight: bold; }}
-    </style>
-    </head>
-    <body>
-        <div class="box">
-            <h1>Sales Report 📊</h1>
-            <p>Today's Sales: <span class="price">₱{today:,.2f}</span></p><hr>
-            <p>This Month: <span class="price">₱{month:,.2f}</span></p><hr>
-            <p>This Year: <span class="price">₱{year:,.2f}</span></p>
-        </div>
-    </body></html>'''
+    total_gross = float(total_row['total'])
+    valid_count = int(total_row['count'])
+    aov = (total_gross / valid_count) if valid_count > 0 else 0.0
+
+    return jsonify({
+        'status': 'success',
+        'total_revenue': total_gross,
+        'total_orders': all_orders_count,
+        'valid_orders_count': valid_count,
+        'average_order_value': round(aov, 2),
+        'today': {
+            'revenue': float(today_row['total']),
+            'orders': int(today_row['count'])
+        },
+        'this_month': {
+            'revenue': float(month_row['total']),
+            'orders': int(month_row['count'])
+        },
+        'status_breakdown': {
+            'counts': status_counts,
+            'revenue': status_revenue
+        },
+        'top_selling_items': sorted_items,
+        'recent_activity': recent_list
+    })
 
 
 # ── Main ──────────────────────────────────────────────────────

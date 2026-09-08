@@ -14,7 +14,11 @@ import {
   ChevronsLeft, 
   ChevronsRight,
   Eye,
-  Info
+  Info,
+  Shield,
+  CheckCircle2,
+  XCircle,
+  AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -22,18 +26,24 @@ import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import { ProductModal } from './ProductModal';
 import { MENU_ITEMS } from '../data/menu';
-import { MenuItem } from '../types';
+import { MenuItem, User } from '../types';
 
 interface MenuProps {
   onAddToCart: (itemName: string, size: string, price: number) => void;
   onAddAddonToLast?: (name: string, price: number) => void;
   initialCategory?: string;
+  productAvailability?: Record<string, boolean>;
+  onToggleAvailability?: (productId: string, isAvailable: boolean) => void;
+  currentUser?: User | null;
 }
 
 export const Menu: React.FC<MenuProps> = ({ 
   onAddToCart, 
   onAddAddonToLast, 
-  initialCategory = 'all' 
+  initialCategory = 'all',
+  productAvailability = {},
+  onToggleAvailability,
+  currentUser = null
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -243,93 +253,168 @@ export const Menu: React.FC<MenuProps> = ({
       ) : (
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {paginatedItems.map((item: MenuItem) => (
-              <Card 
-                key={item.id}
-                className="group flex flex-col overflow-hidden border border-brand-brown/10 bg-white transition-all hover:-translate-y-1.5 hover:shadow-xl rounded-2xl"
-              >
-                {/* Item Image with Category Badge & Click-to-Preview */}
-                <div 
-                  className="relative h-48 w-full overflow-hidden bg-brand-cream/80 cursor-pointer"
-                  onClick={() => handleOpenPreview(item)}
-                  title="Click to view details & what it's made of"
+            {paginatedItems.map((item: MenuItem) => {
+              const isAvailable = productAvailability[item.id] !== false;
+              const isAdmin = currentUser?.role === 'admin';
+
+              return (
+                <Card 
+                  key={item.id}
+                  className={`group flex flex-col overflow-hidden border transition-all hover:-translate-y-1.5 hover:shadow-xl rounded-2xl ${
+                    isAvailable 
+                      ? 'border-brand-brown/10 bg-white' 
+                      : 'border-red-200 bg-red-50/20'
+                  }`}
                 >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  
-                  {/* Hover Overlay with Preview Badge */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 text-brand-brown px-3.5 py-1.5 text-xs font-bold shadow-lg transform group-hover:scale-105 transition-transform">
-                      <Eye className="h-3.5 w-3.5 text-brand-orange" />
-                      View Details &amp; Recipe
-                    </span>
-                  </div>
-
-                  <Badge 
-                    variant="brand"
-                    className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm z-10"
-                  >
-                    {item.category}
-                  </Badge>
-                  <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow z-10">
-                    Starts at ₱{item.prices[0].price}
-                  </div>
-                </div>
-
-                {/* Item Info */}
-                <CardHeader className="p-4 pb-1">
-                  <div className="flex items-start justify-between gap-1">
-                    <CardTitle 
-                      className="line-clamp-1 text-base font-bold text-brand-brown cursor-pointer hover:text-brand-orange transition-colors"
-                      onClick={() => handleOpenPreview(item)}
-                      title="Click to view recipe details"
-                    >
-                      {item.name}
-                    </CardTitle>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenPreview(item)}
-                      className="text-muted-foreground hover:text-brand-orange transition-colors p-0.5 rounded-sm"
-                      title="View details & recipe"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="flex-1 p-4 pt-1">
-                  <p 
-                    className="text-xs text-muted-foreground line-clamp-2 cursor-pointer hover:text-brand-brown transition-colors"
+                  {/* Item Image with Category Badge & Click-to-Preview */}
+                  <div 
+                    className="relative h-48 w-full overflow-hidden bg-brand-cream/80 cursor-pointer"
                     onClick={() => handleOpenPreview(item)}
+                    title="Click to view details & what it's made of"
                   >
-                    Click to view handcrafted ingredients, flavor profile &amp; recipe details.
-                  </p>
-                </CardContent>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                        !isAvailable ? 'grayscale-70 opacity-60' : ''
+                      }`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/public/images/IMG_2476.jpeg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                    
+                    {/* Hover Overlay with Preview Badge */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 text-brand-brown px-3.5 py-1.5 text-xs font-bold shadow-lg transform group-hover:scale-105 transition-transform">
+                        <Eye className="h-3.5 w-3.5 text-brand-orange" />
+                        View Details &amp; Recipe
+                      </span>
+                    </div>
 
-                {/* Size Buttons */}
-                <CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
-                  {item.prices.map(p => (
-                    <Button
-                      key={p.size}
-                      variant="default"
-                      size="sm"
-                      onClick={() => handleAddWithFeedback(item.name, p.size, p.price)}
-                      className="flex-1 bg-brand-coffee text-white hover:bg-brand-brown gap-1 font-semibold text-xs py-2 shadow-sm active:scale-95 transition-transform"
+                    {/* Sold Out Watermark / Badge */}
+                    {!isAvailable && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="rounded-xl bg-red-600/90 text-white px-4 py-1.5 font-display font-black text-sm uppercase tracking-wider shadow-lg border border-white/40 -rotate-6">
+                          Sold Out
+                        </div>
+                      </div>
+                    )}
+
+                    <Badge 
+                      variant="brand"
+                      className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm z-10"
                     >
-                      <Plus className="h-3.5 w-3.5" />
-                      <span>{p.size} &bull; ₱{p.price}</span>
-                    </Button>
-                  ))}
-                </CardFooter>
-              </Card>
-            ))}
+                      {item.category}
+                    </Badge>
+
+                    {/* Admin Direct Availability Toggle Switch */}
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onToggleAvailability) {
+                            onToggleAvailability(item.id, !isAvailable);
+                          }
+                        }}
+                        className={`absolute top-3 left-3 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold shadow-md transition-all border ${
+                          isAvailable
+                            ? 'bg-green-600 hover:bg-green-700 text-white border-green-400'
+                            : 'bg-red-600 hover:bg-red-700 text-white border-red-400'
+                        }`}
+                        title="Click to toggle product availability"
+                      >
+                        <Shield className="h-2.5 w-2.5" />
+                        <span>{isAvailable ? 'In Stock' : 'Sold Out'}</span>
+                      </button>
+                    )}
+
+                    <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow z-10">
+                      Starts at ₱{item.prices[0].price}
+                    </div>
+                  </div>
+
+                  {/* Item Info */}
+                  <CardHeader className="p-4 pb-1">
+                    <div className="flex items-start justify-between gap-1">
+                      <div className="flex flex-col">
+                        <CardTitle 
+                          className="line-clamp-1 text-base font-bold text-brand-brown cursor-pointer hover:text-brand-orange transition-colors"
+                          onClick={() => handleOpenPreview(item)}
+                          title="Click to view recipe details"
+                        >
+                          {item.name}
+                        </CardTitle>
+                        {!isAvailable && (
+                          <span className="text-[10px] font-bold text-red-600 flex items-center gap-1 mt-0.5">
+                            <AlertCircle className="h-3 w-3" /> Currently Unavailable
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenPreview(item)}
+                        className="text-muted-foreground hover:text-brand-orange transition-colors p-0.5 rounded-sm shrink-0"
+                        title="View details & recipe"
+                      >
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="flex-1 p-4 pt-1">
+                    <p 
+                      className="text-xs text-muted-foreground line-clamp-2 cursor-pointer hover:text-brand-brown transition-colors"
+                      onClick={() => handleOpenPreview(item)}
+                    >
+                      Click to view handcrafted ingredients, flavor profile &amp; recipe details.
+                    </p>
+                  </CardContent>
+
+                  {/* Size Buttons / Actions */}
+                  <CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+                    {isAvailable ? (
+                      item.prices.map(p => (
+                        <Button
+                          key={p.size}
+                          variant="default"
+                          size="sm"
+                          onClick={() => handleAddWithFeedback(item.name, p.size, p.price)}
+                          className="flex-1 bg-brand-coffee text-white hover:bg-brand-brown gap-1 font-semibold text-xs py-2 shadow-sm active:scale-95 transition-transform"
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                          <span>{p.size} &bull; ₱{p.price}</span>
+                        </Button>
+                      ))
+                    ) : (
+                      <div className="w-full">
+                        {isAdmin ? (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onToggleAvailability?.(item.id, true)}
+                            className="w-full text-xs font-bold border-green-600 text-green-700 hover:bg-green-50"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-green-600" />
+                            Admin: Mark Available
+                          </Button>
+                        ) : (
+                          <Button
+                            disabled
+                            size="sm"
+                            className="w-full bg-slate-200 text-slate-500 text-xs font-bold cursor-not-allowed"
+                          >
+                            Temporarily Sold Out
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Pagination Navigation Bar */}
@@ -433,6 +518,7 @@ export const Menu: React.FC<MenuProps> = ({
         }}
         onAddToCart={handleAddWithFeedback}
         onAddAddonToLast={onAddAddonToLast}
+        isAvailable={previewItem ? productAvailability[previewItem.id] !== false : true}
       />
     </div>
   );

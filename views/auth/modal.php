@@ -25,9 +25,6 @@
       <p class="auth-footer-text">
         Don't have an account? <a href="javascript:void(0)" onclick="switchAuthTab('register')">Register here</a>
       </p>
-      <div class="auth-admin-hint">
-        <small>💡 Default Admin Login: <strong>admin</strong> / <strong>admin123</strong></small>
-      </div>
     </form>
 
     <!-- REGISTER FORM -->

@@ -10,7 +10,9 @@ import { Team } from './components/Team';
 import { AdminDashboard } from './components/AdminDashboard';
 import { OrderHistory } from './components/OrderHistory';
 import { AuthModal } from './components/AuthModal';
+import { ProfileModal } from './components/ProfileModal';
 import { ReceiptModal } from './components/ReceiptModal';
+import { MiniCart } from './components/MiniCart';
 import { PageSkeleton } from './components/PageSkeleton';
 import { CartItem, User } from './types';
 
@@ -25,6 +27,27 @@ export function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Dark Theme State
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('mr_boy_theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('mr_boy_theme', theme);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const handleTabChange = (nextTab: string) => {
     if (nextTab === activeTab && !isPageLoading) return;
@@ -43,7 +66,39 @@ export function App() {
   // Modals state
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState<boolean>(false);
+
+  // Product Availability State
+  const [productAvailability, setProductAvailability] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const res = await fetch('/api/product_availability.php');
+        const data = await res.json();
+        if (data && typeof data === 'object') {
+          setProductAvailability(data);
+        }
+      } catch (e) {
+        // Fallback to all available
+      }
+    };
+    fetchAvailability();
+  }, []);
+
+  const handleToggleAvailability = async (productId: string, isAvailable: boolean) => {
+    setProductAvailability((prev) => ({ ...prev, [productId]: isAvailable }));
+    try {
+      await fetch('/api/toggle_product_availability.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_id: productId, is_available: isAvailable }),
+      });
+    } catch (e) {
+      console.error('Failed to toggle product availability:', e);
+    }
+  };
 
   // Check auth session on load
   useEffect(() => {
@@ -112,6 +167,15 @@ export function App() {
   // Remove Item
   const handleRemoveItem = (index: number) => {
     setCart((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Update Item in Cart
+  const handleUpdateCartItem = (index: number, updatedItem: CartItem) => {
+    setCart((prev) => {
+      const next = [...prev];
+      next[index] = updatedItem;
+      return next;
+    });
   };
 
   // Clear Cart
@@ -196,7 +260,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-brand-cream/60 font-sans text-brand-brown">
+    <div className="min-h-screen flex flex-col bg-brand-cream/60 dark:bg-[#140e0b] font-sans text-brand-brown dark:text-[#f7f2eb] transition-colors duration-300">
       {/* Navbar */}
       <Navbar
         activeTab={isPageLoading ? targetTab : activeTab}
@@ -204,7 +268,10 @@ export function App() {
         cartCount={cart.length}
         currentUser={currentUser}
         onOpenAuth={handleOpenAuth}
+        onOpenProfile={() => setIsProfileOpen(true)}
         onLogout={handleLogout}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Content Area */}
@@ -226,6 +293,7 @@ export function App() {
                     handleTabChange('menu');
                   }}
                   onOpenAuth={handleOpenAuth}
+                  productAvailability={productAvailability}
                 />
               </div>
             )}
@@ -236,6 +304,9 @@ export function App() {
                   onAddToCart={handleAddToCart}
                   onAddAddonToLast={handleAddAddonToLast}
                   initialCategory={selectedMenuCategory}
+                  productAvailability={productAvailability}
+                  onToggleAvailability={handleToggleAvailability}
+                  currentUser={currentUser}
                 />
               </div>
             )}
@@ -250,9 +321,11 @@ export function App() {
                   currentUser={currentUser}
                   onAddAddonToLast={handleAddAddonToLast}
                   onRemoveItem={handleRemoveItem}
+                  onUpdateItem={handleUpdateCartItem}
                   onClearCart={handleClearCart}
                   onOpenMenu={() => handleTabChange('menu')}
                   onOpenAuth={handleOpenAuth}
+                  onOpenProfile={() => setIsProfileOpen(true)}
                   onGenerateReceipt={handleGenerateReceipt}
                   isSubmitting={isSubmitting}
                 />
@@ -283,7 +356,7 @@ export function App() {
 
             {activeTab === 'contact' && (
               <div className="animate-in fade-in duration-300">
-                <Contact />
+                <Contact currentUser={currentUser} />
               </div>
             )}
 
@@ -292,6 +365,8 @@ export function App() {
                 <AdminDashboard
                   currentUser={currentUser}
                   onOpenAuth={handleOpenAuth}
+                  productAvailability={productAvailability}
+                  onToggleAvailability={handleToggleAvailability}
                 />
               </div>
             )}
@@ -300,7 +375,15 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <Footer onNavigate={handleTabChange} />
+      <Footer onNavigate={handleTabChange} theme={theme} onToggleTheme={handleToggleTheme} />
+
+      {/* Floating Mini Cart at bottom */}
+      <MiniCart
+        cart={cart}
+        total={cartTotal}
+        activeTab={activeTab}
+        onOpenCart={() => handleTabChange('cart')}
+      />
 
       {/* Modals */}
       <AuthModal
@@ -308,6 +391,17 @@ export function App() {
         onClose={() => setIsAuthOpen(false)}
         defaultTab={authTab}
         onAuthSuccess={handleAuthSuccess}
+      />
+
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onOpenOrders={() => {
+          setIsProfileOpen(false);
+          handleTabChange('cart');
+        }}
       />
 
       <ReceiptModal

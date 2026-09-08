@@ -46,4 +46,57 @@ class ContactController {
                   </script>";
         }
     }
+
+    /**
+     * Fetch all contacts as JSON.
+     */
+    public static function fetchContacts() {
+        header('Content-Type: application/json');
+        $messages = Contact::fetchAll();
+        echo json_encode($messages);
+    }
+
+    /**
+     * Delete contact message (POST JSON).
+     */
+    public static function deleteContact() {
+        header('Content-Type: application/json');
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $id = $data['id'] ?? 0;
+
+        if (!$id) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid message ID.']);
+            return;
+        }
+
+        $result = Contact::delete((int)$id);
+        echo json_encode($result);
+    }
+
+    /**
+     * Mark message as read/unread (POST JSON).
+     */
+    public static function markRead() {
+        header('Content-Type: application/json');
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        if (!empty($data['mark_all'])) {
+            $result = Contact::markAllRead();
+            echo json_encode($result);
+            return;
+        }
+
+        $id = $data['id'] ?? 0;
+        $isRead = isset($data['is_read']) ? (bool)$data['is_read'] : true;
+
+        if (!$id) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid message ID.']);
+            return;
+        }
+
+        $result = Contact::markRead((int)$id, $isRead);
+        echo json_encode($result);
+    }
 }

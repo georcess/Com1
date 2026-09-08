@@ -1,8 +1,10 @@
 import React from 'react';
-import { ShoppingBag, Coffee, User as UserIcon, LogOut, Shield, Clock } from 'lucide-react';
+import { ShoppingBag, Coffee, User as UserIcon, LogOut, Shield, KeyRound } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { User } from '../types';
+
+import { ThemeToggle } from './ThemeToggle';
 
 interface NavbarProps {
   activeTab: string;
@@ -10,7 +12,10 @@ interface NavbarProps {
   cartCount: number;
   currentUser: User | null;
   onOpenAuth: (tab: 'login' | 'register') => void;
+  onOpenProfile: () => void;
   onLogout: () => void;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -19,7 +24,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   cartCount,
   currentUser,
   onOpenAuth,
+  onOpenProfile,
   onLogout,
+  theme = 'light',
+  onToggleTheme,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-brand-brown/20 bg-brand-coffee text-white shadow-md backdrop-blur">
@@ -88,18 +96,29 @@ export const Navbar: React.FC<NavbarProps> = ({
           </Button>
         </nav>
 
-        {/* User Auth Profile / Login Button */}
-        <div className="flex items-center gap-2">
+        {/* User Auth Profile / Login Button & Theme Toggle */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {onToggleTheme && (
+            <ThemeToggle 
+              theme={theme} 
+              onToggle={onToggleTheme} 
+              className="bg-black/20 hover:bg-black/40 border border-white/10"
+            />
+          )}
+
           {currentUser ? (
-            <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1.5 backdrop-blur">
-              <div 
-                className="flex items-center gap-1.5 text-sm font-medium text-amber-50 cursor-pointer hover:text-brand-amber transition-colors"
-                onClick={() => setActiveTab('cart')}
-                title="View your Order & Purchases"
+            <div className="flex items-center gap-2 rounded-xl bg-black/25 px-2.5 py-1 backdrop-blur border border-white/10 shadow-inner">
+              <button 
+                type="button"
+                className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-amber-50 cursor-pointer hover:text-brand-amber transition-colors"
+                onClick={onOpenProfile}
+                title="Manage Profile & Security"
               >
-                <UserIcon className="h-4 w-4 text-brand-amber" />
-                <span className="max-w-[120px] truncate sm:max-w-[160px]">{currentUser.fullname}</span>
-              </div>
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-amber/25 text-brand-amber font-bold text-xs">
+                  <UserIcon className="h-3.5 w-3.5" />
+                </div>
+                <span className="max-w-[100px] truncate sm:max-w-[140px]">{currentUser.fullname}</span>
+              </button>
               {currentUser.role === 'admin' && (
                 <Badge 
                   variant="brand" 
@@ -112,10 +131,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </Badge>
               )}
               <Button
+                variant="ghost"
+                size="sm"
+                onClick={onOpenProfile}
+                className="h-7 w-7 p-0 text-amber-200 hover:text-white hover:bg-white/15 rounded-lg"
+                title="Profile & Password Settings"
+              >
+                <KeyRound className="h-3.5 w-3.5" />
+              </Button>
+              <Button
                 variant="destructive"
                 size="sm"
                 onClick={onLogout}
-                className="h-7 px-2 text-xs"
+                className="h-7 w-7 p-0 rounded-lg text-xs"
                 title="Logout"
               >
                 <LogOut className="h-3.5 w-3.5" />

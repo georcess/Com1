@@ -36,4 +36,79 @@ class Contact {
         $conn->close();
         return $result;
     }
+
+    /**
+     * Fetch all contact messages.
+     *
+     * @return array
+     */
+    public static function fetchAll() {
+        $conn = getConnection();
+        $result = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC");
+        $messages = [];
+
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $messages[] = $row;
+            }
+        }
+
+        $conn->close();
+        return $messages;
+    }
+
+    /**
+     * Delete contact message by ID.
+     *
+     * @param int $id
+     * @return array
+     */
+    public static function delete($id) {
+        $conn = getConnection();
+        $stmt = $conn->prepare("DELETE FROM contact_messages WHERE id = ?");
+        $stmt->bind_param('i', $id);
+        $res = $stmt->execute();
+        $stmt->close();
+        $conn->close();
+
+        return $res 
+            ? ['status' => 'success', 'message' => 'Message deleted.']
+            : ['status' => 'error', 'message' => 'Failed to delete message.'];
+    }
+
+    /**
+     * Mark a contact message as read/unread.
+     *
+     * @param int $id
+     * @param bool $isRead
+     * @return array
+     */
+    public static function markRead($id, $isRead = true) {
+        $conn = getConnection();
+        $intVal = $isRead ? 1 : 0;
+        $stmt = $conn->prepare("UPDATE contact_messages SET is_read = ? WHERE id = ?");
+        $stmt->bind_param('ii', $intVal, $id);
+        $res = $stmt->execute();
+        $stmt->close();
+        $conn->close();
+
+        return $res 
+            ? ['status' => 'success', 'message' => 'Message status updated.', 'is_read' => $isRead]
+            : ['status' => 'error', 'message' => 'Failed to update message status.'];
+    }
+
+    /**
+     * Mark all contact messages as read.
+     *
+     * @return array
+     */
+    public static function markAllRead() {
+        $conn = getConnection();
+        $res = $conn->query("UPDATE contact_messages SET is_read = 1");
+        $conn->close();
+
+        return $res 
+            ? ['status' => 'success', 'message' => 'All messages marked as read.']
+            : ['status' => 'error', 'message' => 'Failed to update messages.'];
+    }
 }

@@ -117,4 +117,42 @@ class AuthController {
             ]);
         }
     }
+
+    /**
+     * Handle change password (POST JSON).
+     */
+    public static function changePassword() {
+        header('Content-Type: application/json');
+
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        if (!$data) {
+            echo json_encode(['status' => 'error', 'message' => 'No data received.']);
+            return;
+        }
+
+        $userId = $data['user_id'] ?? ($_SESSION['user']['id'] ?? null);
+        $currentPassword = $data['current_password'] ?? '';
+        $newPassword = $data['new_password'] ?? '';
+
+        if (!$userId) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'You must be logged in to change your password.']);
+            return;
+        }
+
+        if (empty($currentPassword) || empty($newPassword)) {
+            echo json_encode(['status' => 'error', 'message' => 'Both current and new password are required.']);
+            return;
+        }
+
+        if (strlen($newPassword) < 6) {
+            echo json_encode(['status' => 'error', 'message' => 'New password must be at least 6 characters long.']);
+            return;
+        }
+
+        $result = User::changePassword((int)$userId, $currentPassword, $newPassword);
+        echo json_encode($result);
+    }
 }

@@ -105,6 +105,23 @@ class Order {
     }
 
     /**
+     * Update an order's status (e.g. pending, received, completed, cancelled).
+     *
+     * @param int    $id
+     * @param string $status
+     * @return bool
+     */
+    public static function updateStatus($id, $status) {
+        $conn = getConnection();
+        $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
+        $stmt->bind_param('si', $status, $id);
+        $success = $stmt->execute();
+        $stmt->close();
+        $conn->close();
+        return $success;
+    }
+
+    /**
      * Delete an order by ID.
      *
      * @param int $id

@@ -66,6 +66,29 @@ class OrderController {
     }
 
     /**
+     * Update order status (POST JSON).
+     */
+    public static function updateStatus() {
+        header('Content-Type: application/json');
+
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+        $id     = intval($data['id'] ?? 0);
+        $status = trim($data['status'] ?? 'completed');
+
+        if ($id <= 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid order ID.']);
+            return;
+        }
+
+        $success = Order::updateStatus($id, $status);
+        echo json_encode([
+            'status'  => $success ? 'success' : 'error',
+            'message' => $success ? "Order #$id status updated to $status." : 'Failed to update order status.',
+        ]);
+    }
+
+    /**
      * Delete a single order by ID (POST JSON).
      */
     public static function delete() {
