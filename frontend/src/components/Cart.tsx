@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Trash2, Plus, Receipt, Sparkles, User as UserIcon } from 'lucide-react';
+import { ShoppingBag, Trash2, Plus, Receipt, Sparkles, User as UserIcon, Lock, LogIn, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -16,6 +16,7 @@ interface CartProps {
   onRemoveItem: (index: number) => void;
   onClearCart: () => void;
   onOpenMenu: () => void;
+  onOpenAuth: (tab: 'login' | 'register') => void;
   onGenerateReceipt: () => void;
   isSubmitting: boolean;
 }
@@ -30,6 +31,7 @@ export const Cart: React.FC<CartProps> = ({
   onRemoveItem,
   onClearCart,
   onOpenMenu,
+  onOpenAuth,
   onGenerateReceipt,
   isSubmitting,
 }) => {
@@ -65,22 +67,70 @@ export const Cart: React.FC<CartProps> = ({
         </CardHeader>
 
         <CardContent className="p-6 space-y-6">
-          {/* Customer Name Input */}
+          {/* Auth Status Banner for Unauthenticated Users */}
+          {!currentUser && (
+            <div className="rounded-xl border border-amber-300 bg-amber-50/90 p-4 text-amber-900 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-200 text-amber-900 font-bold">
+                  <Lock className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-sm text-brand-brown">Account Login Required</h4>
+                  <p className="text-xs text-amber-800">
+                    You must be logged in to place an order and generate your official receipt.
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="brand"
+                size="sm"
+                onClick={() => onOpenAuth('login')}
+                className="shrink-0 gap-1.5 font-semibold shadow-sm"
+              >
+                <LogIn className="h-4 w-4" />
+                <span>Log In / Register</span>
+              </Button>
+            </div>
+          )}
+
+          {/* Customer Name / Account Info */}
           <div className="space-y-2 rounded-xl bg-brand-cream/60 p-4 border border-brand-brown/10">
-            <Label htmlFor="cust-name" className="flex items-center gap-1.5 text-brand-brown font-semibold">
-              <UserIcon className="h-4 w-4 text-brand-coffee" />
-              Customer Name:
+            <Label htmlFor="cust-name" className="flex items-center justify-between text-brand-brown font-semibold">
+              <span className="flex items-center gap-1.5">
+                <UserIcon className="h-4 w-4 text-brand-coffee" />
+                Customer Name:
+              </span>
+              {currentUser ? (
+                <span className="text-xs text-green-700 font-medium flex items-center gap-1">
+                  <CheckCircle className="h-3.5 w-3.5" /> Logged In
+                </span>
+              ) : (
+                <span className="text-xs text-amber-700 font-medium flex items-center gap-1">
+                  <Lock className="h-3 w-3" /> Login Required
+                </span>
+              )}
             </Label>
             <Input
               id="cust-name"
-              placeholder="Enter your name"
+              placeholder={currentUser ? "Enter customer name" : "Please log in first"}
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
-              className="bg-white"
+              disabled={!currentUser}
+              className={`bg-white ${!currentUser ? 'opacity-60 cursor-not-allowed' : ''}`}
             />
-            {currentUser && (
+            {currentUser ? (
               <p className="text-[11px] text-muted-foreground italic">
-                Logged in as <strong>{currentUser.fullname}</strong>
+                Logged in as <strong>{currentUser.fullname}</strong> ({currentUser.email})
+              </p>
+            ) : (
+              <p className="text-[11px] text-amber-800">
+                <button 
+                  type="button" 
+                  onClick={() => onOpenAuth('login')}
+                  className="font-semibold underline hover:text-brand-orange"
+                >
+                  Click here to sign in
+                </button> to auto-fill your profile details.
               </p>
             )}
           </div>
@@ -174,16 +224,28 @@ export const Cart: React.FC<CartProps> = ({
               Add More Items
             </Button>
 
-            <Button
-              variant="brand"
-              size="lg"
-              disabled={isSubmitting || cart.length === 0}
-              onClick={onGenerateReceipt}
-              className="gap-2 font-bold px-8 shadow-md"
-            >
-              <Receipt className="h-5 w-5" />
-              {isSubmitting ? 'Saving Order...' : 'Generate Receipt & Submit'}
-            </Button>
+            {currentUser ? (
+              <Button
+                variant="brand"
+                size="lg"
+                disabled={isSubmitting || cart.length === 0}
+                onClick={onGenerateReceipt}
+                className="gap-2 font-bold px-8 shadow-md"
+              >
+                <Receipt className="h-5 w-5" />
+                {isSubmitting ? 'Saving Order...' : 'Generate Receipt & Submit'}
+              </Button>
+            ) : (
+              <Button
+                variant="brand"
+                size="lg"
+                onClick={() => onOpenAuth('login')}
+                className="gap-2 font-bold px-8 shadow-md bg-amber-600 hover:bg-amber-700"
+              >
+                <LogIn className="h-5 w-5" />
+                Log In to Place Order
+              </Button>
+            )}
           </CardFooter>
         )}
       </Card>

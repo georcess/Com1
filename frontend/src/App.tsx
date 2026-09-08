@@ -101,7 +101,15 @@ export function App() {
   // Generate Receipt & Submit Order
   const handleGenerateReceipt = async () => {
     if (cart.length === 0) return;
-    if (!customerName.trim()) {
+
+    // Strict Auth Check: Require user login before submitting order
+    if (!currentUser) {
+      handleOpenAuth('login');
+      return;
+    }
+
+    const nameToUse = (customerName || currentUser.fullname || '').trim();
+    if (!nameToUse) {
       alert('Please enter your name before placing the order.');
       return;
     }
@@ -119,7 +127,8 @@ export function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer_name: customerName,
+          user_id: currentUser.id,
+          customer_name: nameToUse,
           order_details: orderDetails,
           total_price: cartTotal,
         }),
@@ -129,6 +138,9 @@ export function App() {
       if (data.status === 'success') {
         setIsReceiptOpen(true);
       } else {
+        if (data.require_auth || res.status === 401) {
+          handleOpenAuth('login');
+        }
         alert(data.message || 'Failed to submit order.');
       }
     } catch (err) {
@@ -212,6 +224,7 @@ export function App() {
               onRemoveItem={handleRemoveItem}
               onClearCart={handleClearCart}
               onOpenMenu={() => setActiveTab('menu')}
+              onOpenAuth={handleOpenAuth}
               onGenerateReceipt={handleGenerateReceipt}
               isSubmitting={isSubmitting}
             />

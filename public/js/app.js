@@ -531,8 +531,14 @@ function generateReceipt() {
         return;
     }
 
+    if (!currentUser) {
+        alert("Please log in or register before submitting your order.");
+        openAuthModal('login');
+        return;
+    }
+
     const nameInput = document.getElementById('customer-name');
-    const name = nameInput ? nameInput.value.trim() : "";
+    const name = nameInput ? nameInput.value.trim() : (currentUser ? currentUser.fullname : "");
 
     if (!name) {
         alert("Please enter your name before generating receipt.");
@@ -544,6 +550,7 @@ function generateReceipt() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+            user_id: currentUser ? currentUser.id : null,
             customer_name: name,
             order_details: cart.map(item => item.item).join(", "),
             total_price: total

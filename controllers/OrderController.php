@@ -24,7 +24,17 @@ class OrderController {
             return;
         }
 
-        $customerName = $data['customer_name'] ?? '';
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (empty($_SESSION['user']) && empty($data['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['status' => 'error', 'message' => 'Please log in before submitting your order.', 'require_auth' => true]);
+            return;
+        }
+
+        $customerName = $data['customer_name'] ?? ($_SESSION['user']['fullname'] ?? '');
         $orderDetails = $data['order_details'] ?? '';
         $totalPrice   = $data['total_price']   ?? 0;
 

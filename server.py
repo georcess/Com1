@@ -226,20 +226,43 @@ def current_user():
 # ── API: Orders ───────────────────────────────────────────────
 
 @app.route('/api/submit_order.php', methods=['POST'])
+@app.route('/api/submit_order', methods=['POST'])
 def submit_order():
-    """Create a new order."""
+    """Create a new order. Requires authenticated user."""
     data = request.get_json()
     if not data:
         return jsonify({'status': 'error', 'message': 'No data received.'}), 400
 
-    customer_name = data.get('customer_name', '').strip()
+    # Verify user authentication via session or provided user_id
+    session_user = session.get('user')
+    user_id = data.get('user_id')
+
+    conn = get_db()
+
+    authenticated_user = None
+    if session_user and session_user.get('id'):
+        authenticated_user = session_user
+    elif user_id:
+        user_row = conn.execute("SELECT id, fullname, username, role FROM users WHERE id = ?", (user_id,)).fetchone()
+        if user_row:
+            authenticated_user = dict(user_row)
+
+    if not authenticated_user:
+        conn.close()
+        return jsonify({
+            'status': 'error',
+            'message': 'You must be logged in to submit an order.',
+            'require_auth': True
+        }), 401
+
+    customer_name = data.get('customer_name', '').strip() or authenticated_user.get('fullname', '')
     order_details = data.get('order_details', '').strip()
     total_price   = data.get('total_price', 0)
 
     if not customer_name or not order_details:
+        conn.close()
         return jsonify({'status': 'error', 'message': 'Missing required fields.'}), 400
 
-    conn = get_db()
     conn.execute(
         'INSERT INTO orders (customer_name, order_details, total_price) VALUES (?, ?, ?)',
         (customer_name, order_details, total_price)
