@@ -308,15 +308,15 @@ export const Home: React.FC<HomeProps> = ({
               return (
                 <div
                   key={`${item.id}-${idx}`}
-                  className="group relative flex items-center gap-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md p-2.5 pr-4 border border-white/15 hover:border-brand-amber/60 shadow-md hover:shadow-xl transition-all duration-300 shrink-0 cursor-pointer"
+                  className="group relative flex items-center gap-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md p-2.5 pr-4 border border-white/15 hover:border-brand-amber/60 shadow-md hover:shadow-2xl transition-all duration-300 shrink-0 cursor-pointer hover:scale-[1.03] active:scale-[0.98] preserve-3d"
                   onClick={() => handleOpenProductModal(item)}
                 >
                   {/* Thumbnail Image */}
-                  <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl bg-black/40">
+                  <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl bg-black/40 ring-1 ring-white/20 group-hover:ring-brand-amber/50 transition-all">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-115"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/images/IMG_2476.jpeg';
                       }}
@@ -330,7 +330,7 @@ export const Home: React.FC<HomeProps> = ({
                   {/* Info */}
                   <div className="flex flex-col text-left">
                     <div className="flex items-center gap-1.5">
-                      <span className="rounded-full bg-brand-orange/30 border border-brand-orange/50 px-1.5 py-0.2 text-[9px] font-bold text-amber-200">
+                      <span className="rounded-full bg-brand-orange/30 border border-brand-orange/50 px-1.5 py-0.2 text-[9px] font-bold text-amber-200 group-hover:bg-brand-orange/50 transition-colors">
                         {item.badge}
                       </span>
                     </div>

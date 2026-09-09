@@ -207,3 +207,37 @@
   animation-play-state: paused;
 }
 
+/* 3D Card Hover & Drag Animations */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+
+/* Card subtle ambient glow on active drag & hover */
+.card-ambient-glow {
+  transition: box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.15s ease-out;
+}
+
+.card-ambient-glow:hover {
+  box-shadow: 0 20px 35px -10px rgba(111, 78, 55, 0.18), 0 10px 15px -5px rgba(255, 77, 0, 0.08);
+}
+
+.dark .card-ambient-glow:hover {
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7), 0 0 20px 2px rgba(255, 165, 75, 0.12);
+}
+

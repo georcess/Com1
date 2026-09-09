@@ -260,7 +260,9 @@ export const Menu: React.FC<MenuProps> = ({
               return (
                 <Card 
                   key={item.id}
-                  className={`group flex flex-col overflow-hidden border transition-all hover:-translate-y-1.5 hover:shadow-xl rounded-2xl ${
+                  interactiveTilt={true}
+                  maxTilt={9}
+                  className={`group flex flex-col overflow-hidden border transition-all duration-300 hover:shadow-2xl rounded-2xl ${
                     isAvailable 
                       ? 'border-brand-brown/10 bg-white' 
                       : 'border-red-200 bg-red-50/20'
@@ -268,14 +270,14 @@ export const Menu: React.FC<MenuProps> = ({
                 >
                   {/* Item Image with Category Badge & Click-to-Preview */}
                   <div 
-                    className="relative h-48 w-full overflow-hidden bg-brand-cream/80 cursor-pointer"
+                    className="relative h-48 w-full overflow-hidden bg-brand-cream/80 cursor-pointer preserve-3d"
                     onClick={() => handleOpenPreview(item)}
                     title="Click to view details & what it's made of"
                   >
                     <img
                       src={item.image}
                       alt={item.name}
-                      className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+                      className={`h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 ${
                         !isAvailable ? 'grayscale-70 opacity-60' : ''
                       }`}
                       onError={(e) => {
@@ -285,8 +287,8 @@ export const Menu: React.FC<MenuProps> = ({
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                     
                     {/* Hover Overlay with Preview Badge */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 text-brand-brown px-3.5 py-1.5 text-xs font-bold shadow-lg transform group-hover:scale-105 transition-transform">
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center translate-z-20">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 text-brand-brown px-3.5 py-1.5 text-xs font-bold shadow-lg transform group-hover:scale-105 transition-transform duration-300">
                         <Eye className="h-3.5 w-3.5 text-brand-orange" />
                         View Details &amp; Recipe
                       </span>
@@ -294,7 +296,7 @@ export const Menu: React.FC<MenuProps> = ({
 
                     {/* Sold Out Watermark / Badge */}
                     {!isAvailable && (
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none translate-z-30">
                         <div className="rounded-xl bg-red-600/90 text-white px-4 py-1.5 font-display font-black text-sm uppercase tracking-wider shadow-lg border border-white/40 -rotate-6">
                           Sold Out
                         </div>
@@ -303,7 +305,7 @@ export const Menu: React.FC<MenuProps> = ({
 
                     <Badge 
                       variant="brand"
-                      className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm z-10"
+                      className="absolute top-3 right-3 capitalize backdrop-blur bg-brand-amber/95 text-brand-brown font-bold shadow-sm z-10 translate-z-20 transition-transform group-hover:scale-105"
                     >
                       {item.category}
                     </Badge>
@@ -318,7 +320,7 @@ export const Menu: React.FC<MenuProps> = ({
                             onToggleAvailability(item.id, !isAvailable);
                           }
                         }}
-                        className={`absolute top-3 left-3 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold shadow-md transition-all border ${
+                        className={`absolute top-3 left-3 z-20 flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold shadow-md transition-all border translate-z-20 ${
                           isAvailable
                             ? 'bg-green-600 hover:bg-green-700 text-white border-green-400'
                             : 'bg-red-600 hover:bg-red-700 text-white border-red-400'
@@ -330,13 +332,13 @@ export const Menu: React.FC<MenuProps> = ({
                       </button>
                     )}
 
-                    <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow z-10">
+                    <div className="absolute bottom-2 left-3 text-[11px] font-semibold text-white drop-shadow z-10 translate-z-10">
                       Starts at ₱{item.prices[0].price}
                     </div>
                   </div>
 
                   {/* Item Info */}
-                  <CardHeader className="p-4 pb-1">
+                  <CardHeader className="p-4 pb-1 translate-z-10">
                     <div className="flex items-start justify-between gap-1">
                       <div className="flex flex-col">
                         <CardTitle 
@@ -363,7 +365,7 @@ export const Menu: React.FC<MenuProps> = ({
                     </div>
                   </CardHeader>
 
-                  <CardContent className="flex-1 p-4 pt-1">
+                  <CardContent className="flex-1 p-4 pt-1 translate-z-10">
                     <p 
                       className="text-xs text-muted-foreground line-clamp-2 cursor-pointer hover:text-brand-brown transition-colors"
                       onClick={() => handleOpenPreview(item)}
@@ -373,7 +375,7 @@ export const Menu: React.FC<MenuProps> = ({
                   </CardContent>
 
                   {/* Size Buttons / Actions */}
-                  <CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+                  <CardFooter className="p-4 pt-0 flex flex-wrap gap-2 translate-z-20">
                     {isAvailable ? (
                       item.prices.map(p => (
                         <Button
