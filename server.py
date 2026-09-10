@@ -24,11 +24,28 @@ app.secret_key = os.environ.get('SECRET_KEY', 'mr_boy_specialtea_secret_key_2026
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH  = os.path.join(BASE_DIR, 'database', 'mr_boy.db')
 
+TURSO_DATABASE_URL = os.environ.get('TURSO_DATABASE_URL')
+TURSO_AUTH_TOKEN   = os.environ.get('TURSO_AUTH_TOKEN')
+
 
 # ── Database Helpers ───────────────────────────────────────────
 
 def get_db():
-    """Get a database connection with row factory."""
+    """Get a database connection (Turso Cloud Database if env set, otherwise local SQLite)."""
+    if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
+        try:
+            import libsql_experimental as libsql
+            url = TURSO_DATABASE_URL
+            if url.startswith("libsql://"):
+                url = url.replace("libsql://", "https://")
+            conn = libsql.connect(database=url, auth_token=TURSO_AUTH_TOKEN)
+            conn.row_factory = sqlite3.Row
+            return conn
+        except ImportError:
+            print("[WARN] libsql-experimental is not installed. Using local SQLite.")
+        except Exception as e:
+            print(f"[WARN] Failed connecting to Turso ({e}). Using local SQLite.")
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
@@ -36,7 +53,9 @@ def get_db():
 
 def init_db():
     """Create tables if they don't exist and seed default admin."""
-    os.makedirs(os.path.join(BASE_DIR, 'database'), exist_ok=True)
+    if not (TURSO_DATABASE_URL and TURSO_AUTH_TOKEN):
+        os.makedirs(os.path.join(BASE_DIR, 'database'), exist_ok=True)
+
     conn = get_db()
     conn.executescript('''
         CREATE TABLE IF NOT EXISTS users (
@@ -107,7 +126,11 @@ def init_db():
 
     conn.commit()
     conn.close()
-    print(f"[OK] Database ready at: {DB_PATH}")
+
+    if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
+        print(f"[OK] Connected to Turso Cloud Database: {TURSO_DATABASE_URL}")
+    else:
+        print(f"[OK] Database ready at local SQLite: {DB_PATH}")
 
 
 # ── Static File Serving ───────────────────────────────────────
@@ -724,8 +747,12 @@ def sales_analytics():
 
 # ── Main ──────────────────────────────────────────────────────
 
-if __name__ == '__main__':
+try:
     init_db()
+except Exception as e:
+    print(f"[WARN] Database initialization notice: {e}")
+
+if __name__ == '__main__':
     print()
     print("== Mr. Boy SpecialTea Server ==")
     print("   http://localhost:5000")

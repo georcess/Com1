@@ -7,7 +7,7 @@ A full-stack ordering and store management web application built for Mr. Boy Spe
 ## Overview
 
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Radix UI primitives, Lucide icons.
-- **Backend (Python)**: Flask with SQLite (`server.py`), session-based authentication, REST API.
+- **Backend (Python)**: Flask with SQLite or Turso Cloud Database (`server.py`), session-based authentication, REST API.
 - **Backend (PHP / Optional)**: PHP MVC with MySQL support for XAMPP / Apache environments.
 
 ---
