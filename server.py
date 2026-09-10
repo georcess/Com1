@@ -20,6 +20,25 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, static_folder=None)
 app.secret_key = os.environ.get('SECRET_KEY', 'mr_boy_specialtea_secret_key_2026_dev')
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Cookie, X-Requested-With'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
+
+@app.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = app.make_default_options_response()
+        response.headers['Access-Control-Allow-Origin'] = request.headers.get('Origin', '*')
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Cookie, X-Requested-With'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        return response
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH  = os.path.join(BASE_DIR, 'database', 'mr_boy.db')
@@ -335,10 +354,26 @@ def serve_images(filename):
     return ('Image not found', 404)
 
 
+# ── Health Check ──────────────────────────────────────────────
+
+@app.route('/api/health', methods=['GET'])
+@app.route('/health', methods=['GET'])
+def health():
+    db_type = 'turso' if (TURSO_DATABASE_URL and TURSO_AUTH_TOKEN) else 'sqlite'
+    return jsonify({
+        'status': 'ok',
+        'database': db_type,
+        'cloud_connected': bool(TURSO_DATABASE_URL and TURSO_AUTH_TOKEN),
+        'timestamp': datetime.utcnow().isoformat()
+    })
+
+
 # ── API: Auth (Register / Login / Logout / Current User) ───────
 
 @app.route('/api/register.php', methods=['POST'])
 @app.route('/api/register', methods=['POST'])
+@app.route('/register.php', methods=['POST'])
+@app.route('/register', methods=['POST'])
 def register():
     """Register a new customer account."""
     data = request.get_json()
@@ -396,6 +431,8 @@ def register():
 
 @app.route('/api/login.php', methods=['POST'])
 @app.route('/api/login', methods=['POST'])
+@app.route('/login.php', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     """Login with username or email."""
     data = request.get_json()
@@ -436,6 +473,8 @@ def login():
 
 @app.route('/api/logout.php', methods=['POST', 'GET'])
 @app.route('/api/logout', methods=['POST', 'GET'])
+@app.route('/logout.php', methods=['POST', 'GET'])
+@app.route('/logout', methods=['POST', 'GET'])
 def logout():
     """Log out current user."""
     session.pop('user', None)
@@ -444,6 +483,8 @@ def logout():
 
 @app.route('/api/current_user.php', methods=['GET'])
 @app.route('/api/current_user', methods=['GET'])
+@app.route('/current_user.php', methods=['GET'])
+@app.route('/current_user', methods=['GET'])
 def current_user():
     """Get current session user."""
     user = session.get('user')
@@ -454,6 +495,8 @@ def current_user():
 
 @app.route('/api/change_password.php', methods=['POST'])
 @app.route('/api/change_password', methods=['POST'])
+@app.route('/change_password.php', methods=['POST'])
+@app.route('/change_password', methods=['POST'])
 def change_password():
     """Change user password after verifying current password."""
     data = request.get_json()
@@ -504,6 +547,8 @@ def change_password():
 
 @app.route('/api/submit_order.php', methods=['POST'])
 @app.route('/api/submit_order', methods=['POST'])
+@app.route('/submit_order.php', methods=['POST'])
+@app.route('/submit_order', methods=['POST'])
 def submit_order():
     """Create a new order bound strictly to authenticated user credentials."""
     data = request.get_json()
@@ -564,6 +609,8 @@ def submit_order():
 
 @app.route('/api/fetch_orders.php', methods=['GET'])
 @app.route('/api/fetch_orders', methods=['GET'])
+@app.route('/fetch_orders.php', methods=['GET'])
+@app.route('/fetch_orders', methods=['GET'])
 def fetch_orders():
     """Fetch orders. If user_id provided, filter by user; otherwise return all."""
     user_id_param = request.args.get('user_id')
@@ -598,6 +645,8 @@ def fetch_orders():
 
 @app.route('/api/update_order_status.php', methods=['POST'])
 @app.route('/api/update_order_status', methods=['POST'])
+@app.route('/update_order_status.php', methods=['POST'])
+@app.route('/update_order_status', methods=['POST'])
 def update_order_status():
     """Update order status (pending / completed)."""
     data = request.get_json() or {}
@@ -617,6 +666,8 @@ def update_order_status():
 
 @app.route('/api/delete_order.php', methods=['POST'])
 @app.route('/api/delete_order', methods=['POST'])
+@app.route('/delete_order.php', methods=['POST'])
+@app.route('/delete_order', methods=['POST'])
 def delete_order():
     """Delete a single order by ID."""
     data = request.get_json()
@@ -635,6 +686,8 @@ def delete_order():
 
 @app.route('/api/clear_orders.php', methods=['POST'])
 @app.route('/api/clear_orders', methods=['POST'])
+@app.route('/clear_orders.php', methods=['POST'])
+@app.route('/clear_orders', methods=['POST'])
 def clear_orders():
     """Delete all orders."""
     conn = get_db()
@@ -649,6 +702,8 @@ def clear_orders():
 
 @app.route('/api/save_contact.php', methods=['POST'])
 @app.route('/api/save_contact', methods=['POST'])
+@app.route('/save_contact.php', methods=['POST'])
+@app.route('/save_contact', methods=['POST'])
 def save_contact():
     """Save a contact form message (supports both JSON and form data)."""
     is_json = request.is_json or request.content_type == 'application/json'
@@ -683,10 +738,13 @@ def save_contact():
     if is_json:
         return jsonify({'status': 'success', 'message': 'Thank you! Your message has been sent.'})
 
+
 # ── API: Product Availability ─────────────────────────────────
 
 @app.route('/api/product_availability.php', methods=['GET'])
 @app.route('/api/product_availability', methods=['GET'])
+@app.route('/product_availability.php', methods=['GET'])
+@app.route('/product_availability', methods=['GET'])
 def get_product_availability():
     """Fetch availability status of all products."""
     conn = get_db()
@@ -702,6 +760,8 @@ def get_product_availability():
 
 @app.route('/api/toggle_product_availability.php', methods=['POST'])
 @app.route('/api/toggle_product_availability', methods=['POST'])
+@app.route('/toggle_product_availability.php', methods=['POST'])
+@app.route('/toggle_product_availability', methods=['POST'])
 def toggle_product_availability():
     """Toggle or set product availability status (1 = Available, 0 = Sold Out)."""
     data = request.get_json() or {}
@@ -735,6 +795,8 @@ def toggle_product_availability():
 
 @app.route('/api/fetch_contacts.php', methods=['GET'])
 @app.route('/api/fetch_contacts', methods=['GET'])
+@app.route('/fetch_contacts.php', methods=['GET'])
+@app.route('/fetch_contacts', methods=['GET'])
 def fetch_contacts():
     """Fetch all submitted customer contact inquiries."""
     conn = get_db()
@@ -758,6 +820,8 @@ def fetch_contacts():
 
 @app.route('/api/mark_contact_read.php', methods=['POST'])
 @app.route('/api/mark_contact_read', methods=['POST'])
+@app.route('/mark_contact_read.php', methods=['POST'])
+@app.route('/mark_contact_read', methods=['POST'])
 def mark_contact_read():
     """Mark a contact message (or all) as read/unread."""
     data = request.get_json() or {}
@@ -792,6 +856,8 @@ def mark_contact_read():
 
 @app.route('/api/delete_contact.php', methods=['POST'])
 @app.route('/api/delete_contact', methods=['POST'])
+@app.route('/delete_contact.php', methods=['POST'])
+@app.route('/delete_contact', methods=['POST'])
 def delete_contact():
     """Delete a contact message by ID."""
     data = request.get_json() or {}
@@ -812,6 +878,8 @@ def delete_contact():
 
 @app.route('/api/sales_analytics.php', methods=['GET'])
 @app.route('/api/sales_analytics', methods=['GET'])
+@app.route('/sales_analytics.php', methods=['GET'])
+@app.route('/sales_analytics', methods=['GET'])
 def sales_analytics():
     """Comprehensive sales analytics for admin dashboard."""
     conn = get_db()
