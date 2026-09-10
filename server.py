@@ -24,27 +24,192 @@ app.secret_key = os.environ.get('SECRET_KEY', 'mr_boy_specialtea_secret_key_2026
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH  = os.path.join(BASE_DIR, 'database', 'mr_boy.db')
 
-TURSO_DATABASE_URL = os.environ.get('TURSO_DATABASE_URL')
-TURSO_AUTH_TOKEN   = os.environ.get('TURSO_AUTH_TOKEN')
+# Auto-load .env configuration if present
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.exists(env_file):
+    try:
+        with open(env_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    k = k.strip()
+                    v = v.strip().strip('"').strip("'")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
+    except Exception as e:
+        print(f"[WARN] Error reading .env: {e}")
+
+TURSO_DATABASE_URL = os.environ.get('TURSO_DATABASE_URL', '').strip()
+TURSO_AUTH_TOKEN   = os.environ.get('TURSO_AUTH_TOKEN', '').strip()
 
 
-# ── Database Helpers ───────────────────────────────────────────
+# ── Turso & SQLite Database Adapters ──────────────────────────
+
+import requests
+
+class TursoRow(dict):
+    """Row object that supports key access, integer index access, and dict conversion."""
+    def __init__(self, cols, values):
+        super().__init__()
+        self._cols = cols
+        self._values = values
+        for col, val in zip(cols, values):
+            self[col] = val
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self._values[key]
+        return super().__getitem__(key)
+
+    def keys(self):
+        return self._cols
+
+    def values(self):
+        return self._values
+
+
+class TursoCursor:
+    def __init__(self, cols=None, rows=None, lastrowid=None, rowcount=0):
+        self._cols = cols or []
+        self._rows = [TursoRow(self._cols, r) for r in (rows or [])]
+        self._index = 0
+        self.lastrowid = lastrowid
+        self.rowcount = rowcount
+
+    def fetchone(self):
+        if self._index < len(self._rows):
+            row = self._rows[self._index]
+            self._index += 1
+            return row
+        return None
+
+    def fetchall(self):
+        res = self._rows[self._index:]
+        self._index = len(self._rows)
+        return res
+
+    def __iter__(self):
+        return iter(self.fetchall())
+
+
+class TursoConnection:
+    """Zero-dependency pure-HTTP Turso Cloud Database connection."""
+    def __init__(self, url, token):
+        self.url = url.replace('libsql://', 'https://').rstrip('/') + '/v2/pipeline'
+        self.token = token
+        self._closed = False
+
+    def _convert_arg(self, arg):
+        if arg is None:
+            return {"type": "null"}
+        elif isinstance(arg, bool):
+            return {"type": "integer", "value": "1" if arg else "0"}
+        elif isinstance(arg, int):
+            return {"type": "integer", "value": str(arg)}
+        elif isinstance(arg, float):
+            return {"type": "float", "value": arg}
+        elif isinstance(arg, (bytes, bytearray)):
+            import base64
+            return {"type": "blob", "base64": base64.b64encode(arg).decode('utf-8')}
+        else:
+            return {"type": "text", "value": str(arg)}
+
+    def _convert_val(self, val_obj):
+        if not isinstance(val_obj, dict):
+            return val_obj
+        t = val_obj.get("type")
+        v = val_obj.get("value")
+        if t == "null":
+            return None
+        elif t == "integer":
+            return int(v) if v is not None else None
+        elif t == "float":
+            return float(v) if v is not None else None
+        elif t == "blob":
+            import base64
+            b64 = val_obj.get("base64", "")
+            return base64.b64decode(b64)
+        else:
+            return v
+
+    def execute(self, sql, params=()):
+        if self._closed:
+            raise RuntimeError("Cannot operate on closed Turso connection")
+        
+        args_payload = [self._convert_arg(p) for p in params]
+        payload = {
+            "requests": [
+                {
+                    "type": "execute",
+                    "stmt": {
+                        "sql": sql,
+                        "args": args_payload
+                    }
+                },
+                {"type": "close"}
+            ]
+        }
+        
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json"
+        }
+        
+        resp = requests.post(self.url, headers=headers, json=payload, timeout=12)
+        if resp.status_code != 200:
+            raise RuntimeError(f"Turso HTTP {resp.status_code}: {resp.text}")
+        
+        data = resp.json()
+        results = data.get("results", [])
+        if not results:
+            return TursoCursor()
+            
+        first = results[0]
+        if first.get("type") == "error":
+            raise RuntimeError(f"Turso SQL Error: {first.get('error')}")
+            
+        response_data = first.get("response", {})
+        result_data = response_data.get("result", {})
+        
+        cols = [c.get("name") for c in result_data.get("cols", [])]
+        raw_rows = result_data.get("rows", [])
+        
+        parsed_rows = []
+        for row in raw_rows:
+            parsed_rows.append([self._convert_val(col_val) for col_val in row])
+            
+        last_insert_id = result_data.get("last_insert_rowid")
+        if last_insert_id is not None:
+            try:
+                last_insert_id = int(last_insert_id)
+            except (ValueError, TypeError):
+                pass
+                
+        affected = result_data.get("affected_row_count", 0)
+        return TursoCursor(cols=cols, rows=parsed_rows, lastrowid=last_insert_id, rowcount=affected)
+
+    def executescript(self, script):
+        statements = [s.strip() for s in script.split(';') if s.strip()]
+        last_cur = None
+        for stmt in statements:
+            last_cur = self.execute(stmt)
+        return last_cur
+
+    def commit(self):
+        pass
+
+    def close(self):
+        self._closed = True
+
 
 def get_db():
     """Get a database connection (Turso Cloud Database if env set, otherwise local SQLite)."""
     if TURSO_DATABASE_URL and TURSO_AUTH_TOKEN:
         try:
-            import libsql_experimental as libsql
-            url = TURSO_DATABASE_URL
-            if url.startswith("libsql://"):
-                url = url.replace("libsql://", "https://")
-            conn = libsql.connect(database=url, auth_token=TURSO_AUTH_TOKEN)
-            conn.row_factory = sqlite3.Row
-            return conn
-        except ImportError:
-            print("[WARN] libsql-experimental is not installed. Using local SQLite.")
+            return TursoConnection(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
         except Exception as e:
-            print(f"[WARN] Failed connecting to Turso ({e}). Using local SQLite.")
+            print(f"[WARN] Failed connecting to Turso ({e}). Falling back to local SQLite.")
 
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
